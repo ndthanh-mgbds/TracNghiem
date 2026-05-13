@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thần Số Học Khai Vấn - ThS. Nguyễn Đức Thành</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #b45309;
+            --gold: #d97706;
+            --light-gold: #fffbeb;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --green: #15803d;
+            --red: #b91c1c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-top: 8px solid var(--gold);
+        }
+        .author-header, .author-footer {
+            text-align: center;
+            padding: 15px;
+            background: var(--light-gold);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #fde68a;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+        }
+        .header-title {
+            text-align: center;
+            color: var(--primary);
+            font-size: 2.2em;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1.1em;
+        }
+        .btn-calc {
+            grid-column: 1 / -1;
+            padding: 16px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-calc:hover { background: var(--accent); transform: translateY(-2px); }
+
+        /* Results Styles */
+        #results-area { display: none; }
+        .core-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .number-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .number-card:hover { transform: translateY(-5px); border-color: var(--gold); }
+        .nc-val { font-size: 2.8em; font-weight: 900; color: var(--gold); line-height: 1; }
+        .nc-label { font-size: 0.8em; color: #64748b; font-weight: bold; margin-top: 10px; text-transform: uppercase;}
+
+        .section-box {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.01);
+        }
+        .section-box h3 {
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        .cycle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .year-item {
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .year-item.active {
+            background: var(--light-gold);
+            border-color: var(--gold);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            color: var(--accent);
+        }
+        .highlight { color: var(--accent); font-weight: bold; }
+        
+        /* Grid 3x3 */
+        .chart-box { display: flex; flex-direction: column; gap: 30px; }
+        .grid-container-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
+        .birth-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 6px;
+            background: var(--primary);
+            padding: 6px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .grid-cell {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            border-radius: 5px;
+            color: var(--primary);
+        }
+        .grid-cell.empty { color: #e2e8f0; font-weight: normal; }
+        
+        /* Arrows Lists */
+        .arrows-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .arrows-container { grid-template-columns: 1fr; }
+        }
+        .arrow-list-box {
+            padding: 20px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        .arrow-list-box h4 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        .arrow-list-box.pos h4 { color: var(--green); }
+        .arrow-list-box.neg h4 { color: var(--red); }
+        
+        .arrow-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 0.95em;
+        }
+        .arrow-item.pos { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+        .arrow-item.neg { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .empty-state { color: #64748b; font-style: italic; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="author-header">
+        BIÊN SOẠN & THIẾT KẾ: ThS. NGUYỄN ĐỨC THÀNH | MB: 0908 639 595
+    </div>
+
+    <h1 class="header-title">Hệ Thống Thần Số Học Khai Vấn</h1>
+    <p style="text-align: center; font-style: italic; color: #64748b; margin-bottom: 30px;">
+        Phân tích chuyên sâu biểu đồ ngày sinh, vận số 9 năm và định hướng nghề nghiệp theo hệ thống Pythagoras.
+    </p>
+
+    <div class="input-grid">
+        <div class="form-group">
+            <label>Họ và Tên (Đầy đủ):</label>
+            <input type="text" id="userName" placeholder="VD: Nguyễn Văn A">
+        </div>
+        <div class="form-group">
+            <label>Ngày sinh Dương lịch:</label>
+            <input type="date" id="dob">
+        </div>
+        <div class="form-group">
+            <label>Năm muốn xem vận hạn:</label>
+            <input type="number" id="targetYear" value="2026">
+        </div>
+        <button class="btn-calc" onclick="processNumerology()">Phân Tích Bản Đồ Cá Nhân</button>
+    </div>
+
+    <div id="results-area">
+        <div class="core-grid">
+            <div class="number-card"><div class="nc-val" id="lp-v">-</div><div class="nc-label">ĐƯỜNG ĐỜI</div></div>
+            <div class="number-card"><div class="nc-val" id="ds-v">-</div><div class="nc-label">SỨ MỆNH</div></div>
+            <div class="number-card"><div class="nc-val" id="sl-v">-</div><div class="nc-label">LINH HỒN</div></div>
+            <div class="number-card"><div class="nc-val" id="nc-v">-</div><div class="nc-label">NHÂN CÁCH</div></div>
+            <div class="number-card"><div class="nc-val" id="py-v">-</div><div class="nc-label">NĂM CÁ NHÂN</div></div>
+        </div>
+
+        <div class="section-box">
+            <h3>🌟 Bức Tranh Tính Cách Tổng Hợp</h3>
+            <p id="synthetic-analysis"></p>
+        </div>
+
+        <div class="section-box">
+            <h3>📈 Chu Kỳ Vận Số 9 Năm (Năm Đang Xét: <span id="current-y"></span>)</h3>
+            <p id="year-description"></p>
+            <div class="cycle-grid" id="cycle-display"></div>
+        </div>
+
+        <div class="section-box">
+            <h3>💼 Lời Khuyên Hoạt Động & Định Hướng Nghề Nghiệp</h3>
+            <p id="career-advice"></p>
+        </div>
+
+        <div class="section-box">
+            <h3>📐 Phân Tích Biểu Đồ Ngày Sinh (Birth Chart)</h3>
+            <p style="color: #64748b; margin-bottom: 25px;">Sự xuất hiện hoặc vắng mặt của các con số trên 8 trục tạo thành các "Mũi tên chỉ cá tính" (Tích cực) hoặc "Mũi tên trống" (Tiêu cực), phản ánh những sức mạnh và điểm yếu tiềm ẩn bên trong bạn.</p>
+            
+            <div class="chart-box">
+                <div class="grid-container-wrapper">
+                    <div class="birth-grid" id="birth-grid"></div>
+                </div>
+                
+                <div class="arrows-container">
+                    <div class="arrow-list-box pos">
+                        <h4>✅ Mũi Tên Tích Cực (Có đủ 3 số)</h4>
+                        <div id="pos-arrows-list"></div>
+                    </div>
+                    <div class="arrow-list-box neg">
+                        <h4>❌ Mũi Tên Tiêu Cực (Trống cả 3 số)</h4>
+                        <div id="neg-arrows-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="author-footer">
+        © 2026 ThS. Nguyễn Đức Thành | Liên hệ: 0908 639 595
+    </div>
+</div>
+
+<script>
+    // Dữ liệu nội dung
+    const numberMeanings = {
+        1: { title: "Người Tiên Phong", traits: "Độc lập, sáng tạo, lãnh đạo.", year: "Năm của những khởi đầu mới, gieo hạt giống và hành động độc lập.", career: "Khởi nghiệp, quản lý, lãnh đạo dự án, hoạt động độc lập." },
+        2: { title: "Người Hòa Giải", traits: "Hợp tác, trực giác, nhạy cảm.", year: "Năm của sự kiên nhẫn, xây dựng mối quan hệ và lắng nghe trực giác.", career: "Tư vấn, ngoại giao, nhân sự, nghệ thuật, chăm sóc khách hàng." },
+        3: { title: "Người Truyền Cảm Hứng", traits: "Sáng tạo, giao tiếp, vui vẻ.", year: "Năm bùng nổ năng lượng sáng tạo, mở rộng các kết nối xã hội.", career: "Marketing, truyền thông, bán hàng, diễn thuyết, giải trí." },
+        4: { title: "Người Kiến Tạo", traits: "Kỷ luật, thực tế, hệ thống.", year: "Năm của công việc vất vả, củng cố nền tảng và quản trị rủi ro.", career: "Quản lý tòa nhà, kiểm soát nội bộ, kỹ sư, kế toán, bất động sản." },
+        5: { title: "Người Tự Do", traits: "Đột phá, linh hoạt, trải nghiệm.", year: "Năm của sự thay đổi, tự do và những bước ngoặt bất ngờ.", career: "Môi giới BĐS, du lịch, bán hàng, cải cách hệ thống." },
+        6: { title: "Người Nuôi Dưỡng", traits: "Trách nhiệm, yêu thương, gia đình.", year: "Năm của trách nhiệm gia đình, phụng sự và điều chỉnh các mối quan hệ thân thiết.", career: "Giáo dục, y tế, quản trị dịch vụ, tư vấn tâm lý." },
+        7: { title: "Người Tìm Kiếm Chân Lý", traits: "Chiêm nghiệm, tri thức, nội tâm.", year: "Năm để dừng lại, học tập, nghiên cứu và phát triển tâm linh.", career: "Nghiên cứu, chiến lược, chuyên gia thẩm định, giảng dạy chuyên sâu." },
+        8: { title: "Người Điều Hành", traits: "Quyền lực, thành công vật chất.", year: "Năm của gặt hái thành quả, quyền lực và sự độc lập tài chính.", career: "Đầu tư, kinh doanh BĐS, giám đốc sàn, tài chính ngân hàng." },
+        9: { title: "Người Nhân Đạo", traits: "Lý tưởng, bao dung, hoàn thiện.", year: "Năm của sự buông bỏ, tha thứ và kết thúc một chu kỳ để chuẩn bị cho cái mới.", career: "Công tác xã hội, cộng đồng, trị liệu, đào tạo truyền cảm hứng." },
+        11: { title: "Nhà Tâm Linh", traits: "Trực giác siêu phàm, khai sáng.", career: "Khai vấn (Coaching), lãnh đạo tinh thần, chuyên gia tư vấn cao cấp." },
+        22: { title: "Kiến Trúc Sư Đại Tài", traits: "Biến ước mơ thành hiện thực.", career: "Nhà phát triển dự án quy mô lớn, xây dựng đế chế kinh doanh." },
+        33: { title: "Bậc Thầy Chữa Lành", traits: "Chữa lành, yêu thương vô điều kiện.", career: "Bác sĩ, nhà trị liệu cấp cao, nhà giáo dục truyền cảm hứng." }
+    };
+
+    // Dữ liệu 8 trục mũi tên
+    const axes = [
+        { nums: [1,2,3], name: "1-2-3", pos: "<b>Mũi tên Kế hoạch:</b> Khả năng tổ chức, sắp xếp công việc và tư duy logic rất tốt.", neg: "<b>Mũi tên Thiếu Kế hoạch:</b> Đôi khi làm việc lộn xộn, thiếu sự sắp xếp bài bản." },
+        { nums: [4,5,6], name: "4-5-6", pos: "<b>Mũi tên Ý chí:</b> Kiên cường, sức chịu đựng cao, dễ vượt qua mọi khó khăn.", neg: "<b>Mũi tên Uất hận:</b> Dễ nản lòng, hay kỳ vọng quá mức rồi sinh ra thất vọng, uất ức." },
+        { nums: [7,8,9], name: "7-8-9", pos: "<b>Mũi tên Hành động:</b> Rất năng động, thích đi lại và học hỏi qua trải nghiệm thực tế.", neg: "<b>Mũi tên Thụ động:</b> Dễ chần chừ, do dự, thiếu sự chủ động trong các hoạt động." },
+        { nums: [1,4,7], name: "1-4-7", pos: "<b>Mũi tên Thực tế:</b> Khéo léo, chú trọng vật chất, làm việc bằng thực chứng.", neg: "<b>Mũi tên Hỗn độn:</b> Thiếu tính thực tế, hay mơ mộng, đôi khi thiếu ngăn nắp." },
+        { nums: [2,5,8], name: "2-5-8", pos: "<b>Mũi tên Cảm xúc:</b> Cân bằng cảm xúc tốt, nhạy cảm sâu sắc và có khả năng đồng cảm.", neg: "<b>Mũi tên Nhạy cảm:</b> Dễ tổn thương bởi lời nói của người khác, hay che giấu cảm xúc thật." },
+        { nums: [3,6,9], name: "3-6-9", pos: "<b>Mũi tên Trí tuệ:</b> Thông minh, học hỏi nhanh, sáng dạ và tư duy sắc bén.", neg: "<b>Mũi tên Trí nhớ ngắn hạn:</b> Dễ quên, cần nỗ lực nhiều hơn trong học tập hoặc chú ý ghi chép." },
+        { nums: [1,5,9], name: "1-5-9", pos: "<b>Mũi tên Quyết tâm:</b> Vô cùng kiên trì, theo đuổi mục tiêu đến cùng, không dễ bỏ cuộc.", neg: "<b>Mũi tên Trì hoãn:</b> Hay bỏ dở mục tiêu giữa chừng, thiếu động lực dài hạn." },
+        { nums: [3,5,7], name: "3-5-7", pos: "<b>Mũi tên Tâm linh:</b> Nhạy bén tâm linh, dễ giác ngộ chân lý và hiểu biết sâu sắc triết lý.", neg: "<b>Mũi tên Hoài nghi:</b> Hay nghi ngờ, chỉ tin vào những gì mắt thấy tai nghe, thiếu niềm tin." }
+    ];
+
+    // Functions core
+    function reduceNum(n, master = true) {
+        if (master && [11, 22, 33].includes(n)) return n;
+        while (n > 9) {
+            n = n.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+            if (master && [11, 22, 33].includes(n)) return n;
+        }
+        return n;
+    }
+
+    function nameToNum(name) {
+        const map = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+        const clean = name.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z]/g, "");
+        let total = 0, vowels = 0, consonants = 0;
+        const vList = ['A','E','I','O','U','Y'];
+        
+        for(let char of clean) {
+            let val = map[char];
+            total += val;
+            if(vList.includes(char)) vowels += val; else consonants += val;
+        }
+        return { destiny: reduceNum(total), soul: reduceNum(vowels), personality: reduceNum(consonants) };
+    }
+
+    // Main execution
+    function processNumerology() {
+        const name = document.getElementById('userName').value.trim();
+        const dobStr = document.getElementById('dob').value;
+        const targetY = parseInt(document.getElementById('targetYear').value);
+        
+        if(!name || !dobStr) return alert("Vui lòng nhập đầy đủ Họ Tên và Ngày sinh Dương lịch!");
+
+        const dobArr = dobStr.split('-');
+        const day = parseInt(dobArr[2]), month = parseInt(dobArr[1]), year = parseInt(dobArr[0]);
+        
+        // Cals
+        const lp = reduceNum(day + month + reduceNum(year, false));
+        const { destiny, soul, personality } = nameToNum(name);
+        const py = reduceNum(reduceNum(day + month, false) + reduceNum(targetY, false), false);
+
+        // Display Core Numbers
+        document.getElementById('lp-v').innerText = lp;
+        document.getElementById('ds-v').innerText = destiny;
+        document.getElementById('sl-v').innerText = soul;
+        document.getElementById('nc-v').innerText = personality;
+        document.getElementById('py-v').innerText = py;
+        document.getElementById('current-y').innerText = targetY;
+
+        // Synthetic Analysis
+        const lpInfo = numberMeanings[lp];
+        const dsInfo = numberMeanings[destiny];
+        const slInfo = numberMeanings[soul];
+        
+        document.getElementById('synthetic-analysis').innerHTML = `
+            Bạn mang trong mình năng lượng cốt lõi của <span class="highlight">Số Đường Đời ${lp} - ${lpInfo.title}</span>. Đây là kịch bản chính của cuộc đời, định hình xu hướng phát triển tự nhiên của bạn với đặc trưng: ${lpInfo.traits.toLowerCase()}<br><br>
+            Kết hợp với <span class="highlight">Số Sứ Mệnh ${destiny}</span>, vũ trụ trang bị cho bạn "công cụ" và năng lực bẩm sinh là khả năng ${dsInfo.traits.toLowerCase()} để hoàn thành con đường đó.<br><br>
+            Bên dưới bề ngoài xã hội, <span class="highlight">Tiếng nói nội tâm (Linh hồn ${soul})</span> khao khát sâu sắc sự ${slInfo.traits.toLowerCase()}. Việc thỏa mãn động lực này là chìa khóa để bạn tìm thấy bình an và hạnh phúc đích thực.
+        `;
+
+        // 9-Year Cycle
+        let cycleHtml = '';
+        for(let i=1; i<=9; i++) {
+            cycleHtml += `<div class="year-item ${i === py ? 'active' : ''}">Năm ${i}</div>`;
+        }
+        document.getElementById('cycle-display').innerHTML = cycleHtml;
+        document.getElementById('year-description').innerHTML = `Năm ${targetY} là <span class="highlight">Năm cá nhân số ${py}</span> đối với bạn. <br><b>Dự báo & Hành động:</b> ${numberMeanings[py].year}`;
+
+        // Career Advice
+        document.getElementById('career-advice').innerHTML = `
+            Với cấu trúc tâm lý này, bạn sẽ phát huy tối đa năng lực ở các vai trò: <br>
+            - <b>Lĩnh vực ưu tiên:</b> ${lpInfo.career} <br>
+            - <b>Thế mạnh bổ trợ:</b> ${dsInfo.career} <br>
+            - <b>Khuyến nghị hoạt động:</b> Thiết kế công việc sao cho vừa thỏa mãn được kỹ năng ${dsInfo.traits.split(',')[0]} (Sứ mệnh), vừa đáp ứng được khao khát ${slInfo.traits.split(',')[0]} (Linh hồn).
+        `;
+
+        // Birth Grid Generation
+        const gridPos = [3, 6, 9, 2, 5, 8, 1, 4, 7];
+        const counts = {1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0};
+        (dobStr.replace(/-/g, '')).split('').forEach(d => { if(counts[d] !== undefined) counts[d]++; });
+        
+        let gridHtml = '';
+        gridPos.forEach(p => {
+            gridHtml += `<div class="grid-cell ${!counts[p]?'empty':''}">${counts[p]?p.toString().repeat(counts[p]):'-'}</div>`;
+        });
+        document.getElementById('birth-grid').innerHTML = gridHtml;
+        
+        // Comprehensive Arrow Analysis
+        let posArrows = [];
+        let negArrows = [];
+
+        axes.forEach(axis => {
+            let [a, b, c] = axis.nums;
+            if(counts[a] > 0 && counts[b] > 0 && counts[c] > 0) {
+                posArrows.push(axis.pos);
+            } else if(counts[a] === 0 && counts[b] === 0 && counts[c] === 0) {
+                negArrows.push(axis.neg);
+            }
+        });
+
+        // Render Arrows
+        let posHtml = posArrows.length > 0 
+            ? posArrows.map(msg => `<div class="arrow-item pos">✅ ${msg}</div>`).join('')
+            : `<div class="empty-state">Biểu đồ của bạn không hình thành mũi tên tích cực nào, năng lượng phân bổ rải rác.</div>`;
+            
+        let negHtml = negArrows.length > 0
+            ? negArrows.map(msg => `<div class="arrow-item neg">❌ ${msg}</div>`).join('')
+            : `<div class="empty-state">Tuyệt vời, biểu đồ của bạn không bị khuyết bất kỳ mũi tên tiêu cực nào.</div>`;
+
+        document.getElementById('pos-arrows-list').innerHTML = posHtml;
+        document.getElementById('neg-arrows-list').innerHTML = negHtml;
+
+        // Reveal and Scroll
+        document.getElementById('results-area').style.display = 'block';
+        document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
