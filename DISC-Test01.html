@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Tính Cách Cá Nhân DISC</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #e74c3c;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --d-color: #27ae60;
+            --i-color: #e74c3c;
+            --s-color: #2980b9;
+            --c-color: #f1c40f;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        h1, h2, h3 { color: var(--primary); text-align: center; }
+        .instructions {
+            background: #eaf2f8; padding: 15px; border-left: 5px solid var(--s-color);
+            margin-bottom: 25px; border-radius: 4px;
+        }
+        .question-block {
+            border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px;
+            background: #fafafa;
+        }
+        .q-header { font-weight: bold; margin-bottom: 10px; font-size: 1.1em; color: var(--primary); border-bottom: 1px solid #ddd; padding-bottom: 5px;}
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+        th { color: #555; width: 15%; }
+        td.word { text-align: left; font-weight: 500; width: 70%; cursor: pointer;}
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f1f1f1; }
+        input[type="radio"] { transform: scale(1.3); cursor: pointer; }
+        
+        .btn-submit {
+            display: block; width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold;
+            color: #fff; background-color: var(--accent); border: none; border-radius: 8px;
+            cursor: pointer; transition: background 0.3s; margin-top: 30px;
+        }
+        .btn-submit:hover { background-color: #c0392b; }
+        
+        #result-section { display: none; margin-top: 40px; padding-top: 20px; border-top: 3px solid var(--primary); }
+        .chart-container { margin: 20px 0; }
+        .bar-wrap { display: flex; align-items: center; margin-bottom: 10px; }
+        .bar-label { width: 40px; font-weight: bold; }
+        .bar-bg { flex-grow: 1; background: #eee; height: 25px; border-radius: 15px; overflow: hidden; position: relative;}
+        .bar-fill { height: 100%; transition: width 0.5s; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; font-size: 0.9em;}
+        .fill-D { background-color: var(--d-color); }
+        .fill-I { background-color: var(--i-color); }
+        .fill-S { background-color: var(--s-color); }
+        .fill-C { background-color: var(--c-color); }
+        
+        .report-box { background: #fdfefe; border: 1px solid #e5e8e8; padding: 20px; border-radius: 8px; margin-bottom: 20px;}
+        .report-box h3 { text-align: left; margin-top: 0; color: var(--s-color); border-bottom: 2px solid var(--s-color); padding-bottom: 5px;}
+        .trait-tag { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-weight: bold; margin-right: 10px; margin-bottom: 10px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TRẮC NGHIỆM TÍNH CÁCH DISC</h1>
+    <div class="instructions">
+        <strong>Hướng dẫn:</strong> Dưới đây là 28 nhóm từ. Trong mỗi nhóm 4 từ, hãy chọn ra <strong>01 từ mô tả giống bạn NHIỀU nhất</strong> và <strong>01 từ mô tả giống bạn ÍT nhất</strong>.
+        <br><i>Lưu ý: Trong 1 nhóm, bạn không thể chọn cùng 1 từ cho cả "Nhiều" và "Ít". Trả lời theo phản xạ tự nhiên nhất của bạn.</i>
+    </div>
+
+    <form id="discForm">
+        <div id="questions-container"></div>
+        <button type="button" class="btn-submit" onclick="calculateResult()">XEM KẾT QUẢ ĐÁNH GIÁ</button>
+    </form>
+
+    <div id="result-section">
+        <h2>BÁO CÁO PHÂN TÍCH DISC CỦA BẠN</h2>
+        
+        <div class="chart-container">
+            <div class="bar-wrap"><div class="bar-label">D</div><div class="bar-bg"><div id="bar-D" class="bar-fill fill-D" style="width: 0%">0</div></div></div>
+            <div class="bar-wrap"><div class="bar-label">I</div><div class="bar-bg"><div id="bar-I" class="bar-fill fill-I" style="width: 0%">0</div></div></div>
+            <div class="bar-wrap"><div class="bar-label">S</div><div class="bar-bg"><div id="bar-S" class="bar-fill fill-S" style="width: 0%">0</div></div></div>
+            <div class="bar-wrap"><div class="bar-label">C</div><div class="bar-bg"><div id="bar-C" class="bar-fill fill-C" style="width: 0%">0</div></div></div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span id="primary-tag" class="trait-tag" style="background-color: var(--primary);">Kiểu chính: </span>
+            <span id="secondary-tag" class="trait-tag" style="background-color: var(--secondary);">Kiểu phụ: </span>
+        </div>
+
+        <div class="report-box">
+            <h3>1. Đặc điểm tính cách cốt lõi</h3>
+            <p id="desc-personality"></p>
+        </div>
+
+        <div class="report-box">
+            <h3>2. Phong cách ứng xử & Giao tiếp</h3>
+            <p id="desc-behavior"></p>
+        </div>
+
+        <div class="report-box">
+            <h3>3. Thách thức & Lời khuyên phát triển</h3>
+            <p id="desc-advice"></p>
+        </div>
+
+        <div class="report-box">
+            <h3>4. Cơ hội nghề nghiệp phù hợp</h3>
+            <p id="desc-career"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu 28 câu hỏi chuẩn hóa từ PDF
+    const questionData = [
+        [ {w: "Hăng hái, nhiệt tình, say mê", t: "I"}, {w: "Táo bạo, cả gan", t: "D"}, {w: "Có tài ngoại giao", t: "C"}, {w: "Dễ thỏa mãn", t: "S"} ],
+        [ {w: "Thận trọng, cẩn trọng", t: "C"}, {w: "Quả quyết, kiên quyết", t: "D"}, {w: "Có sức thuyết phục", t: "I"}, {w: "Có bản chất tốt", t: "S"} ],
+        [ {w: "Thân thiện", t: "I"}, {w: "Chính xác, xác đáng", t: "C"}, {w: "Nói thẳng, trực tính", t: "D"}, {w: "Điềm tĩnh", t: "S"} ],
+        [ {w: "Nói nhiều", t: "I"}, {w: "Có kiểm soát, tiết chế", t: "C"}, {w: "Làm theo thói quen", t: "S"}, {w: "Dứt khoát", t: "D"} ],
+        [ {w: "Liều lĩnh, phiêu lưu", t: "D"}, {w: "Sâu sắc, sáng suốt", t: "C"}, {w: "Dễ gần, chan hòa", t: "I"}, {w: "Ôn hòa", t: "S"} ],
+        [ {w: "Nhẹ nhàng, hòa nhã", t: "S"}, {w: "Có tài thuyết phục", t: "I"}, {w: "Khiêm nhường", t: "C"}, {w: "Độc đáo, lập dị", t: "D"} ],
+        [ {w: "Diễn cảm", t: "I"}, {w: "Tận tâm, tỉ mỉ", t: "C"}, {w: "Lấn át, thống trị", t: "D"}, {w: "Phản ứng nhanh, đáp ứng", t: "S"} ],
+        [ {w: "Đĩnh đạc, tự chủ", t: "S"}, {w: "Hay quan sát", t: "C"}, {w: "Khiêm tốn, nhún nhường", t: "I"}, {w: "Thiếu kiên nhẫn", t: "D"} ],
+        [ {w: "Khéo ứng xử", t: "C"}, {w: "Sẵn sàng tán thành", t: "S"}, {w: "Có sức hấp dẫn", t: "I"}, {w: "Cương quyết", t: "D"} ],
+        [ {w: "Can đảm", t: "D"}, {w: "Gây cảm hứng", t: "I"}, {w: "Dễ phục tùng", t: "C"}, {w: "Nhút nhát", t: "S"} ],
+        [ {w: "Kín đáo, dè dặt", t: "C"}, {w: "Sẵn lòng giúp đỡ", t: "S"}, {w: "Cứng cỏi, kiên quyết", t: "D"}, {w: "Vui vẻ, tươi cười", t: "I"} ],
+        [ {w: "Kích thích, khuyến khích", t: "I"}, {w: "Tử tế", t: "S"}, {w: "Dễ cảm thụ", t: "C"}, {w: "Độc lập", t: "D"} ],
+        [ {w: "Cạnh tranh", t: "D"}, {w: "Ân cần, chu đáo", t: "S"}, {w: "Mang lại niềm vui", t: "I"}, {w: "Ẩn dật, cách biệt", t: "C"} ],
+        [ {w: "Cầu kỳ, kiểu cách", t: "C"}, {w: "Vâng lời, dễ bảo", t: "S"}, {w: "Kiên quyết", t: "D"}, {w: "Hay nghịch", t: "I"} ],
+        [ {w: "Cuốn hút", t: "I"}, {w: "Nội tâm", t: "C"}, {w: "Cứng đầu", t: "D"}, {w: "Dễ đoán", t: "S"} ],
+        [ {w: "Suy nghĩ logic", t: "C"}, {w: "Táo bạo, dũng cảm", t: "D"}, {w: "Trung thành", t: "S"}, {w: "Quyến rũ", t: "I"} ],
+        [ {w: "Dễ gần, chan hòa", t: "I"}, {w: "Kiên nhẫn", t: "S"}, {w: "Tự lực", t: "D"}, {w: "Nói năng nhẹ nhàng", t: "C"} ],
+        [ {w: "Có thiện ý, hay giúp", t: "S"}, {w: "Hăm hở, nhiệt tình", t: "I"}, {w: "Cẩn thận, tỉ mỉ", t: "C"}, {w: "Cao thượng", t: "D"} ],
+        [ {w: "Xông xáo, năng nổ", t: "D"}, {w: "Dễ gần", t: "I"}, {w: "Dễ kết bạn", t: "S"}, {w: "E ngại", t: "C"} ],
+        [ {w: "Tự tin", t: "I"}, {w: "Dễ cảm thông", t: "S"}, {w: "Công bằng", t: "C"}, {w: "Quả quyết", t: "D"} ],
+        [ {w: "Có kỷ luật tốt", t: "C"}, {w: "Rộng lượng", t: "S"}, {w: "Sôi nổi", t: "I"}, {w: "Bền bỉ", t: "D"} ],
+        [ {w: "Bốc đồng", t: "I"}, {w: "Hướng nội", t: "C"}, {w: "Mạnh mẽ, sinh động", t: "D"}, {w: "Dễ dãi", t: "S"} ],
+        [ {w: "Giao thiệp tốt", t: "I"}, {w: "Lịch sự, tao nhã", t: "C"}, {w: "Mãnh liệt", t: "D"}, {w: "Hiền hậu, khoan dung", t: "S"} ],
+        [ {w: "Hấp dẫn", t: "I"}, {w: "Dễ hài lòng", t: "S"}, {w: "Khắt khe", t: "D"}, {w: "Hay phục tùng", t: "C"} ],
+        [ {w: "Hay tranh cãi", t: "D"}, {w: "Làm việc có hệ thống", t: "C"}, {w: "Hướng hợp tác", t: "S"}, {w: "Vô tư lự", t: "I"} ],
+        [ {w: "Vui vẻ, vui tính", t: "I"}, {w: "Đòi hỏi chính xác", t: "C"}, {w: "Thẳng thắn", t: "D"}, {w: "Điềm đạm", t: "S"} ],
+        [ {w: "Luôn không yên, hiếu động", t: "D"}, {w: "Thuận hòa", t: "S"}, {w: "Lôi cuốn", t: "I"}, {w: "Cẩn trọng", t: "C"} ],
+        [ {w: "Tôn trọng người khác", t: "C"}, {w: "Tiên phong", t: "D"}, {w: "Lạc quan", t: "I"}, {w: "Hay giúp đỡ", t: "S"} ]
+    ];
+
+    const profiles = {
+        "D": { name: "Thống trị (Dominance)", color: "var(--d-color)" },
+        "I": { name: "Ảnh hưởng (Influence)", color: "var(--i-color)" },
+        "S": { name: "Kiên định (Steadiness)", color: "var(--s-color)" },
+        "C": { name: "Tuân thủ (Compliance)", color: "var(--c-color)" }
+    };
+
+    // Render questions
+    const container = document.getElementById('questions-container');
+    questionData.forEach((group, qIndex) => {
+        let html = `<div class="question-block">
+            <div class="q-header">Nhóm ${qIndex + 1}</div>
+            <table><tr><th>Nhiều</th><th>Tính từ</th><th>Ít</th></tr>`;
+        
+        group.forEach((item, optIndex) => {
+            html += `<tr>
+                <td><input type="radio" name="most_${qIndex}" value="${item.t}" onchange="checkDisable(${qIndex}, ${optIndex}, 'most')"></td>
+                <td class="word">${item.w}</td>
+                <td><input type="radio" name="least_${qIndex}" value="${item.t}" onchange="checkDisable(${qIndex}, ${optIndex}, 'least')"></td>
+            </tr>`;
+        });
+        html += `</table></div>`;
+        container.innerHTML += html;
+    });
+
+    // Ràng buộc không cho chọn cùng 1 từ ở cả 2 cột Nhiều và Ít
+    function checkDisable(qIndex, optIndex, type) {
+        let opposite = type === 'most' ? 'least' : 'most';
+        let radios = document.getElementsByName(`${opposite}_${qIndex}`);
+        radios.forEach((r, i) => {
+            r.disabled = (i === optIndex);
+        });
+    }
+
+    function calculateResult() {
+        let scoresMost = { D: 0, I: 0, S: 0, C: 0 };
+        let scoresLeast = { D: 0, I: 0, S: 0, C: 0 };
+
+        // Validation & Scoring
+        for (let i = 0; i < 28; i++) {
+            let mostAns = document.querySelector(`input[name="most_${i}"]:checked`);
+            let leastAns = document.querySelector(`input[name="least_${i}"]:checked`);
+            
+            if (!mostAns || !leastAns) {
+                alert(`Vui lòng chọn đầy đủ 1 "Nhiều" và 1 "Ít" ở Nhóm ${i + 1}!`);
+                return;
+            }
+            scoresMost[mostAns.value]++;
+            scoresLeast[leastAns.value]++;
+        }
+
+        // Calculation: Difference = Most - Least
+        let finalScores = {
+            D: scoresMost.D - scoresLeast.D,
+            I: scoresMost.I - scoresLeast.I,
+            S: scoresMost.S - scoresLeast.S,
+            C: scoresMost.C - scoresLeast.C
+        };
+
+        // Normalize scores to percentage for UI (Offsetting negatives)
+        let minScore = Math.min(...Object.values(finalScores));
+        let adjustedScores = {};
+        let totalAdjusted = 0;
+        for (let key in finalScores) {
+            adjustedScores[key] = finalScores[key] + Math.abs(Math.min(0, minScore)) + 1; // Prevent 0
+            totalAdjusted += adjustedScores[key];
+        }
+
+        // Render Bars
+        for (let key in finalScores) {
+            let pct = (adjustedScores[key] / totalAdjusted) * 100;
+            document.getElementById(`bar-${key}`).style.width = `${pct}%`;
+            document.getElementById(`bar-${key}`).innerText = finalScores[key];
+        }
+
+        // Rank to find Primary and Secondary
+        let sortedTraits = Object.keys(finalScores).sort((a, b) => finalScores[b] - finalScores[a]);
+        let primary = sortedTraits[0];
+        let secondary = sortedTraits[1];
+
+        document.getElementById('primary-tag').innerHTML = `Loại hình Chính: ${profiles[primary].name}`;
+        document.getElementById('primary-tag').style.backgroundColor = profiles[primary].color;
+        
+        document.getElementById('secondary-tag').innerHTML = `Loại hình Phụ: ${profiles[secondary].name}`;
+        document.getElementById('secondary-tag').style.backgroundColor = profiles[secondary].color;
+
+        generateReport(primary, secondary);
+
+        document.getElementById('result-section').style.display = 'block';
+        document.getElementById('result-section').scrollIntoView({behavior: "smooth"});
+    }
+
+    function generateReport(prim, sec) {
+        const texts = {
+            "D": {
+                personality: "Bạn là người Hướng tới kết quả, có nhịp độ nhanh, quyết đoán, tự tin và thẳng thắn. Bạn thích làm chủ, sẵn sàng chấp nhận rủi ro và luôn tìm kiếm sự cạnh tranh, chiến thắng.",
+                behavior: "Trong giao tiếp, bạn đi thẳng vào vấn đề, cường độ nói nhanh, ngắn gọn và tập trung vào mục tiêu/lý do. Bạn thích được kiểm soát cuộc trò chuyện và rất ghét sự rườm rà, vòng vo hoặc chậm chạp.",
+                advice: "Điểm yếu của bạn là thiếu kiên nhẫn, đôi khi vô cảm và thiếu quan tâm đến người khác. Hãy học cách lắng nghe nhiều hơn, đồng cảm với đồng nghiệp và không nên áp đặt ý chí của mình một cách quá gay gắt.",
+                career: "Các vai trò Lãnh đạo, Quản lý dự án, Giám đốc kinh doanh, Doanh nhân khởi nghiệp, hoặc các vị trí đòi hỏi sự quyết đoán và giải quyết vấn đề dưới áp lực cao."
+            },
+            "I": {
+                personality: "Bạn là người Hướng ngoại, lạc quan, nhiệt tình và thích giao lưu. Bạn được thúc đẩy bởi sự công nhận xã hội, xây dựng mối quan hệ và có khả năng truyền cảm hứng tuyệt vời.",
+                behavior: "Bạn nói nhiều, giọng nói ấm áp, diễn cảm và hay sử dụng ngôn ngữ cơ thể (mở tay, cười nhiều). Bạn hòa đồng, cởi mở nhưng đôi khi thiếu tổ chức, hành động theo cảm xúc và bốc đồng.",
+                advice: "Thách thức của bạn là quản lý thời gian, chi tiết công việc và tính kỷ luật. Hãy cố gắng ghi chép, lập kế hoạch rõ ràng, tập trung vào kết quả thực tế thay vì chỉ mải mê xây dựng quan hệ hay nói chuyện phiếm.",
+                career: "Bán hàng (Sales), Marketing, Truyền thông (PR), Chăm sóc khách hàng, Đào tạo, MC, hoặc các vị trí đòi hỏi khả năng diễn thuyết và kết nối cộng đồng."
+            },
+            "S": {
+                personality: "Bạn là người Kiên định, điềm tĩnh, khiêm tốn và đáng tin cậy. Bạn hướng tới con người, mong muốn giúp đỡ người khác và tìm kiếm một môi trường ổn định, hòa nhã.",
+                behavior: "Bạn giao tiếp từ tốn, chậm rãi, là một người lắng nghe tuyệt vời. Bạn thường suy nghĩ kỹ trước khi nói, e ngại sự thay đổi đột ngột và thường nhượng bộ để tránh các xung đột cá nhân.",
+                advice: "Bạn có thể bị coi là thiếu quyết đoán, quá dễ dãi hoặc thụ động. Hãy mạnh dạn nói lên quan điểm cá nhân, học cách đối mặt với sự thay đổi và quyết đoán hơn trong các quyết định quan trọng.",
+                career: "Tư vấn tâm lý, Nhân sự (HR), Giáo viên, Chăm sóc sức khỏe, Y tế, Hành chính, hoặc các công việc đòi hỏi sự kiên nhẫn, hỗ trợ và làm việc nhóm gắn kết."
+            },
+            "C": {
+                personality: "Bạn là người Kỷ luật, tuân thủ, có tư duy phân tích, logic và độ chính xác cao. Bạn hướng tới công việc, thích sự hệ thống và luôn muốn đảm bảo chất lượng hoàn hảo nhất.",
+                behavior: "Bạn kín đáo, cẩn trọng, nói chậm rãi nhưng suy nghĩ rất nhanh. Bạn đòi hỏi các con số, bằng chứng và sự logic trong mọi cuộc thảo luận. Bạn ít bộc lộ cảm xúc và rất sợ sự sai sót.",
+                advice: "Tính cầu toàn có thể khiến bạn trở nên cứng nhắc, hay chỉ trích và cô lập bản thân. Đôi khi bạn mất quá nhiều thời gian để phân tích. Hãy học cách linh hoạt, chấp nhận rủi ro ở mức độ nhất định và hòa đồng hơn.",
+                career: "Kế toán, Kiểm toán, Phân tích dữ liệu, Kỹ sư, Lập trình viên, Nghiên cứu khoa học, Quản lý chất lượng (QA/QC)."
+            }
+        };
+
+        // Trộn nội dung Dựa trên Primary và Secondary
+        document.getElementById('desc-personality').innerHTML = `<strong>Cốt lõi (${prim}):</strong> ${texts[prim].personality} <br><br><strong>Ảnh hưởng phụ (${sec}):</strong> Ngoài ra, bạn cũng mang những nét tính cách bổ trợ: ${texts[sec].personality}`;
+        
+        document.getElementById('desc-behavior').innerHTML = `<strong>Khi giao tiếp:</strong> ${texts[prim].behavior} <br>Sự kết hợp với nhóm ${sec} giúp bạn linh hoạt thêm trong việc: ${texts[sec].behavior.split('.')[0]}.`;
+        
+        document.getElementById('desc-advice').innerHTML = `<strong>Thách thức chính:</strong> ${texts[prim].advice} <br><strong>Lưu ý thêm:</strong> Hãy chú ý cân bằng đặc điểm của nhóm phụ (${sec}): ${texts[sec].advice}`;
+        
+        document.getElementById('desc-career').innerHTML = `Với tổ hợp <strong>${prim}${sec}</strong>, bạn sẽ phát huy tối đa năng lực ở các nhóm ngành: <br>- ${texts[prim].career} <br>- Hoặc các vị trí lai tạo mang tính chất: ${texts[sec].career}`;
+    }
+</script>
+
+</body>
+</html>

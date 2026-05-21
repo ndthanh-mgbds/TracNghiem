@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Tính Cách DISC Chuyên Sâu</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .intro {
+            text-align: justify;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #fdfdfd;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 4px;
+        }
+        .question-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 10px;
+            background: #f1f2f6;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .options label:hover {
+            background: #e2e8f0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background-color: #2980b9;
+        }
+        #result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #e8f6f3;
+            border: 1px solid #1abc9c;
+        }
+        .chart-bar {
+            height: 20px;
+            border-radius: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        .bar-D { background-color: #e74c3c; } /* Đỏ - Quyền lực */
+        .bar-I { background-color: #f1c40f; } /* Vàng - Ảnh hưởng */
+        .bar-S { background-color: #2ecc71; } /* Xanh lá - Kiên định */
+        .bar-C { background-color: #3498db; } /* Xanh dương - Tuân thủ */
+        .result-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ĐÁNH GIÁ TÍNH CÁCH DISC</h1>
+    <div class="intro">
+        <p><strong>Hướng dẫn:</strong> Trong mỗi tình huống dưới đây, hãy chọn <strong>MỘT</strong> phương án phản ánh đúng nhất cách bạn thường hành xử một cách tự nhiên (không phải cách bạn muốn trở thành). Trả lời nhanh dựa trên trực giác đầu tiên của bạn để có kết quả chính xác nhất.</p>
+    </div>
+
+    <form id="discForm">
+        <div id="questions-container"></div>
+        <button type="button" class="btn-submit" onclick="calculateDISC()">Xem Kết Quả Phân Tích</button>
+    </form>
+
+    <div id="result-section">
+        <h2 class="result-title" id="dominant-trait">Kết Quả Của Bạn</h2>
+        <div id="score-bars"></div>
+        <div id="trait-description" style="margin-top: 20px; text-align: justify;"></div>
+    </div>
+</div>
+
+<script>
+    // Cơ sở dữ liệu câu hỏi (Có thể dễ dàng mở rộng, thay đổi)
+    const questions = [
+        {
+            title: "1. Trong công việc, điều bạn ưu tiên hàng đầu là:",
+            options: [
+                { text: "Đạt được mục tiêu, kết quả nhanh chóng và chiến thắng.", value: "D" },
+                { text: "Làm việc cùng mọi người, xây dựng không khí vui vẻ, sáng tạo.", value: "I" },
+                { text: "Thực hiện đúng quy trình, đảm bảo sự ổn định và hỗ trợ đồng nghiệp.", value: "S" },
+                { text: "Đảm bảo tính chính xác, chi tiết và chất lượng công việc hoàn hảo.", value: "C" }
+            ]
+        },
+        {
+            title: "2. Phong cách giao tiếp của bạn thường:",
+            options: [
+                { text: "Thẳng thắn, đi thẳng vào vấn đề, đôi khi có vẻ áp đặt.", value: "D" },
+                { text: "Nhiệt tình, nói nhiều, hay dùng ngôn ngữ cơ thể và truyền cảm hứng.", value: "I" },
+                { text: "Điềm tĩnh, lắng nghe nhiều hơn nói, chân thành.", value: "S" },
+                { text: "Chính xác, dựa trên dữ liệu và thực tế, cẩn trọng trong lời nói.", value: "C" }
+            ]
+        },
+        {
+            title: "3. Khi đối mặt với sự thay đổi, bạn:",
+            options: [
+                { text: "Chấp nhận ngay lập tức nếu nó mang lại hiệu quả tốt hơn.", value: "D" },
+                { text: "Hào hứng và coi đó là một cơ hội mới mẻ.", value: "I" },
+                { text: "Cảm thấy e ngại, cần thời gian để thích nghi và muốn duy trì hiện trạng.", value: "S" },
+                { text: "Cần xem xét kỹ các rủi ro và lên kế hoạch chi tiết trước khi áp dụng.", value: "C" }
+            ]
+        },
+        {
+            title: "4. Dưới áp lực căng thẳng, bạn có xu hướng:",
+            options: [
+                { text: "Trở nên cáu gắt, đòi hỏi cao và hành động tự chủ hơn.", value: "D" },
+                { text: "Bộc lộ cảm xúc mạnh, có thể hứa hẹn những điều không thực tế.", value: "I" },
+                { text: "Nhượng bộ để tránh xung đột, kìm nén cảm xúc cá nhân.", value: "S" },
+                { text: "Thu mình lại, trở nên quá soi mói các chi tiết và cứng nhắc.", value: "C" }
+            ]
+        },
+        {
+            title: "5. Khi cần đưa ra quyết định quan trọng, bạn dựa vào:",
+            options: [
+                { text: "Trực giác sắc bén và mong muốn có kết quả ngay.", value: "D" },
+                { text: "Cảm xúc và ý kiến của những người xung quanh.", value: "I" },
+                { text: "Sự đồng thuận của tập thể và kinh nghiệm đã có.", value: "S" },
+                { text: "Việc phân tích logic các số liệu và chứng cứ cụ thể.", value: "C" }
+            ]
+        },
+        {
+            title: "6. Môi trường làm việc lý tưởng của bạn là nơi:",
+            options: [
+                { text: "Có nhiều thử thách, quyền lực và cơ hội thăng tiến.", value: "D" },
+                { text: "Linh hoạt, ít quy tắc cứng nhắc, được tự do sáng tạo và giao lưu.", value: "I" },
+                { text: "Thân thiện, an toàn, mọi người hòa thuận và gắn bó lâu dài.", value: "S" },
+                { text: "Có trật tự rõ ràng, nguyên tắc chuẩn mực và không gian yên tĩnh.", value: "C" }
+            ]
+        },
+        {
+            title: "7. Nhược điểm mà bạn thường được người khác góp ý là:",
+            options: [
+                { text: "Quá nóng vội, thiếu kiên nhẫn và ít lắng nghe.", value: "D" },
+                { text: "Bốc đồng, làm việc thiếu tổ chức và hay quên.", value: "I" },
+                { text: "Quá an toàn, thiếu sự quyết đoán và sợ rủi ro.", value: "S" },
+                { text: "Quá cầu toàn, chậm ra quyết định và hay phê phán.", value: "C" }
+            ]
+        },
+        {
+            title: "8. Khi lãnh đạo một nhóm, phong cách của bạn là:",
+            options: [
+                { text: "Chỉ đạo quyết liệt, phân công rõ ràng và yêu cầu tiến độ.", value: "D" },
+                { text: "Truyền lửa, động viên tinh thần và gắn kết các thành viên.", value: "I" },
+                { text: "Hỗ trợ tận tình, tạo môi trường làm việc gia đình, bình đẳng.", value: "S" },
+                { text: "Lập kế hoạch chuẩn xác, giám sát chất lượng và quy trình chặt chẽ.", value: "C" }
+            ]
+        },
+        {
+            title: "9. Bạn đánh giá cao người khác qua:",
+            options: [
+                { text: "Năng lực, thành tích và tốc độ hoàn thành công việc.", value: "D" },
+                { text: "Sự cởi mở, kỹ năng giao tiếp và mức độ ảnh hưởng.", value: "I" },
+                { text: "Sự trung thành, độ tin cậy và sự hỗ trợ lẫn nhau.", value: "S" },
+                { text: "Tính kỷ luật, tư duy logic và chuyên môn sâu.", value: "C" }
+            ]
+        },
+        {
+            title: "10. Mục tiêu lớn nhất trong cuộc sống của bạn thường hướng tới:",
+            options: [
+                { text: "Sự tự chủ, quyền lực và kiểm soát cục diện.", value: "D" },
+                { text: "Sự công nhận xã hội, danh tiếng và sự nổi bật.", value: "I" },
+                { text: "Sự bình yên, gia đình và môi trường ổn định.", value: "S" },
+                { text: "Sự thông thái, nguyên tắc chuẩn mực và tính đúng đắn.", value: "C" }
+            ]
+        }
+    ];
+
+    const profiles = {
+        "D": "<strong>Nhóm Thống Trị (Dominance):</strong> Bạn là người quyết đoán, mạnh mẽ, tự tin và tập trung vào kết quả. Bạn thích đối mặt với thử thách, hành động nhanh và có khả năng lãnh đạo bẩm sinh. Tuy nhiên, đôi khi bạn có thể thiếu kiên nhẫn và áp đặt lên người khác. Bài học phát triển: Học cách lắng nghe, kiên nhẫn và đồng cảm hơn với đồng đội.",
+        "I": "<strong>Nhóm Ảnh Hưởng (Influence):</strong> Bạn là người hòa đồng, nhiệt tình, lạc quan và có khả năng thuyết phục xuất sắc. Bạn thích môi trường sáng tạo, linh hoạt và là người truyền cảm hứng tốt. Nhược điểm của bạn là đôi khi thiếu tổ chức, sợ sự từ chối và làm việc theo cảm xúc. Bài học phát triển: Tăng cường tính kỷ luật, quản lý thời gian và chú trọng vào chi tiết công việc.",
+        "S": "<strong>Nhóm Kiên Định (Steadiness):</strong> Bạn là người điềm tĩnh, trung thành, kiên nhẫn và đáng tin cậy. Bạn là một 'người hòa giải' tuyệt vời trong nhóm, luôn hướng tới sự hòa bình và ổn định. Tuy nhiên, bạn thường sợ sự thay đổi, né tránh xung đột và thiếu quyết đoán. Bài học phát triển: Mạnh dạn bước ra khỏi vùng an toàn, học cách nói 'không' và quyết đoán hơn.",
+        "C": "<strong>Nhóm Tuân Thủ (Compliance):</strong> Bạn là người logic, chính xác, cầu toàn và làm việc có hệ thống. Bạn phân tích vấn đề rất sâu sắc, yêu cầu dữ liệu thực tế và luôn đảm bảo chất lượng cao nhất. Điểm yếu của bạn là có thể quá cứng nhắc, sợ sai lầm và chậm ra quyết định. Bài học phát triển: Chấp nhận sự không hoàn hảo, linh hoạt hơn và đừng để phân tích dẫn đến tê liệt hành động."
+    };
+
+    // Render Form
+    const container = document.getElementById('questions-container');
+    questions.forEach((q, index) => {
+        let qHTML = `<div class="question-block">
+                        <div class="question-title">${q.title}</div>
+                        <div class="options">`;
+        
+        // Trộn ngẫu nhiên các phương án để người dùng không đoán được quy luật (D,I,S,C)
+        let shuffledOptions = q.options.sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach((opt) => {
+            qHTML += `<label><input type="radio" name="q${index}" value="${opt.value}"> ${opt.text}</label>`;
+        });
+        
+        qHTML += `</div></div>`;
+        container.innerHTML += qHTML;
+    });
+
+    function calculateDISC() {
+        let scores = { D: 0, I: 0, S: 0, C: 0 };
+        let answeredCount = 0;
+
+        for (let i = 0; i < questions.length; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected) {
+                scores[selected.value]++;
+                answeredCount++;
+            }
+        }
+
+        if (answeredCount < questions.length) {
+            alert(`Vui lòng trả lời đầy đủ tất cả các câu hỏi! Bạn mới trả lời ${answeredCount}/${questions.length} câu.`);
+            return;
+        }
+
+        // Tính %
+        let total = questions.length;
+        let pD = Math.round((scores.D / total) * 100);
+        let pI = Math.round((scores.I / total) * 100);
+        let pS = Math.round((scores.S / total) * 100);
+        let pC = Math.round((scores.C / total) * 100);
+
+        // Tìm nhóm chiếm ưu thế
+        let dominantTrait = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+
+        // Hiển thị kết quả
+        document.getElementById('result-section').style.display = 'block';
+        
+        let traitNames = { "D": "Thống Trị (D)", "I": "Ảnh Hưởng (I)", "S": "Kiên Định (S)", "C": "Tuân Thủ (C)" };
+        document.getElementById('dominant-trait').innerHTML = `Đặc điểm chủ đạo của bạn: ${traitNames[dominantTrait]}`;
+
+        document.getElementById('score-bars').innerHTML = `
+            <strong>D - Dominance (${pD}%):</strong> <div class="chart-bar bar-D" style="width: ${pD}%;"></div>
+            <strong>I - Influence (${pI}%):</strong> <div class="chart-bar bar-I" style="width: ${pI}%;"></div>
+            <strong>S - Steadiness (${pS}%):</strong> <div class="chart-bar bar-S" style="width: ${pS}%;"></div>
+            <strong>C - Compliance (${pC}%):</strong> <div class="chart-bar bar-C" style="width: ${pC}%;"></div>
+        `;
+
+        // Mô tả chi tiết (nếu có 2 nhóm bằng điểm cao nhất, sẽ ghép mô tả, nhưng code hiện tại lấy nhóm cao nhất đầu tiên)
+        document.getElementById('trait-description').innerHTML = profiles[dominantTrait];
+        
+        // Tự động cuộn xuống phần kết quả
+        document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
