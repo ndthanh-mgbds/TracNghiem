@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Tính Cách MBTI - Ứng Dụng Ngành Bất Động Sản</title>
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Deep Blue for Trust & Real Estate */
+            --secondary: #1d4ed8;
+            --accent: #f59e0b; /* Gold/Amber for Wealth/Success */
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary);
+        }
+        h1, h2, h3 {
+            color: var(--primary);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .intro {
+            background: #f0f9ff;
+            padding: 20px;
+            border-left: 5px solid var(--secondary);
+            margin-bottom: 30px;
+            border-radius: 6px;
+            font-size: 1.05em;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .question-block:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .question-title {
+            font-weight: bold;
+            font-size: 1.15em;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .options label:hover {
+            background: #e0f2fe;
+            border-color: #bae6fd;
+        }
+        input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-submit:hover {
+            background-color: var(--secondary);
+        }
+        #result-section {
+            display: none;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px dashed var(--border);
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-type {
+            font-size: 3.5em;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin: 10px 0;
+        }
+        .result-name {
+            font-size: 1.8em;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .content-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .content-box h3 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .content-box p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        .highlight {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+        .example-box {
+            background: #fffbeb;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .bar-label {
+            width: 60px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .bar-track {
+            flex-grow: 1;
+            background: #e2e8f0;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 0 15px;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            transition: width 1s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ĐÁNH GIÁ TÍNH CÁCH MBTI CHUYÊN SÂU</h1>
+    <div class="subtitle">Ứng dụng định hướng nghề nghiệp trong ngành Bất Động Sản</div>
+    
+    <div class="intro">
+        <p><strong>Hướng dẫn:</strong> Dựa trên nền tảng tâm lý học của Carl Jung, bài kiểm tra này được tinh chỉnh để phản ánh cách bạn tư duy, ra quyết định và tương tác trong bối cảnh thị trường. Hãy chọn đáp án <strong>phản ánh đúng bản chất tự nhiên</strong> của bạn nhất.</p>
+    </div>
+
+    <form id="mbtiForm">
+        <div id="questions-container"></div>
+        <button type="button" class="btn-submit" onclick="calculateMBTI()">PHÂN TÍCH KẾT QUẢ & ĐỊNH HƯỚNG BĐS</button>
+    </form>
+
+    <div id="result-section">
+        <div class="result-header">
+            <h2>KẾT QUẢ ĐÁNH GIÁ CỦA BẠN</h2>
+            <div class="result-type" id="mbti-type">ENTJ</div>
+            <div class="result-name" id="mbti-name">Giám Đốc Sàn / Nhà Quản Trị Chiến Lược</div>
+        </div>
+        
+        <div class="content-box">
+            <h3>📊 Chỉ Số Ưu Thế Của Bạn</h3>
+            <div id="bar-container"></div>
+        </div>
+
+        <div class="content-box">
+            <h3>🧠 Tổng Quan Tính Cách & Lợi Thế Cạnh Tranh</h3>
+            <p id="desc-overview"></p>
+        </div>
+
+        <div class="content-box">
+            <h3>🤝 Phong Cách Giao Tiếp & Ứng Xử</h3>
+            <p id="desc-behavior"></p>
+        </div>
+
+        <div class="content-box">
+            <h3>🏢 Định Hướng Nghề Nghiệp Bất Động Sản</h3>
+            <p id="desc-career"></p>
+            <div class="example-box" id="desc-example"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 20 Câu hỏi MBTI chuẩn
+    const questions = [
+        { q: "1. Trong một sự kiện mở bán hoặc hội thảo BĐS, bạn thường:", a: "Chủ động bắt chuyện, trao đổi namecard và mở rộng mạng lưới khách hàng (Networking).", a_val: "E", b: "Quan sát thị trường, trò chuyện sâu với một vài đối tác hoặc khách hàng quen thuộc.", b_val: "I" },
+        { q: "2. Sau một tuần làm việc căng thẳng, bạn lấy lại năng lượng bằng cách:", a: "Tham gia các buổi tụ tập, cà phê với đồng nghiệp hoặc gặp gỡ đối tác.", a_val: "E", b: "Dành thời gian không gian yên tĩnh, đọc sách báo chuyên ngành hoặc nghỉ ngơi một mình.", b_val: "I" },
+        { q: "3. Trong quá trình làm việc, bạn thích cách thức nào hơn:", a: "Gọi điện thoại trực tiếp để đàm phán hoặc gặp mặt chốt deal.", a_val: "E", b: "Gửi báo giá qua email/zalo và để khách hàng có thời gian suy nghĩ.", b_val: "I" },
+        { q: "4. Khách hàng thường nhận xét bạn là một người:", a: "Rất nhiệt tình, cởi mở và dễ dàng tạo sự tin tưởng ngay từ lần đầu.", a_val: "E", b: "Trầm tĩnh, đáng tin cậy và có chiều sâu trong tư duy.", b_val: "I" },
+        { q: "5. Khi gặp một vướng mắc pháp lý khó, bạn có xu hướng:", a: "Ngay lập tức gọi điện cho luật sư hoặc đưa ra thảo luận với nhóm để cùng gỡ rối.", a_val: "E", b: "Tự mình tra cứu Luật Đất đai, Luật Kinh doanh BĐS trước khi hỏi người khác.", b_val: "I" },
+        
+        { q: "6. Khi đánh giá một dự án đầu tư, bạn bị thuyết phục bởi:", a: "Vị trí hiện tại, tiến độ xây dựng, sa bàn và các con số dòng tiền thực tế.", a_val: "S", b: "Tầm nhìn quy hoạch 5-10 năm tới, tiềm năng tăng giá và ý tưởng của chủ đầu tư.", b_val: "N" },
+        { q: "7. Bạn có xu hướng tin tưởng vào điều gì hơn khi tư vấn:", a: "Kinh nghiệm thực chiến của bản thân qua các chu kỳ bất động sản.", a_val: "S", b: "Trực giác nhạy bén về xu hướng dòng tiền của thị trường vĩ mô.", b_val: "N" },
+        { q: "8. Cách tiếp cận khách hàng của bạn thường là:", a: "Áp dụng các kịch bản sale (telesale, tư vấn) đã được chứng minh hiệu quả.", a_val: "S", b: "Luôn sáng tạo ra các cách tiếp cận mới, ứng dụng PropTech hoặc Marketing độc lạ.", b_val: "N" },
+        { q: "9. Ngôn từ bạn sử dụng khi quảng cáo (đăng tin) thường:", a: "Rõ ràng, chi tiết: Diện tích, giá cả, hướng nhà, số phòng, pháp lý.", a_val: "S", b: "Gợi mở, truyền cảm hứng: Không gian sống đẳng cấp, cơ hội đổi đời, kiệt tác kiến trúc.", b_val: "N" },
+        { q: "10. Khi nhìn vào một mảnh đất hoang, bạn thấy:", a: "Diện tích mét vuông, hiện trạng pháp lý và ranh giới đất.", a_val: "S", b: "Một khu đô thị sầm uất hoặc một tòa nhà thương mại trong tương lai.", b_val: "N" },
+
+        { q: "11. Khi thẩm định cho vay hoặc đánh giá rủi ro, bạn dựa vào:", a: "Tính khả thi tài chính, bảng tính (excel), biên độ lợi nhuận khách quan.", a_val: "T", b: "Hoàn cảnh của chủ đầu tư, giá trị nhân văn của dự án mang lại cho cộng đồng.", b_val: "F" },
+        { q: "12. Yếu tố nào quan trọng nhất khi giải quyết tranh chấp hợp đồng cọc:", a: "Sự công bằng, các điều khoản đã ký kết và tính minh bạch của pháp luật.", a_val: "T", b: "Sự thông cảm, duy trì mối quan hệ tốt đẹp và tìm cách dung hòa lợi ích đôi bên.", b_val: "F" },
+        { q: "13. Khi phải sa thải hoặc từ chối một nhân sự môi giới, bạn:", a: "Dựa hoàn toàn vào KPI, doanh số và thẳng thắn đưa ra quyết định.", a_val: "T", b: "Cảm thấy khó khăn, cố gắng tìm cách hỗ trợ họ hoặc truyền đạt một cách nhẹ nhàng nhất.", b_val: "F" },
+        { q: "14. Một người lãnh đạo BĐS lý tưởng trong mắt bạn là:", a: "Sắc bén, quyết đoán, logic và có năng lực phân tích xuất sắc.", a_val: "T", b: "Biết lắng nghe, đồng cảm, có khả năng truyền động lực và quan tâm nhân viên.", b_val: "F" },
+        { q: "15. Bạn thích được khen ngợi rằng mình là:", a: '"Một chuyên gia tư vấn có đầu óc phân tích sắc bén và chốt deal chuẩn xác".', a_val: "T", b: '"Một người bạn đồng hành chân thành, thấu hiểu tâm lý khách hàng".', b_val: "F" },
+
+        { q: "16. Trong lịch trình công việc hàng ngày, bạn:", a: "Lên kế hoạch hẹn khách rõ ràng, tuân thủ kỷ luật làm việc (gọi x cuộc/ngày).", a_val: "J", b: "Thích sự linh hoạt, làm việc theo cảm hứng và sẵn sàng thay đổi lịch trình nếu có khách 'hot'.", b_val: "P" },
+        { q: "17. Khi quản lý giấy tờ, hợp đồng (Sổ đỏ, sổ hồng):", a: "Sắp xếp cực kỳ ngăn nắp, phân loại rõ ràng theo từng file, từng dự án.", a_val: "J", b: "Hơi lộn xộn, hay để tạm trên bàn nhưng bạn vẫn tự biết tìm chúng ở đâu khi cần.", b_val: "P" },
+        { q: "18. Bạn cảm thấy thoải mái nhất khi:", a: "Mọi hợp đồng đã được ký kết, tiền hoa hồng/tiền cọc đã chốt xong.", a_val: "J", b: "Quá trình thương lượng vẫn đang mở, còn không gian để đàm phán thêm điều kiện.", b_val: "P" },
+        { q: "19. Khi chuẩn bị mở bán dự án, bạn có xu hướng:", a: "Hoàn thiện mọi tài liệu, pháp lý, kịch bản kỹ lưỡng trước giờ G.", a_val: "J", b: "Hoàn thiện tổng quan, và để phần chi tiết tùy cơ ứng biến khi khách hỏi.", b_val: "P" },
+        { q: "20. Đối với các quy trình của công ty (chấm công, báo cáo báo giá):", a: "Bạn coi trọng và tuân thủ một cách nghiêm túc vì đó là sự chuyên nghiệp.", a_val: "J", b: "Bạn cảm thấy gò bó và cho rằng miễn sao mang doanh thu về là được.", b_val: "P" }
+    ];
+
+    // Cấu hình profiles theo bối cảnh Bất Động Sản (sử dụng "bạn")
+    const profiles = {
+        "ENTJ": {
+            name: "CEO / Nhà Quản Trị Chiến Lược BĐS",
+            overview: "Bạn là người có tầm nhìn xa, năng lực lãnh đạo bẩm sinh và quyết liệt trong việc đạt mục tiêu lợi nhuận. Trong thị trường Bất Động Sản, bạn nhìn nhận mọi thứ như một bàn cờ chiến lược lớn, có khả năng tổ chức bộ máy nhân sự khổng lồ và đưa ra những quyết sách táo bạo.",
+            behavior: "Bạn giao tiếp một cách dứt khoát, trực diện và luôn tập trung vào kết quả (ROI). Bạn không thích sự rườm rà hay vòng vo. Với tư duy logic sắc bén, bạn dễ dàng thuyết phục các cổ đông lớn hoặc đối tác rót vốn.",
+            career: "Giám đốc Sàn giao dịch BĐS, Giám đốc Phát triển dự án, Nhà Đầu tư Cá mập, Cố vấn Chiến lược đầu tư.",
+            example: "Nhân vật điển hình: Một Giám đốc kinh doanh tại các tập đoàn lớn, người có khả năng đọc vị thị trường và xây dựng chiến lược chiếm lĩnh các quỹ đất vàng, dẫn dắt đội ngũ hàng ngàn nhân viên vượt qua giai đoạn đóng băng của thị trường."
+        },
+        "ESTJ": {
+            name: "Giám Đốc Vận Hành / Quản Lý Dự Án",
+            overview: "Bạn là người thực tế, trách nhiệm cao và tôn trọng các quy chuẩn. Bạn xuất sắc trong việc biến các kế hoạch trên giấy thành hành động thực tế. Bạn luôn đảm bảo tiến độ xây dựng, bán hàng tuân thủ đúng quy định và pháp luật.",
+            behavior: "Bạn nói to, rõ ràng, đưa ra chỉ thị thay vì yêu cầu. Bạn đòi hỏi sự minh bạch trong hợp đồng, ghét sự lười biếng hoặc làm việc theo cảm tính của các môi giới viên.",
+            career: "Giám đốc Vận hành (COO), Trưởng phòng Kinh doanh, Quản lý tiến độ dự án, Kiểm soát viên.",
+            example: "Nhân vật điển hình: Một Trưởng phòng kinh doanh kỷ luật thép, người luôn nắm rõ từng con số doanh thu, tỷ lệ chốt sale và đôn đốc đội ngũ bán hàng hoạt động như một cỗ máy chính xác tuyệt đối."
+        },
+        "INTJ": {
+            name: "Chiến Lược Gia Đầu Tư / Phân Tích Thị Trường",
+            overview: "Bạn sở hữu tư duy phân tích độc lập và khả năng dự báo xuất sắc. Trong kỷ nguyên PropTech, bạn là người áp dụng dữ liệu lớn (Big Data) để tìm ra những khu vực có biên độ tăng giá tiềm năng nhất trước khi đám đông nhận ra.",
+            behavior: "Bạn giao tiếp điềm tĩnh, sử dụng số liệu, biểu đồ và luận cứ pháp lý vững chắc. Đôi khi bạn có thể bị coi là lạnh lùng vì bạn đặt tính hợp lý của dòng tiền lên trên cảm xúc cá nhân.",
+            career: "Chuyên gia Phân tích dữ liệu BĐS, Nhà Đầu tư chiến lược dài hạn, Cố vấn M&A Bất động sản.",
+            example: "Nhân vật điển hình: Một Nhà đầu tư thầm lặng nhưng sở hữu danh mục tài sản khổng lồ. Bạn dành hàng tháng trời nghiên cứu quy hoạch 1/500, hạ tầng giao thông tương lai trước khi xuống tiền vào một dự án."
+        },
+        "ISTJ": {
+            name: "Chuyên Gia Thẩm Định / Kiểm Soát Nội Bộ",
+            overview: "Bạn là hiện thân của sự chính xác, tỉ mỉ và tôn trọng truyền thống. Bạn không bao giờ bị cuốn theo những cơn 'sốt đất' ảo. Bạn là người bảo vệ an toàn pháp lý cho mọi giao dịch.",
+            behavior: "Bạn nói chuyện thận trọng, luôn bám sát văn bản luật (Luật Đất đai, Luật Nhà ở). Bạn không đưa ra lời khuyên nếu chưa có đủ căn cứ pháp lý và giấy tờ minh bạch.",
+            career: "Chuyên viên Pháp chế BĐS, Kiểm toán viên dự án, Thẩm định giá Bất động sản.",
+            example: "Nhân vật điển hình: Một Chuyên gia pháp chế BĐS, người có thể phát hiện ra những điểm bất lợi nhỏ nhất trong hợp đồng mua bán, đảm bảo công ty và khách hàng không phải đối mặt với rủi ro kiện tụng."
+        },
+        "ENFJ": {
+            name: "Người Truyền Lửa / Giám Đốc Đào Tạo BĐS",
+            overview: "Bạn là một nhà lãnh đạo lôi cuốn, có đam mê mãnh liệt trong việc phát triển tiềm năng con người. Bạn tin rằng ngành môi giới cốt lõi là việc xây dựng niềm tin. Bạn giúp đội ngũ môi giới vượt qua áp lực và duy trì đạo đức nghề nghiệp.",
+            behavior: "Bạn cởi mở, thấu hiểu tâm lý khách hàng và nhân viên. Bạn dùng ngôn từ truyền cảm hứng xuất sắc, biết cách động viên đội ngũ lúc thị trường khó khăn.",
+            career: "Giám đốc Đào tạo (Training Manager), Trưởng ban Quan hệ Cộng đồng (PR), Trưởng nhóm Kinh doanh xuất sắc.",
+            example: "Nhân vật điển hình: Một 'Người thầy' trong ngành môi giới, chuyên đứng lớp đào tạo kỹ năng bán hàng và truyền tư duy tích cực, giúp hàng trăm nhân viên tìm thấy tình yêu với nghề."
+        },
+        "ESFJ": {
+            name: "Chuyên Viên Chăm Sóc Khách Hàng Cao Cấp",
+            overview: "Bạn là người cực kỳ chu đáo, ấm áp và luôn muốn mang lại trải nghiệm hoàn hảo cho khách hàng. Đối với bạn, bán một căn nhà là trao một tổ ấm. Bạn xây dựng được tệp khách hàng trung thành cực kỳ lớn nhờ sự tận tâm.",
+            behavior: "Bạn hòa nhã, luôn nhớ sinh nhật, sở thích của khách hàng. Giao tiếp của bạn mang lại cảm giác thân thuộc, tin cậy. Bạn xử lý các khiếu nại bằng sự nhẫn nại tuyệt vời.",
+            career: "Quản lý Dịch vụ cư dân, Chăm sóc khách hàng hậu mãi, Môi giới phân khúc gia đình, Lễ tân Sàn giao dịch.",
+            example: "Nhân vật điển hình: Một tư vấn viên xuất sắc có tỷ lệ khách hàng cũ giới thiệu (Referral) cao nhất công ty. Khách hàng coi bạn như một người nhà đáng tin cậy để nhờ mua bán tài sản."
+        },
+        "INFJ": {
+            name: "Chuyên Gia Tư Vấn Định Hướng & Phát Triển Bền Vững",
+            overview: "Dù hướng nội, bạn lại có khả năng đọc vị tâm lý khách hàng cực kỳ sâu sắc. Bạn không chạy theo doanh số mù quáng mà luôn tìm kiếm giá trị cốt lõi, tư vấn cho khách hàng những tài sản thực sự mang lại sự bình an và phát triển bền vững.",
+            behavior: "Bạn tinh tế, lắng nghe bằng sự đồng cảm tuyệt đối. Lời khuyên của bạn thường có trọng lượng lớn vì khách hàng cảm nhận được sự chân thành và không bị ép buộc (push sale).",
+            career: "Tư vấn đầu tư BĐS sinh thái, Quy hoạch cảnh quan, Chuyên viên ESG (Môi trường - Xã hội - Quản trị) dự án.",
+            example: "Nhân vật điển hình: Một cố vấn đầu tư chuyên mảng BĐS nghỉ dưỡng sinh thái, người tư vấn cho giới tinh hoa không chỉ về tài sản mà còn về phong cách sống hòa hợp với thiên nhiên."
+        },
+        "ISFJ": {
+            name: "Trưởng Ban Quản Lý Tòa Nhà / Hỗ Trợ Hành Chính",
+            overview: "Bạn là hậu phương vững chắc, làm việc chăm chỉ thầm lặng để đảm bảo hệ thống vận hành trơn tru. Sự tận tâm, kiên nhẫn của bạn giúp tạo ra một môi trường sống ổn định cho hàng ngàn cư dân.",
+            behavior: "Bạn ít khi lớn tiếng, luôn cẩn thận lắng nghe và ghi chép các yêu cầu của cư dân/khách hàng. Bạn giải quyết công việc hành chính bằng sự cẩn trọng tuyệt đối.",
+            career: "Quản lý vận hành Tòa nhà (Building Manager), Điều phối viên giao dịch, Kế toán dự án.",
+            example: "Nhân vật điển hình: Một Trưởng ban quản lý chung cư, người thuộc nằm lòng hệ thống kỹ thuật của tòa nhà, kiên nhẫn xử lý từng sự cố nhỏ nhất để đảm bảo cư dân luôn hài lòng."
+        },
+        "ENTP": {
+            name: "Nhà Đàm Phán Sắc Bén / Đổi Mới Sáng Tạo",
+            overview: "Bạn là chuyên gia 'phá vỡ rào cản', có khả năng nhìn ra những cơ hội lướt sóng hoặc đầu tư mà người khác bỏ lỡ. Bạn có tư duy linh hoạt, giải quyết các rắc rối pháp lý hoặc tài chính bằng những cách sáng tạo chưa từng có.",
+            behavior: "Bạn ăn nói sắc bén, lập luận logic và rất thích tham gia các cuộc đàm phán căng thẳng. Bạn có khả năng xoay chuyển tình thế nhanh chóng trên bàn đàm phán.",
+            career: "Chuyên gia Đàm phán M&A, Giám đốc Marketing BĐS (với các concept độc lạ), Cố vấn PropTech.",
+            example: "Nhân vật điển hình: Một chuyên gia đàm phán thương vụ, người có thể đưa ra những phương án thanh toán linh hoạt, tháo gỡ nút thắt tài chính giúp hai bên ký kết hợp đồng trong gang tấc."
+        },
+        "ESTP": {
+            name: "Siêu Môi Giới 'Lướt Sóng' / Nhà Đầu Tư Thực Chiến",
+            overview: "Bạn thích nghi cực nhanh với biến động thị trường. Bạn là người hành động, có khả năng nắm bắt tâm lý người bán/người mua ngay tức thì để chốt deal trong thời gian ngắn nhất.",
+            behavior: "Bạn hào sảng, bộc trực, ngôn ngữ cơ thể đầy tự tin. Bạn ưu tiên hành động và tốc độ, thường 'chốt cọc' ngay trên bàn cà phê nhờ khả năng thuyết phục thực dụng.",
+            career: "Môi giới tự do (Broker), Nhà đầu tư thứ cấp (Flipping), Phân phối BĐS thương mại.",
+            example: "Nhân vật điển hình: Một nhà đầu tư cá nhân chuyên 'săn' hàng ngộp, ra quyết định xuống tiền trong vòng 24h và bán chênh lệch thành công nhờ tốc độ và mạng lưới quan hệ sâu rộng."
+        },
+        "INTP": {
+            name: "Kỹ Sư PropTech / Kiến Trúc Sư Hệ Thống",
+            overview: "Bạn đam mê giải quyết các bài toán phức tạp. Trong BĐS, bạn thích việc xây dựng các công cụ định giá tự động, thiết kế ứng dụng thông minh hoặc phân tích xu hướng bằng công nghệ thay vì đi bán hàng trực tiếp.",
+            behavior: "Bạn linh hoạt, tò mò nhưng lại rất khắt khe về tính logic. Bạn giao tiếp thông qua dữ liệu, giải pháp phần mềm và thường thích làm việc độc lập.",
+            career: "Chuyên gia PropTech, Phân tích dữ liệu lớn (Data Scientist), Cố vấn kỹ thuật BĐS.",
+            example: "Nhân vật điển hình: Người đứng sau các hệ thống định giá BĐS trực tuyến (AI) hoặc nền tảng quản lý dự án, giúp số hóa toàn bộ quy trình giao dịch của tập đoàn."
+        },
+        "ISTP": {
+            name: "Chuyên Gia Kỹ Thuật / Quản Lý Tiện Ích",
+            overview: "Bạn là người cực kỳ thực tế, có khả năng 'bắt mạch' các vấn đề kỹ thuật của công trình. Bạn là người giải quyết khủng hoảng tuyệt vời khi dự án gặp sự cố thi công hoặc vận hành.",
+            behavior: "Trầm lặng, trực diện và không thích lý thuyết suông. Bạn đánh giá mọi thứ qua giá trị sử dụng thực tế và công năng của tài sản.",
+            career: "Kỹ sư trưởng tòa nhà, Quản lý thi công nội thất, Chuyên gia giám sát chất lượng.",
+            example: "Nhân vật điển hình: Một Kỹ sư trưởng của khu phức hợp, người phản ứng cực nhanh trong các sự cố PCCC hoặc hỏng hóc kỹ thuật, đảm bảo an toàn tuyệt đối cho công trình."
+        },
+        "ENFP": {
+            name: "Chuyên Viên Truyền Thông & Sáng Tạo Concept",
+            overview: "Bạn là ngọn lửa sáng tạo, không bao giờ cạn kiệt ý tưởng. Bạn đóng vai trò biến một dự án bê tông cốt thép thành một câu chuyện truyền cảm hứng, thu hút khách hàng thông qua cảm xúc và cái đẹp.",
+            behavior: "Bạn quyến rũ, nói nhiều và cực kỳ thuyết phục. Bạn làm việc bằng cảm hứng, rất giỏi trong việc tạo ra các chiến dịch viral Marketing cho dự án mới.",
+            career: "Giám đốc Sáng tạo (Creative Director), Quản lý Marketing Dự án, Chuyên viên PR Bất động sản.",
+            example: "Nhân vật điển hình: Người thổi hồn vào các concept dự án như 'Sống chuẩn nghỉ dưỡng giữa lòng đô thị', giúp chủ đầu tư bán sạch rổ hàng trong ngày mở bán đầu tiên."
+        },
+        "ESFP": {
+            name: "Ngôi Sao Sự Kiện Mở Bán / Môi Giới Năng Động",
+            overview: "Bạn là trung tâm của mọi sự chú ý. Sự nhiệt tình và khả năng kết nối xã hội của bạn khiến mọi khách hàng đều cảm thấy vui vẻ khi làm việc cùng. Bạn rất giỏi trong việc kích thích cảm xúc mua hàng tại các event.",
+            behavior: "Vui vẻ, ồn ào và tràn đầy năng lượng. Bạn sử dụng sự hài hước và khả năng hoạt náo để xóa tan khoảng cách với khách hàng, biến việc mua nhà thành một trải nghiệm thú vị.",
+            career: "Chuyên viên Kinh doanh dự án, MC/Hoạt náo viên sự kiện BĐS, Môi giới cá nhân.",
+            example: "Nhân vật điển hình: Một 'Super Broker', người luôn được xướng tên lên nhận hoa hồng trong các buổi lễ mở bán nhờ khả năng truyền cảm hứng mạnh mẽ khiến khách hàng đặt cọc ngay tại sự kiện."
+        },
+        "INFP": {
+            name: "Kiến Tạo Không Gian Sống Chữa Lành",
+            overview: "Bạn là người mang lý tưởng sâu sắc, luôn mong muốn thị trường BĐS phát triển theo hướng nhân văn, bảo vệ môi trường. Bạn quan tâm đến chất lượng sống thực sự của cư dân hơn là các con số lợi nhuận lạnh lùng.",
+            behavior: "Nhẹ nhàng, thấu cảm và chân thành. Khách hàng tin tưởng bạn vì bạn thực sự đứng về phía lợi ích và sự bình an của họ.",
+            career: "Thiết kế cảnh quan (Landscape), Môi giới BĐS ngoại ô/Nhà vườn, Chuyên viên Trách nhiệm xã hội (CSR).",
+            example: "Nhân vật điển hình: Một nhà thiết kế cảnh quan hoặc môi giới chuyên phân khúc nhà vườn sinh thái, giúp khách hàng tìm về những không gian sống xanh, chữa lành tâm hồn."
+        },
+        "ISFP": {
+            name: "Nghệ Sĩ Kiến Trúc & Thiết Kế Nội Thất",
+            overview: "Bạn có gu thẩm mỹ tuyệt vời và sự nhạy bén với không gian. Trong chuỗi giá trị BĐS, bạn là người làm gia tăng giá trị tài sản thông qua việc thiết kế, trang trí (Home Staging) trước khi bán.",
+            behavior: "Tinh tế, ít nói và thể hiện năng lực qua các tác phẩm thực tế. Bạn không thích bị gò bó trong các quy tắc văn phòng cứng nhắc.",
+            career: "Thiết kế Nội thất (Interior Designer), Chuyên gia Home Staging (Nâng tầm giá trị nhà), Môi giới BĐS cao cấp/Nghệ thuật.",
+            example: "Nhân vật điển hình: Một chuyên gia Decor không gian, người có thể biến một căn hộ cũ kỹ thành một 'kiệt tác' ánh sáng và màu sắc, giúp bán ra với giá chênh lệch hàng tỷ đồng."
+        }
+    };
+
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        let html = '';
+        questions.forEach((q, index) => {
+            html += `
+            <div class="question-block">
+                <div class="question-title">${q.q}</div>
+                <div class="options">
+                    <label><input type="radio" name="q${index}" value="${q.a_val}"> A. ${q.a}</label>
+                    <label><input type="radio" name="q${index}" value="${q.b_val}"> B. ${q.b}</label>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function calculateMBTI() {
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        let missing = false;
+
+        questions.forEach((q, index) => {
+            const ans = document.querySelector(`input[name="q${index}"]:checked`);
+            if(ans) {
+                scores[ans.value]++;
+            } else {
+                missing = true;
+            }
+        });
+
+        if(missing) {
+            alert("Vui lòng hoàn thành đủ 20 câu hỏi để hệ thống phân tích chính xác nhất!");
+            return;
+        }
+
+        let type = "";
+        type += (scores.E >= scores.I) ? "E" : "I";
+        type += (scores.S >= scores.N) ? "S" : "N";
+        type += (scores.T >= scores.F) ? "T" : "F";
+        type += (scores.J >= scores.P) ? "J" : "P";
+
+        displayResult(type, scores);
+    }
+
+    function displayResult(type, scores) {
+        document.getElementById('result-section').style.display = 'block';
+        document.getElementById('mbti-type').innerText = type;
+        
+        const profile = profiles[type];
+        document.getElementById('mbti-name').innerText = profile.name;
+        document.getElementById('desc-overview').innerHTML = `<span class="highlight">Bạn là ai?</span><br>` + profile.overview;
+        document.getElementById('desc-behavior').innerHTML = `<span class="highlight">Trong giao dịch & quản lý:</span><br>` + profile.behavior;
+        document.getElementById('desc-career').innerHTML = `<span class="highlight">Vị trí tỏa sáng:</span><br> ` + profile.career;
+        document.getElementById('desc-example').innerHTML = `💡 ` + profile.example;
+
+        // Vẽ biểu đồ phần trăm
+        const pairs = [
+            { left: 'E (Hướng Ngoại)', right: 'I (Hướng Nội)', leftVal: scores.E, rightVal: scores.I },
+            { left: 'S (Thực Tế)', right: 'N (Trực Giác)', leftVal: scores.S, rightVal: scores.N },
+            { left: 'T (Lý Trí)', right: 'F (Cảm Xúc)', leftVal: scores.T, rightVal: scores.F },
+            { left: 'J (Kỷ Luật)', right: 'P (Linh Hoạt)', leftVal: scores.J, rightVal: scores.P }
+        ];
+
+        let barHtml = '';
+        pairs.forEach(p => {
+            let leftPct = Math.round((p.leftVal / 5) * 100);
+            let rightPct = Math.round((p.rightVal / 5) * 100);
+            barHtml += `
+            <div class="bar-row">
+                <div class="bar-label">${p.left}</div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: ${leftPct}%">${leftPct}%</div>
+                </div>
+                <div class="bar-label">${p.right}</div>
+            </div>`;
+        });
+        document.getElementById('bar-container').innerHTML = barHtml;
+
+        // Tự động cuộn xuống kết quả
+        document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Khởi tạo
+    window.onload = renderQuestions;
+</script>
+</body>
+</html>

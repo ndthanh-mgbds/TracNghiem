@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Tính Cách MBTI</title>
+    <style>
+        :root {
+            --primary: #4a154b;
+            --secondary: #611f69;
+            --accent: #36c5f0;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+        }
+        h1, h2, h3 {
+            color: var(--primary);
+            text-align: center;
+        }
+        .intro {
+            background: #f4f1f4;
+            padding: 20px;
+            border-left: 5px solid var(--accent);
+            margin-bottom: 30px;
+            border-radius: 6px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e2e2e2;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .question-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .question-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 12px 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        .options label:hover {
+            background: #f1ecf1;
+            border-color: #d8cdd8;
+        }
+        input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+        .btn-submit:hover {
+            background-color: var(--secondary);
+        }
+        #result-section {
+            display: none;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px dashed #ddd;
+        }
+        .result-type {
+            font-size: 3em;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        .result-name {
+            font-size: 1.5em;
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .bar-container {
+            margin: 20px 0;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .bar-label {
+            width: 50px;
+            font-weight: bold;
+            text-align: center;
+            color: #555;
+        }
+        .bar-track {
+            flex-grow: 1;
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            margin: 0 10px;
+        }
+        .bar-fill {
+            height: 100%;
+            background-color: var(--accent);
+            transition: width 1s ease-in-out;
+        }
+        .content-box {
+            background: #fdfdfd;
+            border: 1px solid #eaeaea;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .content-box h3 {
+            text-align: left;
+            margin-top: 0;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>TRẮC NGHIỆM TÍNH CÁCH MBTI</h1>
+    <div class="intro">
+        <p><strong>Hướng dẫn:</strong> Bài kiểm tra dựa trên nền tảng tâm lý học của Carl Jung và Isabel Briggs Myers. Hãy chọn đáp án mà bạn cảm thấy <strong>phản ánh đúng bản chất tự nhiên</strong> của mình nhất, không phải điều bạn mong muốn trở thành. Đừng suy nghĩ quá lâu, hãy tin vào trực giác đầu tiên của bạn.</p>
+    </div>
+
+    <form id="mbtiForm">
+        <div id="questions-container"></div>
+        <button type="button" class="btn-submit" onclick="calculateMBTI()">PHÂN TÍCH KẾT QUẢ</button>
+    </form>
+
+    <div id="result-section">
+        <h2>KẾT QUẢ CỦA BẠN</h2>
+        <div class="result-type" id="mbti-type">ESTJ</div>
+        <div class="result-name" id="mbti-name">Người Điều Hành</div>
+        
+        <div class="content-box">
+            <h3>Chỉ số ưu thế</h3>
+            <div class="bar-container" id="bar-container"></div>
+        </div>
+
+        <div class="content-box">
+            <h3>Tổng quan tính cách</h3>
+            <p id="desc-overview"></p>
+        </div>
+
+        <div class="content-box">
+            <h3>Phong cách ứng xử & Giao tiếp</h3>
+            <p id="desc-behavior"></p>
+        </div>
+
+        <div class="content-box">
+            <h3>Định hướng nghề nghiệp</h3>
+            <p id="desc-career"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // E vs I
+        { q: "1. Bạn thường nạp lại năng lượng bằng cách:", a: "Tham gia các hoạt động xã hội, gặp gỡ mọi người", a_val: "E", b: "Dành thời gian ở một mình, tận hưởng không gian riêng", b_val: "I" },
+        { q: "2. Trong các cuộc họp hoặc làm việc nhóm, bạn thường:", a: "Chủ động phát biểu, thảo luận và nêu  tưởng", a_val: "E", b: "Lắng nghe, quan sát và suy nghĩ kỹ trước khi nói", b_val: "I" },
+        { q: "3. Trong giao tiếp, bạn thích phương thức nào hơn:", a: "Trao đổi trực tiếp hoặc gọi điện thoại", a_val: "E", b: "Gửi email hoặc nhắn tin văn bản", b_val: "I" },
+        { q: "4. Người khác thường nhận xét bạn là người:", a: "Cởi mở, nhiệt tình và dễ gần", a_val: "E", b: "Kín đáo, trầm tĩnh và khó đoán", b_val: "I" },
+        { q: "5. Khi gặp vấn đề khó khăn, bạn thường:", a: "Tìm người để tâm sự và bàn bạc hướng giải quyết", a_val: "E", b: "Tự mình suy ngẫm và tự tìm ra câu trả lời", b_val: "I" },
+        
+        // S vs N
+        { q: "6. Khi tiếp nhận thông tin mới, bạn quan tâm nhiều hơn đến:", a: "Sự thật, dữ liệu thực tế và các chi tiết cụ thể", a_val: "S", b: "Ý nghĩa ẩn sâu, bức tranh tổng thể và sự liên kết", b_val: "N" },
+        { q: "7. Bạn có xu hướng tin tưởng vào điều gì hơn:", a: "Kinh nghiệm thực tế đã được chứng minh", a_val: "S", b: "Trực giác và linh cảm cá nhân", b_val: "N" },
+        { q: "8. Khi giải quyết công việc, bạn thích:", a: "Làm theo các bước tiêu chuẩn, phương pháp truyền thống", a_val: "S", b: "Sáng tạo ra các cách làm mới, thử nghiệm hướng đi lạ", b_val: "N" },
+        { q: "9. Bạn thường miêu tả mọi thứ theo phong cách:", a: "Rõ ràng, cụ thể, sát với thực tế khách quan", a_val: "S", b: "Trừu tượng, sử dụng hình ảnh ẩn dụ, khái quát", b_val: "N" },
+        { q: "10. Bạn bị thu hút bởi:", a: "Những gì đang diễn ra ở HIỆN TẠI", a_val: "S", b: "Những tiềm năng và khả năng ở TƯƠNG LAI", b_val: "N" },
+
+        // T vs F
+        { q: "11. Khi đánh giá một người, bạn thường dựa trên:", a: "Năng lực, thành tích và sự hợp lý logic của họ", a_val: "T", b: "Sự chân thành, đồng cảm và lòng tốt của họ", b_val: "F" },
+        { q: "12. Phẩm chất nào quan trọng hơn đối với bạn:", a: "Sự công bằng, khách quan và chính trực", a_val: "T", b: "Sự bao dung, hòa hợp và thông cảm", b_val: "F" },
+        { q: "13. Khi xảy ra tranh cãi, mục tiêu ưu tiên của bạn là:", a: "Tìm ra sự thật khách quan, phân định đúng sai", a_val: "T", b: "Duy trì sự hòa hợp, tránh làm tổn thương người khác", b_val: "F" },
+        { q: "14. Khi đưa ra quyết định quan trọng, bạn sử dụng:", a: "Cái đầu (Lý trí, phân tích dữ liệu)", a_val: "T", b: "Trái tim (Cảm xúc, giá trị nhân văn)", b_val: "F" },
+        { q: "15. Lời khen nào khiến bạn cảm thấy tự hào hơn:", a: '"Bạn là một người rất thông minh, logic và sắc bén"', a_val: "T", b: '"Bạn là một người rất ấm áp, tinh tế và sâu sắc"', b_val: "F" },
+
+        // J vs P
+        { q: "16. Đối với lịch trình hàng ngày, bạn thích:", a: "Lên kế hoạch rõ ràng và tuân thủ sát sao", a_val: "J", b: "Mở, linh hoạt và để mọi thứ diễn ra tự nhiên", b_val: "P" },
+        { q: "17. Phong cách làm việc của bạn là:", a: "Hoàn thành công việc trước rồi mới nghỉ ngơi", a_val: "J", b: "Vừa làm vừa thư giãn, thường tăng tốc sát deadline", b_val: "P" },
+        { q: "18. Không gian làm việc/sống của bạn thường:", a: "Gọn gàng, ngăn nắp, mọi thứ ở đúng vị trí", a_val: "J", b: "Hơi lộn xộn, thoải mái nhưng bạn biết mọi thứ ở đâu", b_val: "P" },
+        { q: "19. Bạn cảm thấy yên tâm hơn khi:", a: "Mọi việc đã được quyết định và chốt lại", a_val: "J", b: "Vẫn còn các lựa chọn mở để có thể thay đổi", b_val: "P" },
+        { q: "20. Trong một chuyến du lịch, bạn có xu hướng:", a: "Lên danh sách chi tiết các điểm đến và lịch trình cụ thể", a_val: "J", b: "Tới đâu hay tới đó, khám phá tùy theo cảm hứng", b_val: "P" }
+    ];
+
+    const profiles = {
+        "INTJ": {
+            name: "Kiến trúc sư",
+            overview: "Những người có trí tưởng tượng phong phú và tư duy chiến lược, luôn có kế hoạch cho mọi thứ. Họ độc lập, tự tin và có tiêu chuẩn rất cao đối với bản thân và người khác.",
+            behavior: "Giao tiếp trực diện, logic và hướng tới giải pháp. Họ không thích nói chuyện phiếm, đề cao tính hiệu quả và sự thông minh. Có thể bị coi là lạnh lùng do đặt lý trí lên trên cảm xúc.",
+            career: "Quản lý chiến lược, Kiến trúc sư phần mềm, Nhà khoa học, Phân tích tài chính, Cố vấn quản trị, Kỹ sư, Luật sư."
+        },
+        "INTP": {
+            name: "Nhà tư duy",
+            overview: "Những nhà phát minh sáng tạo với khát khao mãnh liệt đối với tri thức. Họ yêu thích việc phân tích các khái niệm trừu tượng, tìm ra quy luật và giải quyết các vấn đề phức tạp.",
+            behavior: "Khoan dung, linh hoạt nhưng rất khắt khe khi tranh luận về logic. Thường chìm đắm trong suy nghĩ, có vẻ tách biệt. Họ thích trao đổi về các  tưởng sâu sắc thay vì cảm xúc.",
+            career: "Nhà khoa học dữ liệu, Lập trình viên, Nhà triết học, Giáo sư đại học, Kỹ sư hệ thống, Nghiên cứu viên."
+        },
+        "ENTJ": {
+            name: "Người chỉ huy",
+            overview: "Những nhà lãnh đạo bẩm sinh, dũng cảm và giàu trí tưởng tượng. Họ có khả năng nhìn ra những lỗ hổng, vạch ra chiến lược dài hạn và tập hợp mọi người để đạt được mục tiêu chung.",
+            behavior: "Quyết đoán, có sức thuyết phục và tỏa ra quyền lực. Họ giao tiếp một cách rõ ràng, đưa ra chỉ thị thay vì yêu cầu. Đôi khi có thể lấn át và quá khắt khe với cấp dưới.",
+            career: "Giám đốc điều hành (CEO), Quản lý cấp cao, Khởi nghiệp, Cố vấn doanh nghiệp, Luật sư, Chính trị gia."
+        },
+        "ENTP": {
+            name: "Người phản biện",
+            overview: "Những người thông minh, tò mò và rất thích những thách thức trí tuệ. Họ là những chuyên gia 'chơi đùa' với các ý tưởng, thích tranh luận để tìm ra những khía cạnh mới của vấn đề.",
+            behavior: "Hòa đồng, sắc bén và hài hước. Họ giao tiếp nhanh nhẹn, thích phản biện và không ngại phá vỡ các quy tắc truyền thống. Dễ làm người khác bực mình do hay vạch lá tìm sâu.",
+            career: "Nhà báo, Luật sư, Cố vấn khởi nghiệp, Marketing, Phát triển sản phẩm, Diễn giả."
+        },
+        "INFJ": {
+            name: "Người che chở",
+            overview: "Trầm lặng nhưng có lý tưởng sâu sắc và giàu trí tưởng tượng. Dù là người hướng nội, họ lại có khả năng đọc vị người khác rất tốt và luôn mong muốn đóng góp cho nhân loại.",
+            behavior: "Giao tiếp tinh tế, ấm áp và sâu sắc. Họ lắng nghe bằng sự đồng cảm tuyệt đối, luôn tìm cách giúp đỡ người khác phát triển tâm hồn. Tuy nhiên, họ rất bảo vệ thế giới nội tâm của mình.",
+            career: "Tư vấn tâm lý, Nhà văn, Giáo viên, Chuyên viên nhân sự, Công tác xã hội, Thiết kế trải nghiệm người dùng."
+        },
+        "INFP": {
+            name: "Người hòa giải",
+            overview: "Những tâm hồn thơ mộng, tốt bụng và vị tha. Họ luôn tìm kiếm điều tốt đẹp trong những người tồi tệ nhất và luôn cố gắng làm cho thế giới trở nên tốt đẹp hơn dựa trên hệ giá trị cá nhân.",
+            behavior: "Rụt rè, điềm đạm nhưng sở hữu ngọn lửa đam mê sâu sắc bên trong. Họ giao tiếp bằng ngôn từ giàu cảm xúc, ẩn dụ và thích những cuộc trò chuyện 1-1 mang tính chữa lành.",
+            career: "Nhà văn, Nhà tâm lý học, Thiết kế nghệ thuật, Cố vấn, Giáo dục đặc biệt, Hoạt động phi chính phủ."
+        },
+        "ENFJ": {
+            name: "Người truyền cảm hứng",
+            overview: "Những nhà lãnh đạo lôi cuốn, có tầm ảnh hưởng lớn đến người khác. Họ có đam mê mãnh liệt trong việc dẫn dắt và truyền cảm hứng để cộng đồng cùng nhau phát triển.",
+            behavior: "Nhiệt huyết, ân cần và giao tiếp xuất sắc. Họ dễ dàng nắm bắt cảm xúc của đám đông, biết cách dùng lời nói để động viên và tạo ra sự đồng thuận. Rất nhạy cảm với những lời chỉ trích.",
+            career: "Giảng viên, Đào tạo nhân sự, Giám đốc truyền thông, Diễn giả, Cố vấn, Quan hệ công chúng (PR)."
+        },
+        "ENFP": {
+            name: "Người truyền lửa",
+            overview: "Tinh thần tự do, nhiệt huyết, sáng tạo và luôn tìm kiếm lý do để mỉm cười. Mối quan tâm thực sự của họ là những kết nối cảm xúc và xã hội với những người xung quanh.",
+            behavior: "Hòa đồng, quyến rũ và nói rất nhiều. Họ chuyển chủ đề liên tục, chia sẻ ý tưởng một cách đầy hào hứng. Rất ghét bị gò bó trong các quy tắc và những chi tiết vụn vặt.",
+            career: "Nhà báo, Sáng tạo nội dung, Marketing, Quan hệ công chúng, Quản lý sự kiện, Diễn viên."
+        },
+        "ISTJ": {
+            name: "Người trách nhiệm",
+            overview: "Những cá nhân thực tế, hướng tới sự thật và có tính trách nhiệm cao. Họ không bao giờ bỏ dở công việc, làm việc có hệ thống, trật tự và rất tôn trọng các quy định truyền thống.",
+            behavior: "Giao tiếp ngắn gọn, rõ ràng và tập trung vào dữ kiện, sự thật. Họ không thích những lời sáo rỗng hay những giả định không có căn cứ. Hành xử nguyên tắc, đôi lúc hơi cứng nhắc.",
+            career: "Kế toán, Kiểm toán viên, Cảnh sát, Quản trị hệ thống, Hậu cần (Logistics), Luật sư."
+        },
+        "ISFJ": {
+            name: "Người nuôi dưỡng",
+            overview: "Rất tận tâm, ấm áp và luôn sẵn sàng bảo vệ những người thân yêu. Họ làm việc chăm chỉ thầm lặng đằng sau hậu trường để đảm bảo mọi thứ được vận hành trơn tru và an toàn.",
+            behavior: "Nhẹ nhàng, chu đáo và nhớ rất rõ các chi tiết về người khác. Họ thích giao tiếp thông qua hành động chăm sóc thiết thực hơn là nói suông. Thường ngại xung đột và dễ bị lợi dụng.",
+            career: "Y tá, Giáo viên mầm non, Chăm sóc khách hàng, Quản lý văn phòng, Công tác xã hội."
+        },
+        "ESTJ": {
+            name: "Người điều hành",
+            overview: "Các nhà quản lý xuất sắc, chưa từng lùi bước trong việc quản lý mọi việc - hay mọi người. Họ trân trọng truyền thống, quy tắc và tận tâm hết mình trong việc giữ gìn trật tự.",
+            behavior: "Nói to, rõ ràng, dứt khoát và thích chỉ đạo. Họ tập trung vào việc tổ chức quy trình, đảm bảo mọi người đều tuân thủ. Rất ghét sự chậm trễ, lười biếng hay làm việc theo cảm tính.",
+            career: "Quản lý cấp trung, Quản lý dự án, Giám đốc tài chính, Quân đội, Cảnh sát, Quản lý chuỗi cung ứng."
+        },
+        "ESFJ": {
+            name: "Người quan tâm",
+            overview: "Cực kỳ quan tâm, hòa đồng và nổi tiếng. Họ luôn sẵn sàng giúp đỡ và cố gắng hết sức để đảm bảo mọi người xung quanh được hạnh phúc và sống trong môi trường hòa hợp.",
+            behavior: "Hòa nhã, thích buôn chuyện vui vẻ và quan tâm đến đời sống của người khác. Họ thường là trung tâm của các buổi tiệc nhỏ, giao tiếp ấm áp và dễ dãi với các chuẩn mực xã hội.",
+            career: "Tổ chức sự kiện, Giáo viên, Y tá, Chăm sóc khách hàng, Quản lý nhân sự, Bán lẻ."
+        },
+        "ISTP": {
+            name: "Người thợ thủ công",
+            overview: "Những người thử nghiệm dũng cảm, rất thực tế và giỏi trong việc sử dụng mọi loại công cụ. Họ thích tìm hiểu cách thế giới vận hành thông qua việc tháo rời và lắp ráp lại các hệ thống.",
+            behavior: "Trầm lặng, điềm tĩnh nhưng thường đưa ra những nhận xét thực tế, bất ngờ. Họ giao tiếp trực tiếp, không vòng vo. Cực kỳ linh hoạt trong khủng hoảng nhưng ghét sự cam kết dài hạn.",
+            career: "Kỹ sư cơ khí, Lập trình viên, Thiết kế đồ họa, Sửa chữa máy móc, Phi công, Lính cứu hỏa."
+        },
+        "ISFP": {
+            name: "Người nghệ sĩ",
+            overview: "Những nghệ sĩ linh hoạt và quyến rũ, luôn sẵn sàng khám phá và trải nghiệm những điều mới lạ. Họ thể hiện bản thân qua tính thẩm mỹ, thiết kế và thậm chí cả sự lựa chọn lối sống.",
+            behavior: "Nhạy cảm, hiền lành và ít lời. Họ thích giao tiếp thông qua nghệ thuật, cái đẹp và hành động hơn là lời nói. Họ sống trong hiện tại, tận hưởng từng khoảnh khắc và ghét bị kiểm soát.",
+            career: "Thiết kế thời trang, Nghệ sĩ, Nhạc sĩ, Đầu bếp, Chăm sóc sức khỏe, Thiết kế nội thất."
+        },
+        "ESTP": {
+            name: "Người thực thi",
+            overview: "Rất thông minh, tràn đầy năng lượng và có khả năng nhận thức nhạy bén. Họ thực sự tận hưởng việc sống ở thế giới của những rủi ro và sống vì hiện tại.",
+            behavior: "Hào sảng, bộc trực và rất có sức hút. Họ có khả năng đọc vị ngôn ngữ cơ thể xuất sắc và giao tiếp bằng sự hài hước, thực dụng. Họ hành động trước rồi mới suy nghĩ thay vì ngồi lập kế hoạch.",
+            career: "Bán hàng, Doanh nhân khởi nghiệp, Môi giới bất động sản, Diễn viên, Thể thao chuyên nghiệp."
+        },
+        "ESFP": {
+            name: "Người trình diễn",
+            overview: "Năng động, nhiệt tình và rất có khiếu thẩm mỹ. Cuộc sống xung quanh họ không bao giờ nhàm chán vì họ luôn biết cách khuyến khích mọi người tận hưởng cuộc sống một cách trọn vẹn nhất.",
+            behavior: "Vui vẻ, ồn ào và luôn là tâm điểm của sự chú ý. Họ giao tiếp một cách đầy biểu cảm, thích mua vui cho người khác. Họ cực kỳ ghét các cuộc tranh luận lý thuyết khô khan và cứng nhắc.",
+            career: "Diễn viên, Hướng dẫn viên du lịch, Tổ chức sự kiện, Bán hàng, Chăm sóc khách hàng, Thiết kế."
+        }
+    };
+
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        let html = '';
+        questions.forEach((q, index) => {
+            html += `
+            <div class="question-block">
+                <div class="question-title">${q.q}</div>
+                <div class="options">
+                    <label><input type="radio" name="q${index}" value="${q.a_val}"> A. ${q.a}</label>
+                    <label><input type="radio" name="q${index}" value="${q.b_val}"> B. ${q.b}</label>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function calculateMBTI() {
+        let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        let missing = false;
+
+        questions.forEach((q, index) => {
+            const ans = document.querySelector(`input[name="q${index}"]:checked`);
+            if(ans) {
+                scores[ans.value]++;
+            } else {
+                missing = true;
+            }
+        });
+
+        if(missing) {
+            alert("Vui lòng trả lời đầy đủ 20 câu hỏi để có kết quả chính xác nhất!");
+            return;
+        }
+
+        let type = "";
+        type += (scores.E >= scores.I) ? "E" : "I";
+        type += (scores.S >= scores.N) ? "S" : "N";
+        type += (scores.T >= scores.F) ? "T" : "F";
+        type += (scores.J >= scores.P) ? "J" : "P";
+
+        displayResult(type, scores);
+    }
+
+    function displayResult(type, scores) {
+        document.getElementById('result-section').style.display = 'block';
+        document.getElementById('mbti-type').innerText = type;
+        
+        const profile = profiles[type];
+        document.getElementById('mbti-name').innerText = profile.name;
+        document.getElementById('desc-overview').innerText = profile.overview;
+        document.getElementById('desc-behavior').innerText = profile.behavior;
+        document.getElementById('desc-career').innerText = profile.career;
+
+        // Draw bars
+        const pairs = [
+            { left: 'E', right: 'I', leftVal: scores.E, rightVal: scores.I },
+            { left: 'S', right: 'N', leftVal: scores.S, rightVal: scores.N },
+            { left: 'T', right: 'F', leftVal: scores.T, rightVal: scores.F },
+            { left: 'J', right: 'P', leftVal: scores.J, rightVal: scores.P }
+        ];
+
+        let barHtml = '';
+        pairs.forEach(p => {
+            let leftPct = Math.round((p.leftVal / 5) * 100);
+            let rightPct = Math.round((p.rightVal / 5) * 100);
+            barHtml += `
+            <div class="bar-row">
+                <div class="bar-label">${p.left} (${leftPct}%)</div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: ${leftPct}%"></div>
+                </div>
+                <div class="bar-label">${p.right} (${rightPct}%)</div>
+            </div>`;
+        });
+        document.getElementById('bar-container').innerHTML = barHtml;
+
+        document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.onload = renderQuestions;
+</script>
+</body>
+</html>
