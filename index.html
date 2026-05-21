@@ -48,6 +48,35 @@
             font-size: 1.1em;
             letter-spacing: 0.5px;
         }
+        
+        /* CSS cho thanh Menu Điều Hướng */
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .nav-item {
+            background: var(--secondary);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+            border: 1px solid var(--gold);
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .nav-item:hover {
+            background: var(--gold);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(217, 119, 6, 0.2);
+        }
+
         .header-title {
             text-align: center;
             color: var(--primary);
@@ -215,6 +244,13 @@
 <div class="container">
     <div class="author-header">
         BIÊN SOẠN & THIẾT KẾ: ThS. NGUYỄN ĐỨC THÀNH | MB: 0908 639 595
+    </div>
+
+    <div class="nav-menu">
+        <a href="disc-test.html" target="_blank" class="nav-item">Trắc nghiệm DISC 1</a>
+        <a href="DISC-Test01.html" target="_blank" class="nav-item">Trắc nghiệm DISC 2</a>
+        <a href="mbti_test.html" target="_blank" class="nav-item">MBTI Tính Cách</a>
+        <a href="mbti_bat_dong_san.html" target="_blank" class="nav-item">MBTI Bất Động Sản</a>
     </div>
 
     <h1 class="header-title">Hệ Thống Thần Số Học Khai Vấn</h1>
