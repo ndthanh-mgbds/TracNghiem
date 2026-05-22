@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luận Quẻ Kinh Dịch Số Điện Thoại</title>
+    <style>
+        :root {
+            --primary-color: #8b0000;
+            --secondary-color: #fdf5e6;
+            --text-color: #333;
+            --border-color: #d2b48c;
+            --accent-color: #daa520;
+            --business-color: #0056b3;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #faf0e6;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .input-section {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            max-width: 300px;
+            padding: 12px;
+            font-size: 1.2em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button:hover { background-color: #a52a2a; }
+
+        #error-msg {
+            color: red;
+            font-style: italic;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .results-section {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hexagram-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .hexagram-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 5px; height: 100%;
+            background-color: var(--accent-color);
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .hexagram-title {
+            font-size: 1.4em;
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .hexagram-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #b22222;
+        }
+
+        .gua-symbol {
+            font-size: 2.5em;
+            line-height: 1;
+            margin-left: 10px;
+        }
+
+        .hexagram-details p {
+            margin: 10px 0;
+            text-align: justify;
+            font-size: 1.05em;
+        }
+
+        .highlight { font-weight: bold; color: var(--primary-color); }
+        .business-advice {
+            background-color: #e6f2ff;
+            color: var(--business-color);
+            padding: 10px 15px;
+            border-left: 4px solid var(--business-color);
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 15px !important;
+            display: none;
+        }
+        
+        .calculation-details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+            border-left: 3px solid #ccc;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            input[type="text"] { width: 100%; }
+            .hexagram-title { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Luận Quẻ Kinh Dịch Số Điện Thoại</h1>
+    <p style="text-align: center; color: #666; font-style: italic; margin-top: -20px; margin-bottom: 30px;">Xác định Cát Hung - Định hướng Kinh Doanh & Hành Động</p>
+    
+    <div class="input-section">
+        <label for="phoneNumber">Nhập số điện thoại của bạn:</label>
+        <input type="text" id="phoneNumber" placeholder="Ví dụ: 0908639595" maxlength="11">
+        <br>
+        <button onclick="calculateIChing()">Lập Quẻ Khai Vận</button>
+        <div id="error-msg">Vui lòng nhập số điện thoại hợp lệ (chứa từ 9-11 chữ số).</div>
+    </div>
+
+    <div id="results-section" class="results-section">
+        <div class="calculation-details" id="calc-details"></div>
+
+        <div class="hexagram-card">
+            <div class="hexagram-title">
+                <span>QUẺ CHÍNH (Bổn Quái)</span>
+                <span id="main-hex-symbol" class="gua-symbol"></span>
+            </div>
+            <div class="hexagram-details">
+                <p><strong>Tên Quẻ:</strong> <span id="main-hex-name" class="hexagram-name"></span></p>
+                <p><strong>Ý Nghĩa (Tượng quẻ):</strong> <span id="main-hex-meaning"></span></p>
+                <p><strong>Tác Động & Lời Khuyên:</strong> <span id="main-hex-desc"></span></p>
+                <p id="main-hex-business" class="business-advice"></p>
+            </div>
+        </div>
+        
+        <div class="hexagram-card" style="border-left-color: #4682b4;">
+            <div class="hexagram-title">
+                <span style="color: #4682b4;">QUẺ HỖ (Hỗ Quái)</span>
+                <span id="mutual-hex-symbol" class="gua-symbol"></span>
+            </div>
+            <div class="hexagram-details">
+                <p><strong>Tên Quẻ:</strong> <span id="mutual-hex-name" class="hexagram-name" style="color: #4682b4;"></span></p>
+                <p><strong>Ý Nghĩa (Tượng quẻ):</strong> <span id="mutual-hex-meaning"></span></p>
+                <p><strong>Tác Động (Tiềm ẩn):</strong> <span id="mutual-hex-desc"></span></p>
+                <p id="mutual-hex-business" class="business-advice"></p>
+            </div>
+        </div>
+
+        <div class="hexagram-card" style="border-left-color: #2e8b57;">
+            <div class="hexagram-title">
+                <span style="color: #2e8b57;">QUẺ BIẾN (Biến Quái)</span>
+                <span id="changed-hex-symbol" class="gua-symbol"></span>
+            </div>
+            <div class="hexagram-details">
+                <p><strong>Tên Quẻ:</strong> <span id="changed-hex-name" class="hexagram-name" style="color: #2e8b57;"></span></p>
+                <p><strong>Ý Nghĩa (Tượng quẻ):</strong> <span id="changed-hex-meaning"></span></p>
+                <p><strong>Tác Động (Hậu vận):</strong> <span id="changed-hex-desc"></span></p>
+                <p id="changed-hex-business" class="business-advice"></p>
+            </div>
+        </div>
+        
+        <div class="hexagram-card" style="background-color: #fffaf0; border-color: var(--accent-color);">
+            <h3 style="color: var(--primary-color); margin-top:0; border-bottom: 1px solid #ccc; padding-bottom: 5px;">TỔNG LUẬN CÁT HUNG</h3>
+            <p id="final-conclusion" style="font-size: 1.1em; line-height: 1.8; text-align: justify;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu Bát Quái
+    const baGua = {
+        1: { name: "Càn", nature: "Thiên", binary: [1, 1, 1] }, 
+        2: { name: "Đoài", nature: "Trạch", binary: [0, 1, 1] }, 
+        3: { name: "Ly", nature: "Hỏa", binary: [1, 0, 1] },   
+        4: { name: "Chấn", nature: "Lôi", binary: [0, 0, 1] }, 
+        5: { name: "Tốn", nature: "Phong", binary: [1, 1, 0] }, 
+        6: { name: "Khảm", nature: "Thủy", binary: [0, 1, 0] }, 
+        7: { name: "Cấn", nature: "Sơn", binary: [1, 0, 0] },   
+        8: { name: "Khôn", nature: "Địa", binary: [0, 0, 0] }    
+    };
+
+    // Từ điển 64 Quẻ Kinh Dịch Chuyên Sâu (Bao gồm 8 quẻ thuần và kinh doanh)
+    const hexagramsData = {
+        "Càn_Càn": {
+            name: "Thuần Càn",
+            meaning: "Trời (Sáng tạo, mạnh mẽ)",
+            desc: "Cực cát. Vận thế đang lên như rồng bay. Lời khuyên: Hãy tự tin dẫn đầu, thực hiện các dự án lớn, khẳng định vị thế độc tôn.",
+            business: "Trong kinh doanh: Sự nghiệp đại phát, là thời điểm vàng để mở rộng quy mô, dẫn dắt thị trường và tiên phong ra mắt sản phẩm mới.",
+            symbol: "&#19904;"
+        },
+        "Thiên_Trạch": {
+            name: "Thiên Trạch Lý",
+            meaning: "Dẫm đuôi hổ (Cẩn trọng)",
+            desc: "Cẩn trọng. Như dẫm đuôi hổ, nguy hiểm rình rập. Lời khuyên: Cần giữ thái độ hòa nhã, tuân thủ pháp luật và quy trình để bình an.",
+            symbol: "&#19905;"
+        },
+        "Thiên_Hỏa": {
+            name: "Thiên Hỏa Đồng Nhân",
+            meaning: "Thân thiện (Hợp tác)",
+            desc: "Đại cát. Thuận lợi trong việc tìm kiếm đồng minh. Lời khuyên: Nên mở rộng mạng lưới quan hệ, ký kết hợp đồng, làm việc nhóm.",
+            symbol: "&#19906;"
+        },
+        "Thiên_Lôi": {
+            name: "Thiên Lôi Vô Vọng",
+            meaning: "Sự thật (Tự nhiên)",
+            desc: "Bình hòa. Mọi sự nên thuận theo tự nhiên. Lời khuyên: Đừng cưỡng cầu hay dùng thủ đoạn, sự chân thành sẽ mang lại may mắn bất ngờ.",
+            symbol: "&#19907;"
+        },
+        "Thiên_Phong": {
+            name: "Thiên Phong Cấu",
+            meaning: "Gặp gỡ bất ngờ (Đề phòng)",
+            desc: "Hung. Sự gặp gỡ bất ngờ nhưng mang tính rủi ro. Lời khuyên: Cảnh giác với những lời mời chào quá hấp dẫn, đề phòng tiểu nhân.",
+            symbol: "&#19908;"
+        },
+        "Thiên_Thủy": {
+            name: "Thiên Thủy Tụng",
+            meaning: "Kiện tụng (Tranh chấp)",
+            desc: "Hung. Dễ xảy ra tranh chấp, kiện tụng. Lời khuyên: Hết sức kiềm chế trong giao tiếp, thà chịu thiệt một chút còn hơn sa lầy vào cãi vã.",
+            symbol: "&#19909;"
+        },
+        "Thiên_Sơn": {
+            name: "Thiên Sơn Độn",
+            meaning: "Ẩn cư (Rút lui)",
+            desc: "Bình. Thời điểm nên rút lui để bảo toàn lực lượng. Lời khuyên: Không nên phô trương, hãy ẩn mình chờ thời, tránh xa các cuộc đối đầu.",
+            symbol: "&#19910;"
+        },
+        "Thiên_Địa": {
+            name: "Thiên Địa Bĩ",
+            meaning: "Bế tắc (Không thông)",
+            desc: "Đại hung. Sự bế tắc, âm dương cách biệt. Lời khuyên: Tuyệt đối không đầu tư mạo hiểm, hãy kiên nhẫn tu sửa nội tại và chờ đợi vận mới.",
+            symbol: "&#19911;"
+        },
+        "Trạch_Thiên": {
+            name: "Trạch Thiên Quải",
+            meaning: "Quyết liệt (Công khai)",
+            desc: "Bình. Cần sự dứt khoát để loại bỏ chướng ngại. Lời khuyên: Hãy quyết đoán chấm dứt các mối quan hệ độc hại hoặc cách làm việc lỗi thời.",
+            symbol: "&#19912;"
+        },
+        "Đoài_Đoài": {
+            name: "Thuần Đoài",
+            meaning: "Vui vẻ (Hỷ lạc)",
+            desc: "Cát. Mang lại niềm vui và sự thuyết phục. Lời khuyên: Tận dụng kỹ năng giao tiếp, đàm phán; kết quả sẽ đạt được qua sự vui vẻ, hòa ái.",
+            business: "Trong kinh doanh: Giao tiếp, đàm phán cực kỳ thuận lợi. Tốt cho ngành tư vấn, môi giới, giải trí. Hợp đồng dễ dàng được ký kết qua đàm phán vui vẻ.",
+            symbol: "&#19913;"
+        },
+        "Trạch_Hỏa": {
+            name: "Trạch Hỏa Cách",
+            meaning: "Cải cách (Thay đổi)",
+            desc: "Cát. Thời điểm để thực hiện cuộc cách mạng bản thân. Lời khuyên: Đừng ngần ngại đổi mới hoàn toàn phương pháp kinh doanh hoặc hình ảnh cá nhân.",
+            symbol: "&#19914;"
+        },
+        "Trạch_Lôi": {
+            name: "Trạch Lôi Tùy",
+            meaning: "Thuận theo (Ứng biến)",
+            desc: "Cát. Thuận theo xu hướng và sự dẫn dắt của người khác. Lời khuyên: Hãy là người đồng hành tốt, không cần làm chủ, đi theo người giỏi sẽ có lộc.",
+            symbol: "&#19915;"
+        },
+        "Trạch_Phong": {
+            name: "Trạch Phong Đại Quá",
+            meaning: "Quá mức (Áp lực)",
+            desc: "Hung. Áp lực vượt quá khả năng gánh vác. Lời khuyên: Cần chia sẻ bớt công việc, tránh ôm đồm dẫn đến sai sót lớn gây hỏng việc.",
+            symbol: "&#19916;"
+        },
+        "Trạch_Thủy": {
+            name: "Trạch Thủy Khốn",
+            meaning: "Khốn cùng (Bế tắc)",
+            desc: "Hung. Cảm giác bị vây hãm, thiếu hụt tài chính. Lời khuyên: Cần thắt lưng buộc bụng, giữ vững tinh thần thép, đừng vì túng quẫn mà làm liều.",
+            symbol: "&#19917;"
+        },
+        "Trạch_Sơn": {
+            name: "Trạch Sơn Hàm",
+            meaning: "Giao cảm (Tình cảm)",
+            desc: "Cát. Sự rung động và cảm thông sâu sắc. Lời khuyên: Hãy dùng tình cảm và sự chân thành để kết nối; rất tốt cho việc ký kết dựa trên sự tin cậy.",
+            symbol: "&#19918;"
+        },
+        "Trạch_Địa": {
+            name: "Trạch Địa Tụy",
+            meaning: "Nhóm họp (Đoàn kết)",
+            desc: "Cát. Sức mạnh của sự đoàn kết và tụ họp. Lời khuyên: Hãy kêu gọi cộng đồng, tổ chức sự kiện hoặc huy động vốn, đám đông sẽ ủng hộ bạn.",
+            symbol: "&#19919;"
+        },
+        "Hỏa_Thiên": {
+            name: "Hỏa Thiên Đại Hữu",
+            meaning: "Giàu sang (Thịnh vượng)",
+            desc: "Đại cát. Sự thịnh vượng và sở hữu lớn. Lời khuyên: Vận thế đang đỉnh cao, hãy tận dụng để gia tăng tài sản và tầm ảnh hưởng của mình.",
+            symbol: "&#19920;"
+        },
+        "Hỏa_Trạch": {
+            name: "Hỏa Trạch Khuê",
+            meaning: "Trái ngược (Mâu thuẫn)",
+            desc: "Hung. Sự mâu thuẫn, bằng mặt không bằng lòng. Lời khuyên: Cần chú ý điều chỉnh các mối quan hệ nội bộ, tránh để xung đột nhỏ xé ra to.",
+            symbol: "&#19921;"
+        },
+        "Ly_Ly": {
+            name: "Thuần Ly",
+            meaning: "Sáng sủa (Trí tuệ)",
+            desc: "Cát. Ánh sáng của trí tuệ và sự rạng rỡ. Lời khuyên: Tập trung vào các mảng giáo dục, truyền thông, bằng cấp; uy tín sẽ được nâng cao rõ rệt.",
+            business: "Trong kinh doanh: Thương hiệu tỏa sáng, phát đạt. Rất tốt cho ngành truyền thông, giáo dục, công nghệ. Chú ý quản lý tài chính để tránh 'cháy' ngân sách.",
+            symbol: "&#19922;"
+        },
+        "Hỏa_Lôi": {
+            name: "Hỏa Lôi Phệ Hạp",
+            meaning: "Cắn hợp (Vượt khó)",
+            desc: "Bình. Cần sự nghiêm minh để giải quyết vướng mắc. Lời khuyên: Thẳng thắn đối diện với sai phạm, dùng pháp luật hoặc kỷ luật để dẹp loạn.",
+            symbol: "&#19923;"
+        },
+        "Hỏa_Phong": {
+            name: "Hỏa Phong Đỉnh",
+            meaning: "Vững chắc (Đổi mới)",
+            desc: "Đại cát. Sự vững chãi và thăng tiến sự nghiệp. Lời khuyên: Thời điểm vàng để lên chức hoặc mở rộng quy mô kinh doanh; có quý nhân đỡ đầu.",
+            symbol: "&#19924;"
+        },
+        "Hỏa_Thủy": {
+            name: "Hỏa Thủy Vị Tế",
+            meaning: "Chưa xong (Dở dang)",
+            desc: "Bình. Việc chưa hoàn thành dù đã rất gần đích. Lời khuyên: Cần kiên trì thêm một chút nữa, tuyệt đối không được chủ quan ở phút chót.",
+            symbol: "&#19925;"
+        },
+        "Hỏa_Sơn": {
+            name: "Hỏa Sơn Lữ",
+            meaning: "Lữ khách (Tạm thời)",
+            desc: "Bình. Sự dịch chuyển, không ổn định. Lời khuyên: Chỉ nên thực hiện các kế hoạch ngắn hạn, lưu động; tránh đầu tư vào tài sản cố định lúc này.",
+            symbol: "&#19926;"
+        },
+        "Hỏa_Địa": {
+            name: "Hỏa Địa Tấn",
+            meaning: "Tiến bộ (Vươn lên)",
+            desc: "Cát. Sự thăng tiến mạnh mẽ như mặt trời lên. Lời khuyên: Hãy tự tin thể hiện năng lực, sự nghiệp sẽ phát triển nhanh chóng và rạng rỡ.",
+            symbol: "&#19927;"
+        },
+        "Lôi_Thiên": {
+            name: "Lôi Thiên Đại Tráng",
+            meaning: "Thịnh đại (Cương dương)",
+            desc: "Cát. Sức mạnh lớn nhưng cần sự chính trực. Lời khuyên: Làm việc gì cũng phải dựa trên đạo đức, tránh cậy thế lấn lướt người khác mà rước họa.",
+            symbol: "&#19928;"
+        },
+        "Lôi_Trạch": {
+            name: "Lôi Trạch Quy Muội",
+            meaning: "Sai lầm (Trái đạo)",
+            desc: "Hung. Sự sai lệch về vị thế (vợ lấn quyền chồng, dưới lấn trên). Lời khuyên: Xem lại thứ tự ưu tiên, đừng nôn nóng làm việc trái lẽ thường.",
+            symbol: "&#19929;"
+        },
+        "Lôi_Hỏa": {
+            name: "Lôi Hỏa Phong",
+            meaning: "Sung túc (Đỉnh cao)",
+            desc: "Cát. Đỉnh cao của sự sung túc và nổi tiếng. Lời khuyên: Hãy chia sẻ tài lộc với cộng đồng để giữ vận may bền lâu, đề phòng sự suy tàn sau đỉnh cao.",
+            symbol: "&#19930;"
+        },
+        "Chấn_Chấn": {
+            name: "Thuần Chấn",
+            meaning: "Sấm động (Chấn động)",
+            desc: "Bình. Biến động bất ngờ khiến tâm trí xao động. Lời khuyên: Giữ cái đầu lạnh, mọi sự xáo trộn chỉ là nhất thời để thức tỉnh tiềm năng của bạn.",
+            business: "Trong kinh doanh: Dễ gặp biến động hoặc khủng hoảng bất ngờ. Đây là lúc tung ra các chiến dịch shock, gây tiếng vang, nhưng cần quản trị rủi ro thật tốt.",
+            symbol: "&#19931;"
+        },
+        "Lôi_Phong": {
+            name: "Lôi Phong Hằng",
+            meaning: "Bền vững (Kiên trì)",
+            desc: "Cát. Sự bền vững và kiên định với mục tiêu. Lời khuyên: Đừng thay đổi kế hoạch, sự trung thành và kiên trì sẽ mang lại quả ngọt lâu dài.",
+            symbol: "&#19932;"
+        },
+        "Lôi_Thủy": {
+            name: "Lôi Thủy Giải",
+            meaning: "Giải tỏa (Thoát nạn)",
+            desc: "Cát. Sự tháo gỡ nút thắt, giải tỏa áp lực. Lời khuyên: Đây là lúc để giải quyết các nợ nần, mâu thuẫn cũ; bạn sẽ cảm thấy nhẹ nhàng và thanh thản.",
+            symbol: "&#19933;"
+        },
+        "Lôi_Sơn": {
+            name: "Lôi Sơn Tiểu Quá",
+            meaning: "Hơi quá (Việc nhỏ)",
+            desc: "Bình. Chỉ tốt cho việc nhỏ, không nên làm đại sự. Lời khuyên: Hãy khiêm cung, làm tốt những việc thực tế trước mắt, đừng viển vông.",
+            symbol: "&#19934;"
+        },
+        "Lôi_Địa": {
+            name: "Lôi Địa Dự",
+            meaning: "Vui vẻ (Chuẩn bị)",
+            desc: "Cát. Sự chuẩn bị chu đáo mang lại niềm vui. Lời khuyên: Lên kế hoạch kỹ lưỡng cho tương lai, thời gian tới sẽ có nhiều cơ hội để hưởng thụ thành quả.",
+            symbol: "&#19935;"
+        },
+        "Phong_Thiên": {
+            name: "Phong Thiên Tiểu Súc",
+            meaning: "Ngăn trở nhỏ (Tích lũy)",
+            desc: "Bình. Sự tích lũy nhỏ, chưa thể bứt phá. Lời khuyên: Kiên nhẫn gom góp nguồn lực, kiến thức; chưa phải lúc để ra khơi lớn.",
+            symbol: "&#19936;"
+        },
+        "Phong_Trạch": {
+            name: "Phong Trạch Trung Phu",
+            meaning: "Thành thực (Tin cậy)",
+            desc: "Cát. Sự tin cậy tuyệt đối và chân thành. Lời khuyên: Hãy giữ lời hứa, uy tín cá nhân sẽ giúp bạn vượt qua mọi đối thủ cạnh tranh đáng gờm nhất.",
+            symbol: "&#19937;"
+        },
+        "Phong_Hỏa": {
+            name: "Phong Hỏa Gia Nhân",
+            meaning: "Người nhà (Gia đạo)",
+            desc: "Cát. Sự ổn định trong gia đạo và nội bộ. Lời khuyên: Muốn ra ngoài làm lớn thì phải yên được việc nhà, hãy củng cố hậu phương thật vững.",
+            symbol: "&#19938;"
+        },
+        "Phong_Lôi": {
+            name: "Phong Lôi Ích",
+            meaning: "Lợi lộc (Gia tăng)",
+            desc: "Đại cát. Sự tăng trưởng vượt bậc về tài lộc. Lời khuyên: Hãy mạnh dạn đầu tư, mở rộng sản xuất; tiền bạc sẽ đổ về từ nhiều nguồn khác nhau.",
+            symbol: "&#19939;"
+        },
+        "Tốn_Tốn": {
+            name: "Thuần Tốn",
+            meaning: "Thuận theo (Mềm mỏng)",
+            desc: "Bình. Sự khéo léo, mềm mỏng mang lại kết quả. Lời khuyên: 'Lạt mềm buộc chặt', hãy dùng sự tinh tế để thâm nhập vào thị trường hoặc lòng người.",
+            business: "Trong kinh doanh: Tốt cho mảng dịch vụ, vận tải, thông tin truyền thông. Cần sự mềm mỏng, linh hoạt theo xu hướng thị trường ('lạt mềm buộc chặt').",
+            symbol: "&#19940;"
+        },
+        "Phong_Thủy": {
+            name: "Phong Thủy Hoán",
+            meaning: "Tan rã (Thay đổi)",
+            desc: "Bình. Sự tan rã để tái cấu trúc lại tốt hơn. Lời khuyên: Đừng lo sợ khi thấy sự thay đổi, đó là bước đệm để bạn xây dựng một hệ thống mạnh hơn.",
+            symbol: "&#19941;"
+        },
+        "Phong_Sơn": {
+            name: "Phong Sơn Tiệm",
+            meaning: "Tiến dần (Chậm chắc)",
+            desc: "Cát. Sự tiến bộ chậm rãi nhưng cực kỳ chắc chắn. Lời khuyên: Không được đốt cháy giai đoạn, cứ làm đúng lộ trình bạn sẽ đạt được mục tiêu.",
+            symbol: "&#19942;"
+        },
+        "Phong_Địa": {
+            name: "Phong Địa Thăng",
+            meaning: "Bay cao (Thăng tiến)",
+            desc: "Cát. Sự thăng tiến nhờ quý nhân nâng đỡ. Lời khuyên: Chủ động tìm kiếm sự cố vấn từ người đi trước, con đường thăng tiến của bạn đang rất sáng.",
+            symbol: "&#19943;"
+        },
+        "Thủy_Thiên": {
+            name: "Thủy Thiên Nhu",
+            meaning: "Chờ đợi (Hanh thông)",
+            desc: "Cát. Sự chờ đợi trong niềm vui và hy vọng. Lời khuyên: Thời cơ đang đến gần, hãy chuẩn bị tinh thần và sức khỏe để đón nhận vận may lớn.",
+            symbol: "&#19944;"
+        },
+        "Thủy_Trạch": {
+            name: "Thủy Trạch Tiết",
+            meaning: "Chừng mực (Tiết chế)",
+            desc: "Bình. Cần sự tiết chế và kiểm soát chặt chẽ. Lời khuyên: Hãy quản lý chi tiêu và cảm xúc thật tốt, sự chừng mực sẽ giúp bạn bảo toàn thành quả.",
+            symbol: "&#19945;"
+        },
+        "Thủy_Hỏa": {
+            name: "Thủy Hỏa Ký Tế",
+            meaning: "Đã xong (Hoàn tất)",
+            desc: "Cát. Mọi việc đã hoàn thành và đi vào ổn định. Lời khuyên: Cần duy trì sự tỉnh táo để giữ vững phong độ, tránh tâm lý chủ quan sau chiến thắng.",
+            symbol: "&#19946;"
+        },
+        "Thủy_Lôi": {
+            name: "Thủy Lôi Truân",
+            meaning: "Gian nan (Khởi đầu)",
+            desc: "Hung. Gian nan trắc trở lúc mới bắt đầu. Lời khuyên: Đừng bỏ cuộc, hãy tìm sự giúp đỡ và chuẩn bị kỹ năng tốt hơn để vượt qua giai đoạn đầu khó khăn.",
+            symbol: "&#19947;"
+        },
+        "Thủy_Phong": {
+            name: "Thủy Phong Tỉnh",
+            meaning: "Cái giếng (Giá trị)",
+            desc: "Bình. Sự cung cấp giá trị ổn định như nước giếng. Lời khuyên: Hãy tập trung vào chuyên môn sâu, giá trị cốt lõi của bạn chính là nguồn thu nhập bền vững.",
+            symbol: "&#19948;"
+        },
+        "Khảm_Khảm": {
+            name: "Thuần Khảm",
+            meaning: "Hiểm trở (Thử thách)",
+            desc: "Đại hung. Hiểm họa trùng trùng, vực sâu vây hãm. Lời khuyên: Ngừng mọi hoạt động đầu tư rủi ro, ẩn mình, kiên trì giữ vững đạo đức để vượt khó.",
+            business: "Trong kinh doanh: Khó khăn, dòng tiền tắc nghẽn, nhiều cạm bẫy. Cần phòng thủ, tái cấu trúc tài chính, tuyệt đối không đầu tư mạo hiểm lúc này.",
+            symbol: "&#19949;"
+        },
+        "Thủy_Sơn": {
+            name: "Thủy Sơn Kiển",
+            meaning: "Khó khăn (Ngăn trở)",
+            desc: "Hung. Sự ngăn trở từ cả phía trước và phía sau. Lời khuyên: Không nên cố đấm ăn xôi, hãy dừng lại quan sát và tìm một con đường vòng an toàn hơn.",
+            symbol: "&#19950;"
+        },
+        "Thủy_Địa": {
+            name: "Thủy Địa Tỷ",
+            meaning: "Gần gũi (Hợp tác)",
+            desc: "Cát. Sự lựa chọn cộng sự và liên minh tốt. Lời khuyên: Tìm người có cùng chí hướng để hợp tác, sức mạnh tập thể sẽ giúp bạn thành công rực rỡ.",
+            symbol: "&#19951;"
+        },
+        "Sơn_Thiên": {
+            name: "Sơn Thiên Đại Súc",
+            meaning: "Tích lũy lớn (Tài năng)",
+            desc: "Cát. Tích lũy tiềm lực lớn và tài năng ẩn giấu. Lời khuyên: Đừng vội phô trương, hãy tiếp tục học hỏi, khi đủ 'độ chín' bạn sẽ bùng nổ mạnh mẽ.",
+            symbol: "&#19952;"
+        },
+        "Sơn_Trạch": {
+            name: "Sơn Trạch Tổn",
+            meaning: "Tổn thất (Hy sinh)",
+            desc: "Hung. Sự hao tổn vì những việc không đáng. Lời khuyên: Cần cắt giảm chi phí thừa thãi, biết hy sinh lợi ích nhỏ trước mắt để tránh tổn thất lớn sau này.",
+            symbol: "&#19953;"
+        },
+        "Sơn_Hỏa": {
+            name: "Sơn Hỏa Bí",
+            meaning: "Trang sức (Hình thức)",
+            desc: "Bình. Chú trọng vẻ bề ngoài và văn hóa ứng xử. Lời khuyên: Hãy trau chuốt hình ảnh cá nhân và thương hiệu, nó sẽ là 'giấy thông hành' cho thành công.",
+            symbol: "&#19954;"
+        },
+        "Sơn_Lôi": {
+            name: "Sơn Lôi Di",
+            meaning: "Nuôi dưỡng (Sức khỏe)",
+            desc: "Bình. Chú trọng nuôi dưỡng thân và tâm. Lời khuyên: Cần nghỉ ngơi, chăm sóc sức khỏe và cẩn trọng trong lời nói để không tự chuốc họa vào thân.",
+            symbol: "&#19955;"
+        },
+        "Sơn_Phong": {
+            name: "Sơn Phong Cổ",
+            meaning: "Đổ nát (Sửa chữa)",
+            desc: "Hung. Sự thối rữa từ bên trong do lỗi lầm cũ. Lời khuyên: Cần dũng cảm thừa nhận sai lầm và thực hiện một cuộc cải tổ triệt để trong công việc.",
+            symbol: "&#19956;"
+        },
+        "Sơn_Thủy": {
+            name: "Sơn Thủy Mông",
+            meaning: "Non nớt (Học hỏi)",
+            desc: "Bình. Sự non nớt cần được chỉ bảo. Lời khuyên: Đừng tự mãn, hãy tìm một người thầy hoặc cố vấn giỏi để dẫn dắt bạn đi đúng hướng.",
+            symbol: "&#19957;"
+        },
+        "Cấn_Cấn": {
+            name: "Thuần Cấn",
+            meaning: "Ngưng nghỉ (Tĩnh tại)",
+            desc: "Bình. Thời điểm cần sự tĩnh lặng tuyệt đối. Lời khuyên: Không nên khởi động dự án mới, hãy dành thời gian thiền định hoặc lập kế hoạch trong im lặng.",
+            business: "Trong kinh doanh: Nên chững lại để củng cố nội bộ, không nên mở rộng vội vã. Phù hợp với các mảng khai khoáng, kho bãi, lưu trữ bảo quản.",
+            symbol: "&#19958;"
+        },
+        "Sơn_Địa": {
+            name: "Sơn Địa Bác",
+            meaning: "Tiêu mòn (Hư hỏng)",
+            desc: "Hung. Sự sụp đổ và tiêu tán năng lượng. Lời khuyên: Tránh xa các cuộc tranh chấp, giữ chặt túi tiền, không nên tin lời hứa hẹn của người lạ.",
+            symbol: "&#19959;"
+        },
+        "Địa_Thiên": {
+            name: "Địa Thiên Thái",
+            meaning: "Thông suốt (Hòa hợp)",
+            desc: "Đại cát. Sự hanh thông tuyệt đỉnh, vạn sự như ý. Lời khuyên: Thời điểm lý tưởng để triển khai các kế hoạch lớn nhất đời người; thành công chắc chắn.",
+            symbol: "&#19960;"
+        },
+        "Địa_Trạch": {
+            name: "Địa Trạch Lâm",
+            meaning: "Đến gần (Quản lý)",
+            desc: "Cát. Sự quản lý và giám sát hiệu quả. Lời khuyên: Hãy chủ động nắm quyền kiểm soát, trực tiếp ra tay xử lý công việc sẽ đạt kết quả tốt nhất.",
+            symbol: "&#19961;"
+        },
+        "Địa_Hỏa": {
+            name: "Địa Hỏa Minh Di",
+            meaning: "Ánh sáng lặn (Nhẫn nhục)",
+            desc: "Hung. Tài năng bị vùi lấp, thời thế u tối. Lời khuyên: Hãy nhẫn nhục, 'giả ngơ' để bảo vệ bản thân, đừng cố thể hiện mình lúc này sẽ bị ghen ghét.",
+            symbol: "&#19962;"
+        },
+        "Địa_Lôi": {
+            name: "Địa Lôi Phục",
+            meaning: "Quay lại (Phục hồi)",
+            desc: "Cát. Vận may đang quay trở lại. Lời khuyên: Hãy khởi động lại các dự án cũ từng thất bại, lần này bạn sẽ có cơ hội thành công rất cao.",
+            symbol: "&#19963;"
+        },
+        "Địa_Phong": {
+            name: "Địa Phong Thăng",
+            meaning: "Thăng tiến (Đi lên)",
+            desc: "Cát. Sự thăng tiến vững chắc từ gốc rễ. Lời khuyên: Cứ nỗ lực làm việc chân chính, quý nhân và cấp trên sẽ tự tìm đến để đề bạt bạn.",
+            symbol: "&#19964;"
+        },
+        "Địa_Thủy": {
+            name: "Địa Thủy Sư",
+            meaning: "Quân đội (Kỷ luật)",
+            desc: "Bình. Cần kỷ luật và tổ chức chặt chẽ. Lời khuyên: Mọi việc muốn thành phải có kế hoạch chi tiết và người cầm lái quyết đoán; tránh làm việc tùy hứng.",
+            symbol: "&#19965;"
+        },
+        "Địa_Sơn": {
+            name: "Địa Sơn Khiêm",
+            meaning: "Khiêm tốn (Đại cát)",
+            desc: "Đại cát. Sự khiêm tốn mang lại vinh quang bền vững. Lời khuyên: Càng thành công càng nên nhún nhường, đức độ của bạn sẽ là lá chắn bảo vệ sự nghiệp.",
+            symbol: "&#19966;"
+        },
+        "Khôn_Khôn": {
+            name: "Thuần Khôn",
+            meaning: "Đất mẹ (Nhu thuận)",
+            desc: "Cát. Sự bao dung, nhu thuận và hỗ trợ. Lời khuyên: Hãy làm tốt vai trò hậu phương hoặc hỗ trợ người khác, lộc lá sẽ tự nhiên đến với bạn.",
+            business: "Trong kinh doanh: Ổn định và bền vững, lấy chữ tín và dịch vụ hậu mãi làm đầu. Rất tốt khi đầu tư vào bất động sản, nông nghiệp hoặc dịch vụ hỗ trợ.",
+            symbol: "&#19967;"
+        }
+    };
+
+    const defaultGua = { name: "Chưa Rõ", meaning: "Đang cập nhật...", desc: "Tự bản thân nỗ lực là chính.", symbol: "&#19904;" };
+
+    function renderGuaDetails(guaObj, nameId, meaningId, descId, businessId, symbolId, upperName, lowerName) {
+        document.getElementById(nameId).innerText = guaObj.name;
+        document.getElementById(symbolId).innerHTML = guaObj.symbol;
+        document.getElementById(meaningId).innerText = guaObj.meaning;
+        
+        let descText = guaObj.desc;
+        if(descText.includes('.')) {
+            document.getElementById(descId).innerHTML = `<span class="highlight">${descText.split('.')[0]}.</span> ${descText.substring(descText.indexOf('.') + 1)}`;
+        } else {
+            document.getElementById(descId).innerHTML = descText;
+        }
+
+        let busElem = document.getElementById(businessId);
+        if (guaObj.business) {
+            busElem.innerText = guaObj.business;
+            busElem.style.display = "block";
+        } else {
+            busElem.style.display = "none";
+        }
+    }
+
+    function calculateIChing() {
+        const phone = document.getElementById("phoneNumber").value.trim();
+        const errorMsg = document.getElementById("error-msg");
+        const resultsSection = document.getElementById("results-section");
+        
+        if (!phone || phone.length < 9 || phone.length > 11 || !/^\d+$/.test(phone)) {
+            errorMsg.style.display = "block";
+            resultsSection.style.display = "none";
+            return;
+        }
+        errorMsg.style.display = "none";
+
+        let firstPartStr = phone.substring(0, 5);
+        let secondPartStr = phone.substring(5);
+
+        let sumUpper = 0, sumLower = 0, totalSum = 0;
+        for (let i = 0; i < firstPartStr.length; i++) sumUpper += parseInt(firstPartStr[i]);
+        for (let i = 0; i < secondPartStr.length; i++) sumLower += parseInt(secondPartStr[i]);
+        for (let i = 0; i < phone.length; i++) totalSum += parseInt(phone[i]);
+
+        let upperGuaNum = sumUpper % 8 || 8;
+        let lowerGuaNum = sumLower % 8 || 8;
+
+        let upperGua = baGua[upperGuaNum];
+        let lowerGua = baGua[lowerGuaNum];
+
+        // Quẻ Chính
+        let mainHexagramKey = upperGua.name === lowerGua.name ? `${upperGua.name}_${lowerGua.name}` : `${upperGua.nature}_${lowerGua.nature}`;
+        let mainHexagram = hexagramsData[mainHexagramKey] || defaultGua;
+
+        let movingLine = totalSum % 6 || 6;
+
+        let mainBinary = [...lowerGua.binary, ...upperGua.binary]; 
+        
+        // Quẻ Hỗ
+        let mutualLowerBinary = [mainBinary[1], mainBinary[2], mainBinary[3]];
+        let mutualUpperBinary = [mainBinary[2], mainBinary[3], mainBinary[4]];
+
+        let getBaGuaNumFromBinary = (binArr) => {
+            for (let i = 1; i <= 8; i++) {
+                if (baGua[i].binary.join('') === binArr.join('')) return i;
+            }
+            return 1;
+        };
+
+        let mutualUpperGua = baGua[getBaGuaNumFromBinary(mutualUpperBinary)];
+        let mutualLowerGua = baGua[getBaGuaNumFromBinary(mutualLowerBinary)];
+        
+        let mutualHexagramKey = mutualUpperGua.name === mutualLowerGua.name ? `${mutualUpperGua.name}_${mutualLowerGua.name}` : `${mutualUpperGua.nature}_${mutualLowerGua.nature}`;
+        let mutualHexagram = hexagramsData[mutualHexagramKey] || defaultGua;
+
+        // Quẻ Biến
+        let changedBinary = [...mainBinary];
+        changedBinary[movingLine - 1] = changedBinary[movingLine - 1] === 1 ? 0 : 1;
+
+        let changedUpperGua = baGua[getBaGuaNumFromBinary([changedBinary[3], changedBinary[4], changedBinary[5]])];
+        let changedLowerGua = baGua[getBaGuaNumFromBinary([changedBinary[0], changedBinary[1], changedBinary[2]])];
+
+        let changedHexagramKey = changedUpperGua.name === changedLowerGua.name ? `${changedUpperGua.name}_${changedLowerGua.name}` : `${changedUpperGua.nature}_${changedLowerGua.nature}`;
+        let changedHexagram = hexagramsData[changedHexagramKey] || defaultGua;
+
+        // Render Calc Details
+        document.getElementById('calc-details').innerHTML = `
+            <strong>Chi tiết Lập quẻ:</strong><br>
+            - 5 số đầu (${firstPartStr}) = Tổng ${sumUpper} &rarr; Thượng Quái: <strong>${upperGua.nature} (${upperGua.name})</strong><br>
+            - ${secondPartStr.length} số cuối (${secondPartStr}) = Tổng ${sumLower} &rarr; Hạ Quái: <strong>${lowerGua.nature} (${lowerGua.name})</strong><br>
+            - Tổng dãy số (${totalSum}) chia 6 dư ${movingLine} &rarr; <strong>Hào Động: Hào ${movingLine}</strong>
+        `;
+
+        renderGuaDetails(mainHexagram, "main-hex-name", "main-hex-meaning", "main-hex-desc", "main-hex-business", "main-hex-symbol");
+        renderGuaDetails(mutualHexagram, "mutual-hex-name", "mutual-hex-meaning", "mutual-hex-desc", "mutual-hex-business", "mutual-hex-symbol");
+        renderGuaDetails(changedHexagram, "changed-hex-name", "changed-hex-meaning", "changed-hex-desc", "changed-hex-business", "changed-hex-symbol");
+
+        let conclusionStr = "";
+        let mainCat = mainHexagram.desc.includes("Cát") || mainHexagram.desc.includes("Tốt");
+        let changedCat = changedHexagram.desc.includes("Cát") || changedHexagram.desc.includes("Tốt");
+
+        if (mainCat && changedCat) {
+            conclusionStr = "Số điện thoại mang trường năng lượng <strong>RẤT TỐT (ĐẠI CÁT)</strong>. Cả gốc rễ (Quẻ Chính) lẫn tương lai (Quẻ Biến) đều hanh thông. Mang lại tài lộc, sự bình an và thuận lợi trong các mối quan hệ.";
+        } else if (mainCat && !changedCat) {
+            conclusionStr = "Số điện thoại mang mức độ <strong>TRUNG BÌNH</strong>. Ban đầu (Quẻ Chính) rất thuận lợi, công việc hanh thông nhưng về lâu dài (Quẻ Biến) dễ sinh ra biến cố, trắc trở. Cần thận trọng bảo vệ thành quả.";
+        } else if (!mainCat && changedCat) {
+            conclusionStr = "Số điện thoại mang ý nghĩa <strong>TIỀN HUNG HẬU CÁT</strong>. Khởi đầu (Quẻ Chính) nhiều chông gai, vất vả nhưng nếu kiên trì vượt qua, hậu vận tương lai (Quẻ Biến) sẽ vô cùng tươi sáng, thành công rực rỡ.";
+        } else {
+            conclusionStr = "Số điện thoại mang trường năng lượng <strong>XẤU (HUNG)</strong>. Cả hiện tại và tương lai đều gặp nhiều cản trở, thị phi, khó tụ tài. Lời khuyên nên cân nhắc đổi số điện thoại khác để cải thiện phong thủy.";
+        }
+        document.getElementById('final-conclusion').innerHTML = conclusionStr;
+        
+        resultsSection.style.display = "block";
+    }
+</script>
+</body>
+</html>

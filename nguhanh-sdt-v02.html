@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Ngũ Hành Số Điện Thoại - Định Hướng Chuyên Sâu</title>
+    <style>
+        :root {
+            --primary: #111827;
+            --secondary: #374151;
+            --accent: #f59e0b;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+            --success: #059669;
+            --danger: #dc2626;
+            /* Màu Ngũ Hành */
+            --kim: #9ca3af;
+            --moc: #10b981;
+            --thuy: #3b82f6;
+            --hoa: #ef4444;
+            --tho: #d97706;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-top: 5px solid var(--accent);
+        }
+        .author-header, .author-footer {
+            text-align: center;
+            padding: 12px;
+            background: #fffbeb;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.9em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 16px;
+            font-size: 1.2em;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        button {
+            padding: 16px 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        button:hover { 
+            background-color: var(--accent); 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+        .error { 
+            color: var(--danger); 
+            text-align: center; 
+            display: none; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            padding: 10px;
+            background: #fef2f2;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+        }
+        
+        #results { display: none; animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(15px);} to {opacity: 1; transform: translateY(0);} }
+        
+        .element-card {
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .element-card h3 { 
+            margin-top: 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.3); 
+            padding-bottom: 12px;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .calc-details { 
+            background: rgba(255,255,255,0.15); 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', Courier, monospace; 
+            margin-bottom: 15px;
+            font-size: 1.05em;
+        }
+        .meaning-box { 
+            background: rgba(0,0,0,0.15); 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 15px;
+        }
+        
+        /* Chuyên mục Hậu Vận */
+        .hauvan-analysis {
+            background: #ffffff;
+            color: var(--primary);
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .hauvan-analysis h4 {
+            margin-top: 0;
+            color: var(--secondary);
+            font-size: 1.4em;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .outcome-box {
+            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: 6px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .outcome-success { background-color: #f0fdf4; border-left: 4px solid var(--success); }
+        .outcome-danger { background-color: #fef2f2; border-left: 4px solid var(--danger); }
+        .outcome-advice { background-color: #fffbeb; border-left: 4px solid var(--accent); }
+        .outcome-xahoi { background-color: #f0f9ff; border-left: 4px solid #3b82f6; }
+        .outcome-cskh { background-color: #fdf4ff; border-left: 4px solid #d946ef; }
+
+        .outcome-title {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .outcome-success .outcome-title { color: var(--success); }
+        .outcome-danger .outcome-title { color: var(--danger); }
+        .outcome-advice .outcome-title { color: #b45309; }
+        .outcome-xahoi .outcome-title { color: #1d4ed8; }
+        .outcome-cskh .outcome-title { color: #a21caf; }
+
+        .career-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 25px;
+            border-radius: 12px;
+            color: var(--primary);
+            margin-top: 10px;
+        }
+        .career-section h3 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .career-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+        .career-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .career-title {
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        
+        .bg-kim { background: linear-gradient(135deg, #4b5563, #9ca3af); }
+        .bg-moc { background: linear-gradient(135deg, #065f46, #10b981); }
+        .bg-thuy { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+        .bg-hoa { background: linear-gradient(135deg, #991b1b, #ef4444); }
+        .bg-tho { background: linear-gradient(135deg, #92400e, #d97706); }
+        
+        .highlight-text { font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="author-header">
+        BIÊN SOẠN: ThS. NGUYỄN ĐỨC THÀNH | MB: 0908 639 595
+    </div>
+
+    <h1>Hệ Thống Phân Tích Ngũ Hành Số Điện Thoại</h1>
+    <div class="subtitle">Định chuẩn năng lượng Lạc Thư & Giải mã Cát Hung Hậu Vận theo Hà Đồ</div>
+    
+    <div class="error" id="error-msg">Vui lòng nhập chính xác số điện thoại gồm 10 chữ số!</div>
+    
+    <div class="input-group">
+        <input type="text" id="phoneInput" placeholder="Ví dụ: 0908639595" maxlength="10">
+        <button onclick="calculateElements()">Phân Tích Năng Lượng</button>
+    </div>
+
+    <div id="results">
+        <div id="card-sum" class="element-card">
+            <h3>1. Ngũ Hành Tổng Hòa (Bản Chất Dãy Số)</h3>
+            <div class="calc-details" id="sum-calc"></div>
+            <div class="meaning-box" id="sum-meaning"></div>
+        </div>
+        
+        <div id="card-career" class="career-section">
+            <h3>💼 Ứng Dụng Năng Lượng Vào Nghề Nghiệp</h3>
+            <div id="career-content">
+                </div>
+        </div>
+
+        <div id="card-last" class="element-card" style="margin-top: 25px;">
+            <h3>2. Ngũ Hành Hậu Vận (Giải Mã Thành Bại)</h3>
+            <div class="calc-details" id="last-calc"></div>
+            <div class="meaning-box" id="last-meaning"></div>
+            
+            <div class="hauvan-analysis">
+                <h4>Phân Tích Chuyên Sâu Tương Lai & Hậu Vận</h4>
+                <div id="hauvan-content">
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="author-footer" style="margin-top: 30px; margin-bottom: 0;">
+        © 2026 ThS. Nguyễn Đức Thành | Giảng viên. Khoa QLĐĐ&BĐS. NLU
+    </div>
+</div>
+
+<script>
+    // Dữ liệu Cửu Tinh Lạc Thư
+    const lucThuMap = {
+        1: { el: "THỦY", color: "bg-thuy", name: "Nhất Bạch Thủy", desc: "Đại diện cho trí tuệ, sự linh hoạt, khéo léo trong giao tiếp và dòng chảy tài lộc liên tục." },
+        2: { el: "THỔ", color: "bg-tho", name: "Nhị Hắc Thổ", desc: "Đại diện cho sự bao dung, nuôi dưỡng, sự ổn định vững chắc và tích lũy điền sản." },
+        3: { el: "MỘC", color: "bg-moc", name: "Tam Bích Mộc", desc: "Đại diện cho sự sinh sôi, vươn lên mạnh mẽ, năng động, mang tính tiên phong." },
+        4: { el: "MỘC", color: "bg-moc", name: "Tứ Lục Mộc", desc: "Đại diện cho học thuật, thi cử đỗ đạt, sự lãng mạn, tài năng nghệ thuật và tư duy sư phạm." },
+        5: { el: "THỔ", color: "bg-tho", name: "Ngũ Hoàng Thổ", desc: "Năng lượng trung tâm, uy quyền và mạnh mẽ. Chứa đựng sức mạnh lãnh đạo và quy tụ." },
+        6: { el: "KIM", color: "bg-kim", name: "Lục Bạch Kim", desc: "Đại diện cho quyền lực, sự quyết đoán, kỷ luật thép và may mắn về tài chính, công danh." },
+        7: { el: "KIM", color: "bg-kim", name: "Thất Xích Kim", desc: "Đại diện cho khả năng đàm phán, tính thuyết phục cao, thu hút sự chú ý của đám đông." },
+        8: { el: "THỔ", color: "bg-tho", name: "Bát Bạch Thổ", desc: "Cát tinh đại diện cho sự giàu có, tài lộc dồi dào, thăng tiến vững chắc, phồn vinh." },
+        9: { el: "HỎA", color: "bg-hoa", name: "Cửu Tử Hỏa", desc: "Đại diện cho danh tiếng, sự rực rỡ, nhiệt huyết, tầm nhìn xa và sức mạnh truyền cảm hứng." }
+    };
+
+    // Dữ liệu Tiên Thiên Hà Đồ
+    const haDoMap = {
+        1: { el: "THỦY", color: "bg-thuy" }, 6: { el: "THỦY", color: "bg-thuy" },
+        2: { el: "HỎA", color: "bg-hoa" }, 7: { el: "HỎA", color: "bg-hoa" },
+        3: { el: "MỘC", color: "bg-moc" }, 8: { el: "MỘC", color: "bg-moc" },
+        4: { el: "KIM", color: "bg-kim" }, 9: { el: "KIM", color: "bg-kim" },
+        5: { el: "THỔ", color: "bg-tho" }, 0: { el: "THỔ", color: "bg-tho" }
+    };
+
+    // Phân tích Cát Hung Hậu Vận Chuyên Sâu
+    const hauVanAdvice = {
+        "KIM": {
+            thanh: "Nằm ở sự cương quyết, quản trị chặt chẽ và khả năng duy trì kỷ luật. Hậu vận của số này mang lại sự tích lũy tài sản cứng (vàng bạc, bất động sản) rất vững vàng. Càng dùng lâu, quyền lực và vị thế càng được củng cố.",
+            bai: "Thất bại thường đến từ sự cứng nhắc, bảo thủ và độc đoán. Đề cao lý trí mà thiếu đi sự đồng cảm có thể dẫn đến gãy đổ các mối quan hệ đối tác chiến lược.",
+            khuyen: "Cần học cách mềm mỏng hơn trong giao tiếp (kết hợp với Thủy). Biết lùi một bước để tiến ba bước, tránh vì cái lý trước mắt mà làm mất đi hòa khí lâu dài.",
+            xahoi: "<b>Mối quan hệ xã hội:</b> Ít nhưng chất lượng. Sự chọn lọc đối tác rất khắt khe. Dù dễ bị hiểu lầm là người lạnh lùng, xa cách, nhưng bạn lại cực kỳ uy tín. Lời nói ra có trọng lượng và được đối tác tin cậy tuyệt đối.",
+            cskh: "<b>Dịch vụ & CSKH:</b> Cung cấp dịch vụ chuyên nghiệp, đúng quy trình, giải quyết khiếu nại nhanh gọn bằng lý trí thay vì cảm xúc. Tuy nhiên, rủi ro là bạn có thể thiếu đi sự ân cần, mềm mỏng cần thiết khi khách hàng đang có tâm lý kích động."
+        },
+        "MỘC": {
+            thanh: "Nằm ở sự kiên trì phát triển, vươn lên không ngừng và khả năng 'nhân hòa'. Hậu vận cực tốt về mặt di sản, đào tạo con người, xây dựng nền tảng từ từ nhưng vững chắc, được xã hội kính trọng.",
+            bai: "Thất bại thường nằm ở việc 'đâm lao thì phải theo lao', phân tán nguồn lực quá nhiều. Sự bộc trực, quá ngay thẳng đôi khi khiến chủ nhân dính vào thị phi hoặc bị tiểu nhân cản trở.",
+            khuyen: "Cần tập trung vào giá trị cốt lõi, tránh đầu tư dàn trải. Hãy dũng cảm 'cắt tỉa' những nhánh không cần thiết trong sự nghiệp để dồn nhựa sống nuôi 'quả ngọt' cuối cùng.",
+            xahoi: "<b>Mối quan hệ xã hội:</b> Mạng lưới quan hệ rộng mở, ôn hòa, thích kết giao và được nhiều người quý mến nhờ sự nhân từ, vị tha. Thường đóng vai trò người hòa giải trong các mâu thuẫn.",
+            cskh: "<b>Dịch vụ & CSKH:</b> Phục vụ cực kỳ tận tâm, chu đáo, luôn hướng tới sự phát triển và mang lại giá trị nuôi dưỡng cho khách hàng. Vô cùng phù hợp với các dịch vụ giáo dục, y tế hoặc tư vấn đầu tư dài hạn."
+        },
+        "THỦY": {
+            thanh: "Nằm ở sự linh hoạt, mềm mỏng và ngoại giao xuất sắc. Hậu vận của người dùng số này là mạng lưới Networking rộng mở, tiền tài luân chuyển liên tục, dễ dàng nắm bắt và thích nghi với xu hướng mới.",
+            bai: "Thất bại nằm ở việc 'tiền vào cửa trước ra cửa sau', khó giữ của cải lâu dài. Thủy quá vượng dễ dẫn đến thiếu kiên định, thay đổi mục tiêu liên tục.",
+            khuyen: "Nước cần có đê (Thổ) để quy tụ thành hồ lớn. Cần học cách quản lý tài chính chặt chẽ, gửi tiết kiệm hoặc chuyển tiền vào các tài sản cố định (nhà đất) để khóa dòng tiền.",
+            xahoi: "<b>Mối quan hệ xã hội:</b> Cực kỳ linh hoạt, giao tiếp khéo léo (như nước chảy chỗ trũng), dễ dàng hòa nhập vào mọi môi trường và tầng lớp xã hội. Người dùng số Thủy đi đâu cũng có bạn.",
+            cskh: "<b>Dịch vụ & CSKH:</b> Khả năng nắm bắt tâm lý xuất sắc, biết cách chiều lòng khách hàng khéo léo, xử lý khủng hoảng truyền thông rất mượt mà. Tuy nhiên cần cẩn trọng tránh việc hứa hẹn mập mờ, hứa suông để làm hài lòng khách tạm thời."
+        },
+        "HỎA": {
+            thanh: "Nằm ở sức mạnh truyền cảm hứng, nhiệt huyết và khả năng bứt phá thần tốc trong ngắn hạn. Hậu vận mang lại danh tiếng lẫy lừng, hình ảnh cá nhân rực rỡ, thành công vang dội trong ngành truyền thông.",
+            bai: "Thất bại nằm ở sự nóng vội, bốc đồng 'sớm nở tối tàn'. Hỏa quá vượng dễ gây rắc rối giấy tờ, kiện tụng, tranh chấp, hoặc tiêu sản nhanh chóng nếu đầu tư liều lĩnh không biết điểm dừng.",
+            khuyen: "Hỏa cần được kiểm soát. Trước khi đưa ra các quyết định lớn, đặc biệt liên quan đến ký kết tài liệu, cần có khoảng lùi để tĩnh tâm suy xét. Đừng để cái tôi bùng cháy làm tiêu rụi những mối quan hệ tốt đẹp.",
+            xahoi: "<b>Mối quan hệ xã hội:</b> Luôn là trung tâm của sự chú ý, nhiệt tình, hào sảng và nổi bật. Thường đóng vai trò là người truyền cảm hứng, 'ngọn lửa' khuấy động không khí của mọi tập thể.",
+            cskh: "<b>Dịch vụ & CSKH:</b> Phục vụ nhanh chóng, nhiệt huyết, mang lại nguồn năng lượng tích cực lan tỏa cho khách hàng. Rào cản lớn nhất là hay thiếu kiên nhẫn với các khách hàng khó tính, đòi hỏi chi tiết, dễ mất bình tĩnh."
+        },
+        "THỔ": {
+            thanh: "Nằm ở sự tĩnh tại, kiên nhẫn và chữ TÍN được đặt lên hàng đầu. Hậu vận mang lại sự an toàn tuyệt đối, hậu phương vững chãi và đặc biệt là sự sinh sôi của Điền sản (Bất động sản).",
+            bai: "Thất bại thường đến từ sự trì trệ, chậm chạp đổi mới. Đôi khi vì quá cầu toàn, bám giữ những phương thức cũ kỹ mà bỏ lỡ thời cơ vàng. Thổ vượng dễ sinh ra tính ỷ lại hoặc cố chấp.",
+            khuyen: "Bản chất Thổ đã rất vững chắc, do đó bạn cần mạnh dạn hơn thử nghiệm công cụ mới (như PropTech). Hãy sẵn sàng thay đổi phương thức làm việc khi thị trường yêu cầu để không bị tụt hậu.",
+            xahoi: "<b>Mối quan hệ xã hội:</b> Bền vững, chậm mà chắc. Bạn không phải là người quá quảng giao, nhưng là nơi người khác đặt trọn niềm tin. Những ai đã làm bạn, đối tác với bạn thì đều gắn bó rất lâu dài.",
+            cskh: "<b>Dịch vụ & CSKH:</b> Chân thành, trung thực, mang lại cảm giác an toàn tuyệt đối cho người đối diện. Kỹ năng chăm sóc khách hàng cũ cực kỳ xuất sắc, có khả năng biến họ thành những 'khách hàng trung thành' cả đời."
+        }
+    };
+
+    const careerAdvice = {
+        "KIM": `
+            <div class="career-item">
+                <div class="career-title">🏢 Quản trị & Điều hành</div>
+                Hành Kim mang năng lượng của sự sắc bén, cấu trúc và kỷ luật. Sử dụng số điện thoại này giúp người quản lý ra quyết định dứt khoát, quản trị rủi ro chặt chẽ và thiết lập quy trình vận hành hệ thống một cách tối ưu.
+            </div>
+            <div class="career-item">
+                <div class="career-title">🏙️ Đầu tư Bất động sản</div>
+                Cực kỳ phù hợp cho các hoạt động đầu tư BĐS thương mại, M&A (mua bán sáp nhập) dự án, hoặc lướt sóng. Năng lượng Kim thu hút tài chính mạnh mẽ, giúp tính toán dòng tiền logic và chốt lời chính xác.
+            </div>
+        `,
+        "MỘC": `
+            <div class="career-item">
+                <div class="career-title">📚 Giáo dục & Đào tạo</div>
+                Mộc đại diện cho sự sinh trưởng và lòng nhân ái. Số điện thoại mang hành Mộc tạo ra trường năng lượng kiên nhẫn, tận tâm, cực kỳ xuất sắc cho giảng viên, người truyền đạt kiến thức và ươm mầm tài năng.
+            </div>
+            <div class="career-item">
+                <div class="career-title">🌱 Bất động sản Sinh thái & Đất nền</div>
+                Mang lại may mắn lớn khi môi giới hoặc đầu tư vào đất nông nghiệp, đất vườn, BĐS nghỉ dưỡng sinh thái hoặc các dự án có quy hoạch mảng xanh lớn. 
+            </div>
+        `,
+        "THỦY": `
+            <div class="career-item">
+                <div class="career-title">🗣️ Môi giới BĐS & Ngoại Giao</div>
+                Thủy chủ về trí tuệ và sự luân chuyển. Năng lượng Thủy đặc biệt vượng cho nghề môi giới, giúp khả năng giao tiếp trở nên linh hoạt, khéo léo nắm bắt tâm lý khách hàng và hóa giải các xung đột trên bàn đàm phán.
+            </div>
+            <div class="career-item">
+                <div class="career-title">🏢 Khởi nghiệp & Networking</div>
+                Tạo ra sự thích nghi cao trong môi trường nhiều biến động. Người quản lý sử dụng số này dễ dàng kết nối các phòng ban, luân chuyển dòng vốn và mở rộng mạng lưới quan hệ (networking) đối tác xuất sắc.
+            </div>
+        `,
+        "HỎA": `
+            <div class="career-item">
+                <div class="career-title">🔥 Marketing BĐS & Xây dựng thương hiệu</div>
+                Hỏa là ánh sáng, sự lan tỏa và rực rỡ. Tuyệt vời cho việc ra mắt dự án mới, tạo tiếng vang truyền thông, thu hút sự chú ý của đám đông. Hỗ trợ xây dựng thương hiệu cá nhân của môi giới trở nên nổi bật trên thị trường.
+            </div>
+            <div class="career-item">
+                <div class="career-title">🗣️ Giáo dục & Diễn giả truyền cảm hứng</div>
+                Khơi dậy ngọn lửa nhiệt huyết. Năng lượng này giúp các chuyên gia đào tạo, diễn giả truyền động lực mạnh mẽ, thu hút học viên và để lại dấu ấn sâu đậm.
+            </div>
+        `,
+        "THỔ": `
+            <div class="career-item">
+                <div class="career-title">🏠 Bất Động Sản (Hành Vượng Nhất)</div>
+                Thổ chính là Đất đai, Điền sản. Đây là trường năng lượng tương hỗ mạnh mẽ nhất cho toàn bộ hệ sinh thái Bất động sản. Giúp tích lũy tài sản vững chắc, mua may bán đắt và gia tăng giá trị đất đai theo thời gian.
+            </div>
+            <div class="career-item">
+                <div class="career-title">🤝 Quản lý Vận hành & Cố vấn</div>
+                Cực kỳ phù hợp với vị trí quản lý bất động sản, ban quản lý tòa nhà, hoặc hậu cần. Nó đem lại sự ổn định, bình an, mang lại cảm giác chân thành, an tâm tuyệt đối cho nhà đầu tư khi ra quyết định lớn.
+            </div>
+        `
+    };
+
+    function calculateElements() {
+        const phone = document.getElementById("phoneInput").value.trim();
+        const err = document.getElementById("error-msg");
+        
+        if(!phone || phone.length !== 10 || !/^\d+$/.test(phone)) {
+            err.style.display = 'block';
+            document.getElementById("results").style.display = 'none';
+            return;
+        }
+        err.style.display = 'none';
+
+        // 1. Lạc Thư
+        let sum = 0;
+        let sumString = "";
+        for(let i=0; i<10; i++) {
+            sum += parseInt(phone[i]);
+            sumString += phone[i] + (i<9 ? " + " : "");
+        }
+        
+        let reduced = sum;
+        let reduceSteps = `${sum}`;
+        while(reduced > 9) {
+            let tempSum = 0;
+            let tempStr = reduced.toString();
+            for(let char of tempStr) tempSum += parseInt(char);
+            reduced = tempSum;
+            reduceSteps += ` &rarr; ${tempStr.split('').join('+')} = ${reduced}`;
+        }
+        
+        const totalData = lucThuMap[reduced];
+        
+        const cardSum = document.getElementById("card-sum");
+        cardSum.className = "element-card " + totalData.color;
+        document.getElementById("sum-calc").innerHTML = `Phép tính Lạc Thư: ${sumString} = ${sum}<br>Rút gọn Cửu Cung: ${reduceSteps} (Chòm sao ${totalData.name})`;
+        document.getElementById("sum-meaning").innerHTML = `<span class="highlight-text">Ngũ Hành Đại Diện: ${totalData.el}</span><br><br><b>Bản chất trường năng lượng:</b> ${totalData.desc}`;
+
+        document.getElementById("career-content").innerHTML = careerAdvice[totalData.el];
+
+        // 2. Hà Đồ
+        const lastDigit = parseInt(phone[9]);
+        const lastData = haDoMap[lastDigit];
+        
+        const cardLast = document.getElementById("card-last");
+        cardLast.className = "element-card " + lastData.color;
+        document.getElementById("last-calc").innerHTML = `Số tận cùng (Điểm tụ khí): ${lastDigit}`;
+        document.getElementById("last-meaning").innerHTML = `<span class="highlight-text">Ngũ Hành Hậu Vận: ${lastData.el}</span><br><br><b>Ý nghĩa Tiên Thiên:</b> Đại diện cho kết quả cuối cùng, sự đọng lại của tài lộc và nhân duyên mà số điện thoại này sẽ mang lại cho chủ nhân trong quá trình sử dụng dài hạn.`;
+
+        // 3. Phân Tích Chuyên Sâu Cát Hung Hậu Vận
+        const hauvan = hauVanAdvice[lastData.el];
+        let hauvanHtml = `
+            <div class="outcome-box outcome-success">
+                <div class="outcome-title">📈 Gợi ý về sự THÀNH CÔNG</div>
+                <div>${hauvan.thanh}</div>
+            </div>
+            <div class="outcome-box outcome-danger">
+                <div class="outcome-title">📉 Nguồn cơn của sự THẤT BẠI</div>
+                <div>${hauvan.bai}</div>
+            </div>
+            <div class="outcome-box outcome-advice">
+                <div class="outcome-title">💡 Lời khuyên khai vận</div>
+                <div>${hauvan.khuyen}</div>
+            </div>
+            <div class="outcome-box outcome-xahoi">
+                <div class="outcome-title">🤝 Mối Quan Hệ Xã Hội</div>
+                <div>${hauvan.xahoi}</div>
+            </div>
+            <div class="outcome-box outcome-cskh">
+                <div class="outcome-title">🛎️ Dịch Vụ & Chăm Sóc Khách Hàng</div>
+                <div>${hauvan.cskh}</div>
+            </div>
+        `;
+        document.getElementById("hauvan-content").innerHTML = hauvanHtml;
+
+        document.getElementById("results").style.display = 'block';
+        document.getElementById("results").scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+</script>
+
+</body>
+</html>
