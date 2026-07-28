@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Khám Phá 10 Năng Lực Cá Nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #333; }
+        .container-app { max-width: 1200px; margin: 40px auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .header-banner { background: linear-gradient(135deg, #0d6efd, #0b5ed7); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 40px; }
+        .header-banner h1 { font-weight: 700; font-size: 28px; margin-bottom: 10px; }
+        .header-banner p { margin: 0; font-size: 16px; opacity: 0.9; }
+        
+        /* Bảng 1 Styling */
+        .table-responsive { border-radius: 8px; border: 1px solid #dee2e6; overflow: hidden; }
+        .table-questions thead th { position: sticky; top: 0; background-color: #e9ecef; border-bottom: 2px solid #dee2e6; text-align: center; vertical-align: middle; font-size: 14px; padding: 15px; color: #495057; }
+        .table-questions tbody td { vertical-align: middle; font-size: 15px; padding: 12px 15px; }
+        .col-q { width: 50%; text-align: left; }
+        .col-radio { width: 10%; text-align: center; cursor: pointer; }
+        .radio-wrapper { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; cursor: pointer; }
+        input[type="radio"] { transform: scale(1.4); cursor: pointer; accent-color: #0d6efd; }
+        
+        .section-title { font-size: 22px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; border-left: 5px solid #0d6efd; padding-left: 15px; }
+        .btn-submit { font-size: 18px; font-weight: 600; padding: 12px 40px; border-radius: 8px; background-color: #0d6efd; transition: all 0.3s ease; }
+        .btn-submit:hover { background-color: #0b5ed7; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3); }
+        
+        /* Results Styling */
+        #results-section { display: none; animation: fadeIn 0.8s ease-in-out; margin-top: 50px; border-top: 2px dashed #ced4da; padding-top: 40px; }
+        .result-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
+        .table-results thead th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center; vertical-align: middle; }
+        .table-results tbody td { text-align: center; vertical-align: middle; font-size: 15px; }
+        .table-results tbody td.text-start { font-weight: 500; color: #495057; }
+        .hsdc-highlight { background-color: #fff3cd !important; font-weight: 700; color: #856404; }
+        
+        /* Chart container */
+        .chart-container { position: relative; height: 500px; width: 100%; display: flex; justify-content: center; align-items: center; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .score-legend { display: flex; justify-content: space-between; background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 14px; }
+        .score-legend span { padding: 5px 15px; border-radius: 4px; }
+        .legend-1 { background: #ff4d4f; color: white; }
+        .legend-2 { background: #ffa940; color: white; }
+        .legend-3 { background: #ffec3d; color: #333; }
+        .legend-4 { background: #73d13d; color: white; }
+        .legend-5 { background: #4096ff; color: white; }
+        
+        @media print {
+            .btn-submit, .score-legend { display: none !important; }
+            body { background: white; }
+            .container-app { box-shadow: none; padding: 0; margin: 0; }
+            #results-section { border-top: none; padding-top: 0; margin-top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-app">
+    <div class="header-banner">
+        <h1>TRẮC NGHIỆM KHÁM PHÁ 10 NĂNG LỰC CÁ NHÂN</h1>
+        <p>Bảng trắc nghiệm đánh giá năng lực dựa trên mô hình Tinh thần doanh nhân (Đại học Philippines - UP, 1998)</p>
+    </div>
+    
+    <div id="quiz-section">
+        <h2 class="section-title">Bảng 1: Câu hỏi trắc nghiệm</h2>
+        <div class="score-legend">
+            <span class="legend-1">1: Chưa bao giờ (0%)</span>
+            <span class="legend-2">2: Ít khi (1 - 39%)</span>
+            <span class="legend-3">3: Thỉnh thoảng (40 - 69%)</span>
+            <span class="legend-4">4: Thường xuyên (70 - 99%)</span>
+            <span class="legend-5">5: Luôn luôn (100%)</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-questions mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 5%">STT</th>
+                        <th class="col-q">CÂU HỎI</th>
+                        <th class="col-radio">1</th>
+                        <th class="col-radio">2</th>
+                        <th class="col-radio">3</th>
+                        <th class="col-radio">4</th>
+                        <th class="col-radio">5</th>
+                    </tr>
+                </thead>
+                <tbody id="questions-body">
+                    <!-- Javascript will populate rows here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-primary btn-submit" onclick="calculateScores()">Hoàn Thành & Tính Điểm</button>
+        </div>
+    </div>
+
+    <!-- Kết quả -->
+    <div id="results-section">
+        
+        <!-- Bảng 2: Điểm gốc -->
+        <div class="result-card">
+            <h2 class="section-title">Bảng 2: Bảng tính điểm năng lực cá nhân có hệ số điều chỉnh</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-results">
+                    <thead>
+                        <tr>
+                            <th width="5%">STT</th>
+                            <th width="35%">Các năng lực cá nhân</th>
+                            <th width="45%">Công thức tính (Điểm từ từng câu)</th>
+                            <th width="15%">Số điểm gốc</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-2-body">
+                        <!-- JS gen -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bảng 3: Điểm điều chỉnh -->
+        <div class="result-card">
+            <h2 class="section-title">Bảng 3: Bảng tính điểm 10 năng lực cá nhân</h2>
+            <p class="text-muted"><em>Quy tắc hệ số điều chỉnh (HSĐC): HSĐC 24-25 → Trừ 7 điểm; 22-23 → Trừ 5 điểm; 20-21 → Trừ 3 điểm; Dưới 19 → Không trừ.</em></p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-results">
+                    <thead>
+                        <tr>
+                            <th width="5%">(1) STT</th>
+                            <th width="35%">(2) Các năng lực cá nhân</th>
+                            <th width="20%">(3) Điểm gốc</th>
+                            <th width="20%">(4) Điểm suy ra từ HSĐC</th>
+                            <th width="20%">(5) Số điểm cuối cùng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-3-body">
+                        <!-- JS gen -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bảng 4: Đồ thị & Đánh giá -->
+        <div class="result-card">
+            <h2 class="section-title">Bảng 4: Đồ thị & Đánh giá năng lực cá nhân</h2>
+            <p class="text-muted"><em>Tiêu chí: 0-5 (Cần thay đổi), 6-10 (Trung bình), 11-15 (Khá), 16-20 (Tốt), 21-25 (Rất tốt/Xuất sắc)</em></p>
+            <div class="chart-container">
+                <canvas id="competencyChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const questions = ["Tôi tìm kiếm những công việc tôi thấy đáng ra cần phải làm.", "Khi phải đối phó với những công việc khó khăn, tôi dành nhiều thời gian để cố gắng tìm ra một cách giải quyết.", "Tôi hoàn thành công việc của tôi đúng thời gian.", "Tôi cảm thấy bực mình, khó chịu khi công việc đã làm không tốt.", "Tôi thích có thể kiểm soát kết quả công việc càng nhiều càng tốt.", "Tôi thích nghĩ về tương lai.", "Khi bắt đầu một công việc mới, Tôi tập hợp thật nhiều thông tin trước khi tiến hành.", "Tôi lập kế hoạch cho một công việc lớn bằng cách chia nó thành những phần việc nhỏ hơn.", "Tôi vận động người khác ủng hộ cho những đề nghị của tôi.", "Tôi tin chắc rằng tôi sẽ thành công trong tất cả mọi việc nếu tôi cố gắng.", "Tôi là người biết lắng nghe.", "Tôi làm những việc cần thiết trước khi người khác yêu cầu.", "Tôi cố gắng vài lần để vận động người khác làm những điều mà tôi muốn họ làm.", "Tôi giữ lời hứa.", "Tôi làm tốt công việc của mình hơn những đồng nghiệp khác.", "Tôi sẽ không thử làm điều gì mới mẻ nếu không chắc nó sẽ thành công.", "Tôi cho rằng sẽ thật là lãng phí thời gian để lo lắng những cái phải làm trong cuộc sống.", "Tôi đi tìm lời khuyên của những người am hiểu công việc mà tôi đang làm.", "Tôi suy nghĩ về những thuận lợi và khó khăn của từng phương án khác nhau để thực hiện công việc.", "Tôi không dành nhiều thời gian suy nghĩ làm thế nào để có thể tạo ảnh hưởng đến người khác.", "Tôi thay đổi suy nghĩ của mình nếu có ai đó phản đối mạnh mẽ với tôi.", "Tôi cảm thấy bực bội khi tôi không được làm theo cách của mình.", "Tôi thích những thử thách và những cơ hội mới.", "Khi có điều gì tác động đến cách thức tôi đang làm việc, tôi sẽ cố gắng giữ vững phương pháp của mình để hoàn thành điều mà tôi muốn làm.", "Nếu cần thiết để cho kịp tiến độ thời gian, tôi sẵn sàng làm công việc của người khác.", "Tôi cảm thấy bực bội khi thời gian của tôi bị lãng phí.", "Tôi cân nhắc những cơ hội thành công và thất bại trước khi quyết định điều gì.", "Tôi xác định cụ thể những điều tôi muốn làm trong cuộc sống.", "Khi làm việc, tôi không bỏ thời gian thu thập thông tin.", "Tôi suy nghĩ đến tất cả những vấn đề có thể gặp phải và tính toán cụ thể cách giải quyết cho từng vấn đề đó.", "Tôi nhờ sự giúp đỡ của những người quan trọng để hoàn thành mục tiêu của mình.", "Khi cố gắng làm việc gì khó khăn và thử thách, tôi tin rằng mình sẽ thành công.", "Tôi đã từng thất bại trong quá khứ.", "Tôi thích hơn những hoạt động mà tôi đã am hiểu và làm tôi cảm thấy thoải mái.", "Khi đối mặt với một khó khăn lớn, tôi nhanh chóng chuyển sang những việc khác.", "Khi tôi đang làm việc cho ai đó, tôi cố gắng nỗ lực để tin chắc là người ta cảm thấy hài lòng với công việc của tôi.", "Tôi không bao giờ hài lòng hoàn toàn với những cách đã làm, tôi luôn luôn nghĩ rằng phải có một cách tốt hơn.", "Tôi làm những công việc mạo hiểm.", "Tôi có một kế hoạch rất rõ ràng về cuộc đời mình.", "Khi làm một việc cho ai đó, tôi đặt nhiều câu hỏi để xác định rõ người đó muốn gì.", "Tôi đối phó với vấn đề khi nó phát sinh hơn là dành thời gian suy nghĩ để tiên liệu trước.", "Để đạt được mục tiêu của tôi, tôi suy nghĩ nhiều cách giải quyết mang lại lợi ích cho những người cùng tham gia.", "Tôi làm tốt công việc của mình.", "Tôi tận dụng lợi thế của người khác trong những trường hợp có thể.", "Tôi cố gắng làm những công việc mới mẻ và khác biệt so với những việc tôi đã từng làm.", "Tôi thử nhiều cách để khắc phục những khó khăn xảy ra nhằm thực hiện mục đích của mình.", "Đối với tôi, gia đình và cuộc sống cá nhân quan trọng hơn là những kỳ hạn công việc mà tôi đã lập ra cho chính mình.", "Tôi tìm ra cách hoàn tất công việc nhanh hơn khi ở cơ quan và ở nhà.", "Tôi làm những việc mà người khác cho là mạo hiểm.", "Tôi cân nhắc những mục tiêu hàng tuần sao cho phù hợp với mục tiêu cả năm của tôi.", "Tôi đi đến vài nơi để thu thập những thông tin hữu dụng cho công việc của mình.", "Nếu một cách giải quyết vấn đề không hiệu quả, tôi nghĩ đến cách giải quyết khác.", "Tôi có thể làm cho những người vốn có những quan điểm và ý tưởng mạnh mẽ thay đổi suy nghĩ của họ.", "Tôi có thể giữ vững quyết định của mình dù cho có những người phản đối mạnh mẽ quyết định của tôi.", "Tôi không muốn thừa nhận những điều mình chưa biết."];
+    
+    const competencies = [
+        "Khả năng tìm kiếm cơ hội",
+        "Tính kiên trì",
+        "Tính tận tụy với công việc",
+        "Khả năng hoàn thành công việc một cách chất lượng và hiệu quả",
+        "Khả năng chấp nhận mạo hiểm",
+        "Khả năng xây dựng kế hoạch, xác định mục tiêu",
+        "Khả năng thu thập, tìm kiếm thông tin",
+        "Khả năng lập kế hoạch, kiểm tra công việc một cách có hệ thống",
+        "Khả năng thuyết phục và làm việc nhóm",
+        "Tính tự tin"
+    ];
+
+    const formulas = [
+        { text: "(1) + (12) + (23) - (34) + (45) + 6", vars: [1, 12, 23, -34, 45, 6] },
+        { text: "(2) + (13) + (24) - (35) + (46) + 6", vars: [2, 13, 24, -35, 46, 6] },
+        { text: "(3) + (14) + (25) + (36) - (47) + 6", vars: [3, 14, 25, 36, -47, 6] },
+        { text: "(4) + (15) + (26) + (37) - (48) + 6", vars: [4, 15, 26, 37, -48, 6] },
+        { text: "(5) - (16) + (27) + (38) + (49) + 6", vars: [5, -16, 27, 38, 49, 6] },
+        { text: "(6) - (17) + (28) + (39) + (50) + 6", vars: [6, -17, 28, 39, 50, 6] },
+        { text: "(7) + (18) - (29) + (40) + (51) + 6", vars: [7, 18, -29, 40, 51, 6] },
+        { text: "(8) + (19) + (30) - (41) + (52) + 6", vars: [8, 19, 30, -41, 52, 6] },
+        { text: "(9) - (20) + (31) + (42) + (53) + 6", vars: [9, -20, 31, 42, 53, 6] },
+        { text: "(10) - (21) + (32) + (43) + (54) + 6", vars: [10, -21, 32, 43, 54, 6] }
+    ];
+
+    const hsdc_formula = { text: "(11) + (22) - (33) + (44) + (55) + 6", vars: [11, 22, -33, 44, 55, 6] };
+
+    // Render questions
+    const qBody = document.getElementById('questions-body');
+    questions.forEach((q, index) => {
+        const row = document.createElement('tr');
+        let radioBtns = '';
+        for(let i = 1; i <= 5; i++) {
+            radioBtns += `<td class="col-radio"><label class="radio-wrapper"><input type="radio" name="q${index+1}" value="${i}"></label></td>`;
+        }
+        row.innerHTML = `
+            <td class="text-center font-weight-bold">${index + 1}</td>
+            <td class="col-q">${q}</td>
+            ${radioBtns}
+        `;
+        qBody.appendChild(row);
+    });
+
+    let myChart = null;
+
+    function getVal(qNum) {
+        const ele = document.querySelector(`input[name="q${qNum}"]:checked`);
+        return ele ? parseInt(ele.value) : 0;
+    }
+
+    function calculateScores() {
+        // Validate
+        for (let i = 1; i <= 55; i++) {
+            if (getVal(i) === 0) {
+                alert(`Vui lòng trả lời câu hỏi số ${i} trước khi tính điểm!`);
+                
+                // Cuộn tới câu chưa làm
+                document.querySelector(`input[name="q${i}"]`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                return;
+            }
+        }
+
+        const rawScores = [];
+        
+        // Calculate Bảng 2
+        const tb2Body = document.getElementById('table-2-body');
+        tb2Body.innerHTML = '';
+        
+        for (let i = 0; i < 10; i++) {
+            let score = 0;
+            let displayFormula = formulas[i].text;
+            formulas[i].vars.forEach(v => {
+                if (v === 6) { score += 6; return; }
+                let qVal = getVal(Math.abs(v));
+                if (v < 0) score -= qVal; else score += qVal;
+                // Replace string formula with actual values logically (optional extra detail, kept simple here)
+            });
+            rawScores.push(score);
+            
+            tb2Body.innerHTML += `
+                <tr>
+                    <td>${String(i+1).padStart(2, '0')}</td>
+                    <td class="text-start">${competencies[i]}</td>
+                    <td>${formulas[i].text}</td>
+                    <td class="fw-bold text-primary">${score}</td>
+                </tr>
+            `;
+        }
+
+        // Calculate HSĐC
+        let hsdc = 0;
+        hsdc_formula.vars.forEach(v => {
+            if (v === 6) { hsdc += 6; return; }
+            let qVal = getVal(Math.abs(v));
+            if (v < 0) hsdc -= qVal; else hsdc += qVal;
+        });
+
+        tb2Body.innerHTML += `
+            <tr class="hsdc-highlight">
+                <td>11</td>
+                <td class="text-start">Hệ số điều chỉnh</td>
+                <td>${hsdc_formula.text}</td>
+                <td>${hsdc}</td>
+            </tr>
+        `;
+
+        // Calculate Bảng 3
+        let deduction = 0;
+        if (hsdc >= 24) deduction = 7;
+        else if (hsdc >= 22) deduction = 5;
+        else if (hsdc >= 20) deduction = 3;
+        else deduction = 0;
+
+        const finalScores = [];
+        const tb3Body = document.getElementById('table-3-body');
+        tb3Body.innerHTML = '';
+
+        for (let i = 0; i < 10; i++) {
+            let final = rawScores[i] - deduction;
+            finalScores.push(final);
+            tb3Body.innerHTML += `
+                <tr>
+                    <td>${String(i+1).padStart(2, '0')}</td>
+                    <td class="text-start">${competencies[i]}</td>
+                    <td>${rawScores[i]}</td>
+                    <td class="text-danger">-${deduction}</td>
+                    <td class="fw-bold fs-5 text-success">${final}</td>
+                </tr>
+            `;
+        }
+        
+        let totalFinal = finalScores.reduce((a, b) => a + b, 0);
+        tb3Body.innerHTML += `
+            <tr class="table-secondary font-weight-bold">
+                <td colspan="4" class="text-end pe-4"><strong>TỔNG CỘNG</strong></td>
+                <td class="fs-4 text-success"><strong>${totalFinal}</strong></td>
+            </tr>
+        `;
+
+        // Show Results
+        document.getElementById('results-section').style.display = 'block';
+        document.getElementById('results-section').scrollIntoView({behavior: 'smooth'});
+
+        // Draw Chart (Bảng 4)
+        drawChart(finalScores);
+    }
+
+    function drawChart(dataScores) {
+        const ctx = document.getElementById('competencyChart').getContext('2d');
+        
+        // Define colors based on score
+        const bgColors = dataScores.map(score => {
+            if(score <= 5) return 'rgba(255, 77, 79, 0.8)'; // Cần thay đổi - Red
+            if(score <= 10) return 'rgba(255, 169, 64, 0.8)'; // Trung bình - Orange
+            if(score <= 15) return 'rgba(255, 236, 61, 0.8)'; // Khá - Yellow
+            if(score <= 20) return 'rgba(115, 209, 61, 0.8)'; // Tốt - Green
+            return 'rgba(64, 150, 255, 0.8)'; // Rất tốt - Blue
+        });
+
+        if (myChart) { myChart.destroy(); }
+        
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    "Tìm kiếm cơ hội", "Kiên trì", "Tận tụy", "Hiệu quả", 
+                    "Chấp nhận mạo hiểm", "Lập kế hoạch/Mục tiêu", 
+                    "Thu thập thông tin", "Kiểm tra hệ thống", 
+                    "Thuyết phục/Nhóm", "Tự tin"
+                ],
+                datasets: [{
+                    label: 'Điểm Năng Lực',
+                    data: dataScores,
+                    backgroundColor: bgColors,
+                    borderColor: bgColors.map(c => c.replace('0.8', '1')),
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 25,
+                        ticks: {
+                            stepSize: 5,
+                            callback: function(value) {
+                                if(value === 0) return '0';
+                                if(value === 5) return '5 (Cần thay đổi)';
+                                if(value === 10) return '10 (Trung bình)';
+                                if(value === 15) return '15 (Khá)';
+                                if(value === 20) return '20 (Tốt)';
+                                if(value === 25) return '25 (Xuất sắc)';
+                                return value;
+                            }
+                        },
+                        grid: { color: '#e2e8f0', borderDash: [5, 5] }
+                    },
+                    x: {
+                        ticks: { maxRotation: 45, minRotation: 45, font: {size: 11} }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let val = context.raw;
+                                let status = '';
+                                if(val <= 5) status = 'Cần thay đổi';
+                                else if(val <= 10) status = 'Trung bình';
+                                else if(val <= 15) status = 'Khá';
+                                else if(val <= 20) status = 'Tốt';
+                                else status = 'Rất tốt';
+                                return `Điểm: ${val} - Đánh giá: ${status}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
