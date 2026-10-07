@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đánh Giá Năng Lực Enneagram Chuyên Sâu</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #2980b9;
+            --bg-color: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .instruction {
+            background: #e8f4f8;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .options-container {
+            display: flex;
+            justify-content: space-between;
+            background: #f9f9f9;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .option-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+            width: 18%;
+        }
+
+        .option-label input {
+            margin-bottom: 8px;
+            transform: scale(1.2);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #1f6391;
+        }
+
+        /* Result Section */
+        #result-section {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .result-card {
+            background: #fdfbf7;
+            border: 1px solid #e0dcd3;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .bar-label {
+            width: 150px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .bar-wrapper {
+            flex-grow: 1;
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0;
+            transition: width 1s ease-out;
+        }
+
+        .bar-score {
+            width: 30px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #c0392b;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .options-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .option-label {
+                flex-direction: row;
+                width: 100%;
+                margin-bottom: 10px;
+                text-align: left;
+            }
+            .option-label input {
+                margin-right: 15px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Khảo Sát Năng Lực Enneagram Chuyên Sâu</h1>
+    
+    <div class="instruction">
+        <strong>Hướng dẫn:</strong> Vui lòng đọc kỹ từng nhận định và chọn mức độ phản ánh chân thực nhất về bạn theo thang điểm từ 1 đến 5. Hãy đánh giá dựa trên con người thật của bạn trong hiện tại, không phải người bạn muốn trở thành trong tương lai.<br><br>
+        1 = Hoàn toàn không đúng | 2 = Ít khi đúng | 3 = Đôi khi đúng (Trung lập) | 4 = Thường xuyên đúng | 5 = Hoàn toàn chính xác
+    </div>
+
+    <form id="enneagram-form">
+        <div id="questions-container"></div>
+        <div id="error-msg" class="error">Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi xem kết quả!</div>
+        <button type="submit" class="submit-btn">Phân Tích Kết Quả</button>
+    </form>
+
+    <div id="result-section">
+        <h2>Báo Cáo Phân Tích Năng Lực</h2>
+        
+        <div class="result-card" id="core-type-card">
+            <!-- Core Type Information injected by JS -->
+        </div>
+
+        <div class="result-card" id="matrix-analysis-card">
+            <!-- Matrix Analysis injected by JS -->
+        </div>
+
+        <h3>Biểu Đồ Phân Bổ Các Nhóm Tính Cách</h3>
+        <div class="chart-container" id="chart-container">
+            <!-- Bars injected by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu câu hỏi (ánh xạ Type từ 1 đến 9)
+    const questions = [
+        { text: "Tôi có những tiêu chuẩn nội tâm khắt khe và thường cảm thấy bứt rứt khi bản thân hoặc người khác làm việc thiếu hoàn hảo.", type: 1 },
+        { text: "Tôi cực kỳ nhạy cảm với nhu cầu của người khác, đôi khi mải mê giúp đỡ mà quên đi việc chăm sóc bản thân.", type: 2 },
+        { text: "Tôi đánh giá giá trị bản thân thông qua các mục tiêu đạt được và cách xã hội nhìn nhận sự thành công của tôi.", type: 3 },
+        { text: "Tôi thường cảm thấy mình khác biệt với số đông và có những cảm xúc nội tâm sâu sắc, đôi khi là sự u buồn hoặc lãng mạn.", type: 4 },
+        { text: "Tôi khao khát kiến thức, thích sự riêng tư tuyệt đối để suy nghĩ và thường cảm thấy kiệt sức nếu phải giao tiếp xã hội quá lâu.", type: 5 },
+        { text: "Tâm trí tôi thường tự động quét các rủi ro tiềm ẩn trong mọi kế hoạch để chuẩn bị sẵn phương án dự phòng.", type: 6 },
+        { text: "Tôi có tư duy tích cực, thích sự đa dạng, liên tục tìm kiếm các ý tưởng/trải nghiệm mới và rất sợ cảm giác bị mắc kẹt.", type: 7 },
+        { text: "Tôi là người quyết đoán, thích nắm quyền kiểm soát tình hình và sẵn sàng đối đầu trực diện nếu cảm thấy bất công.", type: 8 },
+        { text: "Tôi thường chọn cách nhượng bộ hoặc 'hòa tan' ý kiến cá nhân vào tập thể để duy trì sự bình yên, tránh xung đột.", type: 9 },
+        { text: "Tôi thà tự làm mọi việc còn hơn giao cho người khác mà họ làm không đúng nguyên tắc và quy chuẩn.", type: 1 },
+        { text: "Tôi cảm thấy có giá trị nhất khi trở thành người không thể thiếu trong cuộc sống hay công việc của ai đó.", type: 2 },
+        { text: "Tôi có khả năng thích ứng linh hoạt như một 'tắc kè hoa' để phù hợp với những môi trường và kỳ vọng khác nhau nhằm thăng tiến.", type: 3 },
+        { text: "Tôi luôn tìm kiếm ý nghĩa đích thực của cuộc sống và không thích những cuộc trò chuyện xã giao hời hợt.", type: 4 },
+        { text: "Trước khi hành động, tôi cần thu thập thông tin và dữ liệu một cách triệt để, hiếm khi hành động theo cảm tính.", type: 5 },
+        { text: "Tôi đề cao lòng trung thành, có tính hoài nghi cao và thường mất nhiều thời gian để thực sự tin tưởng ai đó.", type: 6 },
+        { text: "Tôi có xu hướng lên lịch trình dày đặc những điều thú vị để tránh phải đối mặt với những cảm xúc tiêu cực bên trong.", type: 7 },
+        { text: "Tôi bảo vệ mạnh mẽ những người thuộc vòng tròn quan hệ của mình và không cho phép ai thao túng hay kiểm soát tôi.", type: 8 },
+        { text: "Tôi có khả năng thấu hiểu góc nhìn của tất cả các bên trong một cuộc tranh luận, làm tốt vai trò trung gian hòa giải.", type: 9 }
+    ];
+
+    // Dữ liệu từ điển phân tích học thuật
+    const typeDictionary = {
+        1: { name: "Nhà Cải Cách (The Reformer)", code: "CZ", hornevian: "C", harmonic: "Z", 
+             desc: "Những người có lương tâm, đạo đức, có ý thức mạnh mẽ về đúng sai. Luôn cố gắng cải thiện vạn vật, đề cao sự hoàn hảo, tổ chức tốt nhưng dễ trở nên chỉ trích và oán giận khi thực tế không đạt chuẩn." },
+        2: { name: "Người Giúp Đỡ (The Helper)", code: "CX", hornevian: "C", harmonic: "X", 
+             desc: "Đồng cảm, chân thành, có trái tim ấm áp. Luôn hy sinh vì người khác để nhận lại tình cảm, nhưng đôi khi dễ đa cảm, khao khát được công nhận và gặp khó khăn trong việc thiết lập ranh giới cá nhân." },
+        3: { name: "Người Thành Công (The Achiever)", code: "AZ", hornevian: "A", harmonic: "Z", 
+             desc: "Tự tin, định hướng thành công, hấp dẫn và quyến rũ. Có tham vọng, linh hoạt để đạt mục tiêu, nhưng có nguy cơ quan tâm quá mức đến hình tượng, địa vị và dễ rơi vào tham công tiếc việc." },
+        4: { name: "Người Lãng Mạn/Nguyên Bản (The Individualist)", code: "BY", hornevian: "B", harmonic: "Y", 
+             desc: "Nội tâm, lãng mạn, nhận thức sâu sắc về bản thân. Sáng tạo, trung thực về mặt cảm xúc, nhưng dễ bị kẹt trong sự u sầu, tự thương hại hoặc cảm giác thiếu sót so với người khác." },
+        5: { name: "Người Quan Sát (The Investigator)", code: "BZ", hornevian: "B", harmonic: "Z", 
+             desc: "Cảnh giác, sâu sắc, tò mò. Tập trung phát triển tri thức và kỹ năng phức tạp. Rất độc lập nhưng có xu hướng cô lập bản thân, trở nên lập dị, ngắt kết nối cảm xúc với thực tại." },
+        6: { name: "Người Trung Thành (The Loyalist)", code: "CY", hornevian: "C", harmonic: "Y", 
+             desc: "Đáng tin cậy, chăm chỉ, có tinh thần trách nhiệm cực cao. Giỏi dự báo rủi ro để chuẩn bị, nhưng hay bị lo âu, thiếu quyết đoán hoặc nghi ngờ quá mức vào động cơ của người khác." },
+        7: { name: "Người Phiêu Lưu (The Enthusiast)", code: "AX", hornevian: "A", harmonic: "X", 
+             desc: "Hướng ngoại, lạc quan, linh hoạt, tự phát. Tìm kiếm trải nghiệm mới để luôn bận rộn, nhưng dễ bị phân tán, bốc đồng và trốn tránh nỗi đau hoặc các vấn đề sâu sắc." },
+        8: { name: "Người Thách Thức (The Challenger)", code: "AY", hornevian: "A", harmonic: "Y", 
+             desc: "Mạnh mẽ, tự tin, bảo vệ người khác. Thích kiểm soát môi trường, thẳng thắn, không ngại đối đầu. Điểm yếu là dễ trở nên độc đoán, nóng nảy và khó thể hiện sự yếu đuối của bản thân." },
+        9: { name: "Người Hòa Giải (The Peacemaker)", code: "BX", hornevian: "B", harmonic: "X", 
+             desc: "Dễ gần, khiêm tốn, thích sự ổn định. Có khả năng gắn kết mọi người và hàn gắn xung đột. Tuy nhiên, dễ né tránh vấn đề, thụ động, và thỏa hiệp để duy trì sự bình yên giả tạo." }
+    };
+
+    const hornevianDict = {
+        "A": "<strong>Nhóm Quyết đoán (Assertive - A):</strong> Hành động độc lập, có xu hướng chống lại sự kiểm soát và hướng ra bên ngoài để đòi hỏi quyền lợi. Phù hợp với vai trò tiên phong, mở rộng thị trường, hoặc lãnh đạo trực tiếp.",
+        "B": "<strong>Nhóm Thu mình (Withdrawn - B):</strong> Có xu hướng lùi lại vào thế giới nội tâm để xử lý vấn đề, tiết kiệm năng lượng cá nhân. Rất phù hợp với công việc nghiên cứu chuyên sâu, sáng tạo nghệ thuật hoặc phân tích chiến lược độc lập.",
+        "C": "<strong>Nhóm Tuân thủ (Compliant - C):</strong> Hành động dựa trên những chuẩn mực, quy tắc và kỳ vọng của xã hội/tổ chức. Có tinh thần trách nhiệm cao, đặc biệt xuất sắc trong quản trị hệ thống, nhân sự và kiểm soát chất lượng."
+    };
+
+    const harmonicDict = {
+        "X": "<strong>Nhóm Tích cực (Positive Outlook - X):</strong> Có xu hướng định hình lại vấn đề theo hướng lạc quan để tránh nỗi đau. Giỏi duy trì nhuệ khí tập thể, tạo không khí vui vẻ nhưng đôi khi phớt lờ rủi ro thực tế.",
+        "Y": "<strong>Nhóm Phản ứng (Reactive - Y):</strong> Phản ứng cảm xúc mạnh, cần sự xác nhận từ người khác để giải quyết vấn đề. Nhạy cảm với sự lừa dối, không thích bị kìm nén, có khả năng phát hiện rủi ro và khủng hoảng rất sắc bén.",
+        "Z": "<strong>Nhóm Năng lực (Competency - Z):</strong> Có khả năng gạt cảm xúc sang một bên để giải quyết vấn đề bằng logic và quy trình thực tiễn. Đạt hiệu suất cao, lạnh lùng, đặc biệt xuất sắc trong xử lý khủng hoảng hệ thống và kỹ thuật."
+    };
+
+    // Khởi tạo form câu hỏi
+    const container = document.getElementById('questions-container');
+    questions.forEach((q, index) => {
+        const qNum = index + 1;
+        const html = `
+            <div class="question-block">
+                <div class="question-text">Câu ${qNum}: ${q.text}</div>
+                <div class="options-container">
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="1"> 1 (Hoàn toàn không đúng)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="2"> 2 (Ít khi đúng)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="3"> 3 (Đôi khi đúng)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="4"> 4 (Thường xuyên đúng)</label>
+                    <label class="option-label"><input type="radio" name="q${qNum}" value="5"> 5 (Hoàn toàn chính xác)</label>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+    });
+
+    // Xử lý sự kiện nộp form
+    document.getElementById('enneagram-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let scores = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+        let isComplete = true;
+
+        // Tính điểm
+        questions.forEach((q, index) => {
+            const qNum = index + 1;
+            const selected = document.querySelector(`input[name="q${qNum}"]:checked`);
+            if (!selected) {
+                isComplete = false;
+            } else {
+                scores[q.type] += parseInt(selected.value);
+            }
+        });
+
+        const errorMsg = document.getElementById('error-msg');
+        if (!isComplete) {
+            errorMsg.style.display = 'block';
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tìm loại tính cách nổi trội nhất (Core Type)
+        let maxScore = -1;
+        let coreType = 1;
+        for (let type = 1; type <= 9; type++) {
+            if (scores[type] > maxScore) {
+                maxScore = scores[type];
+                coreType = type;
+            }
+        }
+
+        // Hiển thị kết quả
+        renderResults(coreType, scores);
+    });
+
+    function renderResults(coreType, scores) {
+        document.getElementById('result-section').style.display = 'block';
+        
+        const typeInfo = typeDictionary[coreType];
+        
+        // Render Core Type Card
+        const coreTypeHtml = `
+            <h3 style="margin-top: 0;">Loại tính cách cốt lõi: Type ${coreType} - ${typeInfo.name}</h3>
+            <p><strong>Mã định danh (QUEST):</strong> ${typeInfo.code}</p>
+            <p><strong>Điểm số:</strong> ${scores[coreType]} / 10</p>
+            <p><strong>Đặc điểm nhận diện:</strong> ${typeInfo.desc}</p>
+        `;
+        document.getElementById('core-type-card').innerHTML = coreTypeHtml;
+
+        // Render Matrix Analysis Card
+        const matrixHtml = `
+            <h3 style="margin-top: 0;">Phân Tích Cơ Chế Hành Vi (Dựa trên ma trận QUEST)</h3>
+            <p><strong>1. Động lực xã hội (Nhóm I): Cách bạn tương tác để đạt được mục tiêu</strong><br>
+            ${hornevianDict[typeInfo.hornevian]}</p>
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+            <p><strong>2. Cơ chế phản ứng (Nhóm II): Cách bạn xử lý khủng hoảng và xung đột</strong><br>
+            ${harmonicDict[typeInfo.harmonic]}</p>
+        `;
+        document.getElementById('matrix-analysis-card').innerHTML = matrixHtml;
+
+        // Render Chart
+        const chartContainer = document.getElementById('chart-container');
+        chartContainer.innerHTML = ''; // Clear old chart
+        
+        // Sắp xếp các Type theo điểm để vẽ biểu đồ từ cao xuống thấp
+        const sortedScores = Object.keys(scores).map(type => ({
+            type: parseInt(type),
+            score: scores[type],
+            name: typeDictionary[type].name
+        })).sort((a, b) => b.score - a.score);
+
+        sortedScores.forEach(item => {
+            const percentage = (item.score / 10) * 100; // max score is 10
+            const html = `
+                <div class="bar-row">
+                    <div class="bar-label">Type ${item.type}</div>
+                    <div class="bar-wrapper">
+                        <div class="bar-fill" style="width: 0%; background-color: ${item.type === coreType ? '#c0392b' : '#2980b9'}"></div>
+                    </div>
+                    <div class="bar-score">${item.score}</div>
+                </div>
+            `;
+            chartContainer.insertAdjacentHTML('beforeend', html);
+        });
+
+        // Animation fill cho biểu đồ thanh
+        setTimeout(() => {
+            const fills = document.querySelectorAll('.bar-fill');
+            fills.forEach((fill, idx) => {
+                const percentage = (sortedScores[idx].score / 10) * 100;
+                fill.style.width = percentage + '%';
+            });
+        }, 100);
+
+        // Tự động cuộn xuống kết quả
+        document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
