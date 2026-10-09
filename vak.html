@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Thiên Hướng Học Tập & Làm Việc (VAK) - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --border: #cbd5e1;
+            --primary: #0f172a;
+            
+            /* VAK Colors */
+            --color-v: #0ea5e9; /* Sky Blue for Visual */
+            --color-a: #8b5cf6; /* Violet for Auditory */
+            --color-k: #f97316; /* Orange for Kinesthetic */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 15px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; background: var(--primary); color: white;
+            padding: 45px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(15,23,42,0.15);
+        }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 15px; }
+        .header p { color: #94a3b8; font-size: 15px; max-width: 750px; margin: 0 auto; }
+
+        .instruction {
+            background: var(--card-bg); border-radius: 12px; padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; font-size: 15px;
+            border-left: 5px solid var(--color-v);
+        }
+
+        .question-card {
+            background: var(--card-bg); padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 25px;
+            border: 1px solid var(--border); transition: all 0.2s;
+        }
+        .question-card:hover { border-color: #94a3b8; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+
+        .q-title { font-weight: 700; font-size: 17px; margin-bottom: 20px; color: var(--primary); }
+
+        .options-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 16px; background: #f8fafc;
+            border: 2px solid var(--border); border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 15px; font-weight: 500;
+        }
+        
+        .option-label input { display: none; }
+        
+        .option-label::before {
+            content: ''; display: inline-block; width: 22px; height: 22px;
+            border: 2px solid #94a3b8; border-radius: 4px; margin-right: 15px;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+
+        .option-label:hover { background: #f1f5f9; border-color: #94a3b8; }
+        
+        .option-label.selected { background: #f0f9ff; border-color: var(--color-v); color: var(--primary); }
+        .option-label.selected::before { 
+            background: var(--color-v); border-color: var(--color-v);
+            box-shadow: inset 0 0 0 4px #f0f9ff;
+        }
+
+        .submit-btn {
+            display: block; width: 100%; background: var(--primary); color: white; border: none;
+            padding: 20px; font-size: 18px; font-weight: 700; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; margin-top: 40px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);
+        }
+        .submit-btn:hover { background: #1e293b; transform: translateY(-2px); }
+
+        .error {
+            background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 8px;
+            text-align: center; margin-top: 20px; display: none; font-weight: 600; border: 1px solid #f87171;
+        }
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s ease-in; }
+        
+        .result-container {
+            background: var(--card-bg); padding: 40px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border);
+        }
+
+        .result-title { text-align: center; font-size: 26px; font-weight: 700; margin-bottom: 10px; color: var(--primary); }
+        .dom-style { text-align: center; font-size: 20px; font-weight: 600; margin-bottom: 40px; color: var(--color-v); text-transform: uppercase;}
+
+        .chart-container { margin-bottom: 40px; }
+        .bar-row { margin-bottom: 20px; }
+        .bar-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; font-size: 15px; }
+        .bar-track { width: 100%; height: 16px; background: #e2e8f0; border-radius: 8px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 8px;}
+
+        .analysis-card { background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 5px solid var(--primary); margin-top: 20px; }
+        .analysis-card h3 { font-size: 18px; margin-bottom: 10px; color: var(--primary); }
+        .analysis-card p { font-size: 15px; line-height: 1.8; margin-bottom: 15px;}
+        .analysis-card ul { padding-left: 20px; font-size: 14px; line-height: 1.8;}
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Khảo Sát Phong Cách Tiếp Nhận Thông Tin (VAK)</h1>
+        <p>Hệ thống đánh giá chuyên sâu giúp xác định cách bạn học hỏi, tiếp nhận thông tin và định hình phương pháp chốt sales/quản trị hiệu quả nhất trong Bất động sản.</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn thực hiện:</strong> Dưới đây là 15 tình huống thực tế tại sàn giao dịch BĐS. Hãy chọn <strong>MỘT</strong> phương án phản xạ tự nhiên nhất của bạn. Đừng phân tích quá nhiều, hãy chọn theo thói quen thực tế.
+    </div>
+
+    <div id="quiz-container">
+        <!-- 15 câu hỏi -->
+        
+        <div class="question-card">
+            <div class="q-title">Câu 1: Khi tiếp cận một dự án BĐS mới, cách nhanh nhất để bạn nắm bắt thông tin là:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q1" value="V"> A. Đọc kỹ brochure, xem bản đồ quy hoạch, sa bàn và video phối cảnh.</label>
+                <label class="option-label"><input type="radio" name="q1" value="A"> B. Nghe Giám đốc dự án thuyết trình hoặc nghe file ghi âm về thị trường khu vực đó.</label>
+                <label class="option-label"><input type="radio" name="q1" value="K"> C. Trực tiếp lái xe xuống công trường dự án để tự mình trải nghiệm không gian và đường đi.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 2: Khi tư vấn cho khách hàng, công cụ đắc lực nhất của bạn thường là:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q2" value="V"> A. Chỉ tay vào sơ đồ mặt bằng trên iPad, gửi bảng tính dòng tiền và hình ảnh nhà mẫu.</label>
+                <label class="option-label"><input type="radio" name="q2" value="A"> B. Sử dụng giọng điệu nhấn nhá, kể những câu chuyện thành công của các nhà đầu tư trước.</label>
+                <label class="option-label"><input type="radio" name="q2" value="K"> C. Đưa khách đi xem thực tế (site tour), mời khách sờ thử vật liệu hoặc đi dạo quanh tiện ích.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 3: Khi cần nhớ thông tin của một khách hàng VIP mới gặp, bạn sẽ:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q3" value="V"> A. Ghi chú ngay vào sổ tay hoặc cố gắng nhớ đặc điểm khuôn mặt, trang phục của họ.</label>
+                <label class="option-label"><input type="radio" name="q3" value="A"> B. Nhẩm đi nhẩm lại tên họ trong đầu hoặc nhớ lại giọng nói, cách họ trò chuyện.</label>
+                <label class="option-label"><input type="radio" name="q3" value="K"> C. Nhớ lại cái bắt tay của họ, hoặc liên hệ họ với hành động lúc gặp gỡ (VD: gặp lúc đang đi xem đất).</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 4: Trong các buổi họp giao ban đầu tuần của sàn, bạn thấy mình tiếp thu tốt nhất khi:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q4" value="V"> A. Quản lý trình chiếu slide Powerpoint có biểu đồ doanh số và chỉ tiêu rõ ràng.</label>
+                <label class="option-label"><input type="radio" name="q4" value="A"> B. Mọi người cùng thảo luận mở, chia sẻ kinh nghiệm chốt deal bằng lời nói.</label>
+                <label class="option-label"><input type="radio" name="q4" value="K"> C. Có các hoạt động đóng vai (role-play) xử lý từ chối hoặc các trò chơi teamwork tạo năng lượng.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 5: Nếu phải học thuộc một kịch bản telesales (Sale script) dài, bạn sẽ:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q5" value="V"> A. Đọc đi đọc lại văn bản, dùng bút dạ quang tô đậm các từ khóa chốt sale quan trọng.</label>
+                <label class="option-label"><input type="radio" name="q5" value="A"> B. Đọc to thành tiếng nhiều lần hoặc ghi âm lại rồi cắm tai nghe nghe lại.</label>
+                <label class="option-label"><input type="radio" name="q5" value="K"> C. Vừa cầm giấy đọc vừa đi lại quanh phòng, hoặc kết hợp với cử chỉ tay chân.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 6: Khách hàng yêu cầu bạn chỉ đường đến khu đất nền đang bán. Bạn sẽ:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q6" value="V"> A. Gửi định vị (Google Maps) và chụp ảnh các ngã rẽ quan trọng có vẽ mũi tên đánh dấu.</label>
+                <label class="option-label"><input type="radio" name="q6" value="A"> B. Gọi điện thoại miêu tả chi tiết: "Anh cứ đi thẳng 200m, gặp cây xăng thì rẽ phải...".</label>
+                <label class="option-label"><input type="radio" name="q6" value="K"> C. Hẹn khách ở một điểm mốc dễ tìm, sau đó chạy xe máy dẫn đường cho khách đi theo mình.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 7: Yếu tố nào của một căn nhà mẫu khiến bạn ấn tượng và dễ dùng để chốt sale nhất?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q7" value="V"> A. Thiết kế nội thất đẹp mắt, phối màu sang trọng và view nhìn tuyệt đẹp từ ban công.</label>
+                <label class="option-label"><input type="radio" name="q7" value="A"> B. Không gian yên tĩnh, khả năng cách âm tốt hoặc tiếng nhạc du dương tại khu tiện ích.</label>
+                <label class="option-label"><input type="radio" name="q7" value="K"> C. Cảm giác chạm vào chất liệu gỗ tủ bếp, độ êm của sofa, sự thoáng đãng của luồng gió thổi vào nhà.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 8: Khi hướng dẫn một nhân viên môi giới mới, bạn thường:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q8" value="V"> A. Gửi cho họ bộ tài liệu training, kịch bản sales bản text và yêu cầu họ tự đọc kỹ.</label>
+                <label class="option-label"><input type="radio" name="q8" value="A"> B. Ngồi nói chuyện 1-1, giải thích cặn kẽ và cho họ nghe các cuộc gọi ghi âm mẫu.</label>
+                <label class="option-label"><input type="radio" name="q8" value="K"> C. Dắt họ đi theo mình trong một buổi gặp khách hàng thực tế để họ "vừa học vừa làm".</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 9: Trong lúc ngồi trực tại sa bàn dự án và không có khách, bạn thường làm gì?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q9" value="V"> A. Lướt điện thoại đọc tin tức, xem ảnh tiến độ dự án hoặc chăm chú quan sát thiết kế sa bàn.</label>
+                <label class="option-label"><input type="radio" name="q9" value="A"> B. Trò chuyện phím với đồng nghiệp xung quanh hoặc nghe nhạc, podcast qua tai nghe.</label>
+                <label class="option-label"><input type="radio" name="q9" value="K"> C. Đi lại xung quanh, pha cà phê, nghịch chìa khóa trên tay hoặc sắp xếp lại ghế ngồi.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 10: Khi cần đưa ra quyết định có nên "ôm" một lô đất đầu tư hay không, bạn dựa vào:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q10" value="V"> A. Hình ảnh bản vẽ quy hoạch 1/500 và tiềm năng có thể nhìn thấy trên bản đồ vệ tinh.</label>
+                <label class="option-label"><input type="radio" name="q10" value="A"> B. Thông tin "phím hàng", tin đồn từ các đối tác, lời khuyên của chuyên gia mà bạn nghe được.</label>
+                <label class="option-label"><input type="radio" name="q10" value="K"> C. "Cảm giác" khi trực tiếp đặt chân xuống khu đất đó (địa thế, luồng khí, cảm nhận phong thủy).</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 11: Đâu là cách bạn thường dùng để giữ tập trung khi làm việc tại văn phòng ồn ào?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q11" value="V"> A. Dán mắt vào màn hình máy tính, tạo một không gian làm việc gọn gàng không xao nhãng tầm nhìn.</label>
+                <label class="option-label"><input type="radio" name="q11" value="A"> B. Đeo tai nghe chống ồn hoặc nghe nhạc không lời/lo-fi để cách ly âm thanh bên ngoài.</label>
+                <label class="option-label"><input type="radio" name="q11" value="K"> C. Cầm bút xoay, rung đùi, hoặc thỉnh thoảng đứng dậy vươn vai đi lấy nước để giữ tỉnh táo.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 12: Khi đánh giá hiệu quả của một chiến dịch quảng cáo BĐS, bạn chú ý nhất đến:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q12" value="V"> A. Hình ảnh banner có bắt mắt không, biểu đồ báo cáo tỷ lệ click (CTR) rõ ràng.</label>
+                <label class="option-label"><input type="radio" name="q12" value="A"> B. Câu slogan có vần điệu bắt tai không, âm nhạc của video quảng cáo có cảm xúc không.</label>
+                <label class="option-label"><input type="radio" name="q12" value="K"> C. Trải nghiệm người dùng khi bấm vào website có mượt mà không, thao tác điền form có dễ không.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 13: Trong một sự kiện mở bán (Event) có hàng trăm người, bạn cảm thấy tự tin nhất khi:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q13" value="V"> A. Quan sát tổng thể hội trường, kiểm soát ánh mắt khách hàng và theo dõi slide trên sân khấu.</label>
+                <label class="option-label"><input type="radio" name="q13" value="A"> B. Lắng nghe MC hô vang các mã căn được chốt và hòa mình vào âm thanh nhạc hiệu sôi động.</label>
+                <label class="option-label"><input type="radio" name="q13" value="K"> C. Chạy ngược xuôi hỗ trợ khách làm thủ tục đặt cọc, cảm nhận nhịp độ khẩn trương của sự kiện bằng cơ thể.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 14: Khi bạn cần giải tỏa áp lực sau một tháng không chốt được giao dịch nào:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q14" value="V"> A. Xem một bộ phim hay, đọc sách, hoặc tìm một quán cafe có view đẹp để ngồi tĩnh lặng.</label>
+                <label class="option-label"><input type="radio" name="q14" value="A"> B. Tìm một người bạn/đồng nghiệp để gọi điện xả stress hoặc nghe các bài diễn thuyết truyền động lực.</label>
+                <label class="option-label"><input type="radio" name="q14" value="K"> C. Chơi thể thao cường độ cao (gym, chạy bộ) hoặc bắt tay vào dọn dẹp lại nhà cửa/bàn làm việc.</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-title">Câu 15: Sau khi ký thành công một hợp đồng lớn, bạn muốn ăn mừng bằng cách:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q15" value="V"> A. Mua một món đồ đẹp (quần áo, đồng hồ, phụ kiện) để nâng cấp hình ảnh cá nhân.</label>
+                <label class="option-label"><input type="radio" name="q15" value="A"> B. Tụ tập bạn bè/đồng nghiệp hò dô ở quán nhậu hoặc đi hát Karaoke.</label>
+                <label class="option-label"><input type="radio" name="q15" value="K"> C. Đi du lịch, trải nghiệm một hoạt động thể chất (spa, massage, leo núi).</label>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="error-msg" class="error">⚠️ Vui lòng hoàn thành toàn bộ 15 câu hỏi trước khi phân tích!</div>
+    
+    <button type="button" id="calc-btn" class="submit-btn">PHÂN TÍCH VAK CỦA TÔI</button>
+
+    <div id="result-section">
+        <div class="result-container">
+            <h2 class="result-title">Kết Quả Hồ Sơ Năng Lực VAK</h2>
+            <div class="dom-style" id="dom-style">Phong cách chủ đạo: ...</div>
+            
+            <div class="chart-container">
+                <!-- Visual -->
+                <div class="bar-row">
+                    <div class="bar-header">
+                        <span style="color: var(--color-v)">Visual (Thị giác)</span>
+                        <span id="v-score-text">0%</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="v-bar" style="background: var(--color-v)"></div>
+                    </div>
+                </div>
+                <!-- Auditory -->
+                <div class="bar-row">
+                    <div class="bar-header">
+                        <span style="color: var(--color-a)">Auditory (Thính giác)</span>
+                        <span id="a-score-text">0%</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="a-bar" style="background: var(--color-a)"></div>
+                    </div>
+                </div>
+                <!-- Kinesthetic -->
+                <div class="bar-row">
+                    <div class="bar-header">
+                        <span style="color: var(--color-k)">Kinesthetic (Vận động/Xúc giác)</span>
+                        <span id="k-score-text">0%</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="k-bar" style="background: var(--color-k)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analysis-content">
+                <!-- Dynamic Content injected here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // UX: Hiệu ứng chọn đáp án
+    const allRadios = document.querySelectorAll('input[type="radio"]');
+    allRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const group = this.closest('.options-group');
+            group.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
+            this.closest('.option-label').classList.add('selected');
+        });
+    });
+
+    const vakData = {
+        'V': {
+            name: 'VISUAL (THỊ GIÁC)',
+            color: 'var(--color-v)',
+            desc: 'Bạn tiếp thu và xử lý thông tin tốt nhất thông qua hình ảnh, biểu đồ, màu sắc và việc quan sát. Trí nhớ của bạn mang tính không gian rất cao.',
+            tips: `
+                <ul>
+                    <li><b>Kỹ năng Chốt Sales:</b> Vũ khí mạnh nhất của bạn là "Công cụ trực quan". Hãy đầu tư mạnh vào iPad, in ấn Layout dự án chất lượng cao, vẽ sơ đồ dòng tiền ra giấy cho khách xem. Bạn bán hàng bằng đôi mắt của khách hàng.</li>
+                    <li><b>Cách học & Tiếp nhận:</b> Khi học một dự án mới, hãy yêu cầu sơ đồ phân lô, bản đồ tiện ích. Dùng bút highlight tô đậm các keyword quan trọng.</li>
+                    <li><b>Định hướng Quản lý:</b> Nếu bạn là Quản lý, hãy giao tiếp với nhân viên qua văn bản, email rõ ràng. Thường xuyên sử dụng bảng trắng, biểu đồ doanh số để thúc đẩy team.</li>
+                </ul>`
+        },
+        'A': {
+            name: 'AUDITORY (THÍNH GIÁC)',
+            color: 'var(--color-a)',
+            desc: 'Bạn là bậc thầy của ngôn từ. Bạn tiếp nhận thông tin xuất sắc thông qua việc nghe, thảo luận và giao tiếp. Bạn nhạy cảm với giọng điệu và âm thanh.',
+            tips: `
+                <ul>
+                    <li><b>Kỹ năng Chốt Sales:</b> Bạn là "sát thủ Telesales". Vũ khí của bạn là nghệ thuật kể chuyện (Storytelling), sử dụng ngữ điệu, sự nhấn nhá để thôi miên khách hàng qua điện thoại và trong bàn đàm phán.</li>
+                    <li><b>Cách học & Tiếp nhận:</b> Thay vì đọc tài liệu dự án nhàm chán, hãy xin file ghi âm đào tạo, hoặc rủ đồng nghiệp ra cafe ngồi thảo luận, trình bày lại dự án bằng lời.</li>
+                    <li><b>Định hướng Quản lý:</b> Nếu bạn là Quản lý, hãy duy trì các buổi họp nhóm chia sẻ (sharing sessions), đào tạo bằng hình thức truyền cảm hứng, và thường xuyên có các buổi Coaching 1-1 với nhân viên.</li>
+                </ul>`
+        },
+        'K': {
+            name: 'KINESTHETIC (VẬN ĐỘNG / XÚC GIÁC)',
+            color: 'var(--color-k)',
+            desc: 'Bạn là mẫu người thực chiến (Hands-on). Bạn học qua trải nghiệm thực tế, vận động cơ thể và việc trực tiếp chạm vào, cảm nhận sự vật.',
+            tips: `
+                <ul>
+                    <li><b>Kỹ năng Chốt Sales:</b> Môi trường tỏa sáng của bạn là "Site Tour". Hãy đưa khách đi xem nhà mẫu, xem đất thực tế. Cầm tay chỉ việc, mời khách chạm vào vật liệu, mở cửa sổ cảm nhận gió. Bạn bán hàng bằng trải nghiệm thực tế.</li>
+                    <li><b>Cách học & Tiếp nhận:</b> Bạn không thể ngồi yên đọc tài liệu. Khi có dự án mới, hãy xách xe chạy thẳng xuống công trường, đóng vai khách hàng đi tham quan để nạp thông tin vào cơ thể.</li>
+                    <li><b>Định hướng Quản lý:</b> Nếu bạn là Quản lý, hãy tổ chức các hoạt động đào tạo thực địa, Role-play (đóng vai xử lý từ chối), và gắn kết team thông qua các hoạt động thể chất, teambuilding.</li>
+                </ul>`
+        }
+    };
+
+    document.getElementById('calc-btn').addEventListener('click', function() {
+        let scores = { 'V': 0, 'A': 0, 'K': 0 };
+        let answered = 0;
+
+        for(let i = 1; i <= 15; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected) {
+                answered++;
+                scores[selected.value]++;
+            }
+        }
+
+        const errorMsg = document.getElementById('error-msg');
+        if(answered < 15) {
+            errorMsg.style.display = 'block';
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tính % 
+        const vPct = Math.round((scores['V'] / 15) * 100);
+        const aPct = Math.round((scores['A'] / 15) * 100);
+        const kPct = Math.round((scores['K'] / 15) * 100);
+
+        // Xác định nhóm thống trị
+        let maxScore = -1;
+        let domType = 'V';
+        for (let key in scores) {
+            if (scores[key] > maxScore) {
+                maxScore = scores[key];
+                domType = key;
+            }
+        }
+
+        // Cập nhật UI
+        document.getElementById('result-section').style.display = 'block';
+        
+        document.getElementById('v-score-text').innerText = vPct + '%';
+        document.getElementById('a-score-text').innerText = aPct + '%';
+        document.getElementById('k-score-text').innerText = kPct + '%';
+        
+        setTimeout(() => {
+            document.getElementById('v-bar').style.width = vPct + '%';
+            document.getElementById('a-bar').style.width = aPct + '%';
+            document.getElementById('k-bar').style.width = kPct + '%';
+        }, 100);
+
+        const domData = vakData[domType];
+        
+        const domTitleEl = document.getElementById('dom-style');
+        domTitleEl.innerText = 'NHÓM THỐNG TRỊ: ' + domData.name;
+        domTitleEl.style.color = domData.color;
+
+        const analysisContent = `
+            <div class="analysis-card" style="border-left-color: ${domData.color}">
+                <h3 style="color: ${domData.color}">Đặc điểm của bạn</h3>
+                <p>${domData.desc}</p>
+                <h3 style="color: ${domData.color}; margin-top: 20px;">Lời khuyên ứng dụng trong Bất động sản</h3>
+                ${domData.tips}
+            </div>
+        `;
+        document.getElementById('analysis-content').innerHTML = analysisContent;
+
+        // Auto scroll
+        setTimeout(() => {
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    });
+</script>
+
+</body>
+</html>
