@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Thiên Hướng Bán Cầu Não (Trái - Phải) - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --left-brain: #3b82f6;  /* Blue for Logic */
+            --right-brain: #f59e0b; /* Amber for Creativity */
+            --primary: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 15px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; background: var(--primary); color: white;
+            padding: 45px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30,41,59,0.15);
+            position: relative; overflow: hidden;
+        }
+
+        /* Background pattern for header */
+        .header::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+            background: linear-gradient(90deg, rgba(59,130,246,0.2) 0%, transparent 100%);
+        }
+        .header::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%;
+            background: linear-gradient(-90deg, rgba(245,158,11,0.2) 0%, transparent 100%);
+        }
+
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 15px; position: relative; z-index: 2; }
+        .header p { color: #cbd5e1; font-size: 15px; max-width: 750px; margin: 0 auto; position: relative; z-index: 2; }
+
+        .instruction {
+            background: var(--card-bg); border-radius: 12px; padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); margin-bottom: 30px; font-size: 15px;
+            border-top: 4px solid var(--primary);
+        }
+
+        .question-card {
+            background: var(--card-bg); padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); margin-bottom: 25px;
+            border: 1px solid var(--border); transition: all 0.2s;
+        }
+        .question-card:hover { border-color: #cbd5e1; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+
+        .q-title { font-weight: 700; font-size: 17px; margin-bottom: 20px; color: var(--primary); }
+
+        .options-group { display: flex; flex-direction: column; gap: 12px; }
+
+        .option-label {
+            display: flex; align-items: center; padding: 16px; background: #f8fafc;
+            border: 2px solid var(--border); border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; font-size: 15px; font-weight: 500;
+        }
+        
+        .option-label input { display: none; }
+        
+        /* Custom Radio Button styling */
+        .option-label::before {
+            content: ''; display: inline-block; width: 20px; height: 20px;
+            border: 2px solid #94a3b8; border-radius: 50%; margin-right: 15px;
+            transition: all 0.2s; flex-shrink: 0;
+        }
+
+        .option-label:hover { background: #f1f5f9; border-color: #94a3b8; }
+        
+        .option-label.selected { background: #f1f5f9; border-color: var(--primary); color: var(--primary); }
+        .option-label.selected::before { border-color: var(--primary); background: var(--primary); box-shadow: inset 0 0 0 4px #f1f5f9; }
+
+        .submit-btn {
+            display: block; width: 100%; background: var(--primary); color: white; border: none;
+            padding: 20px; font-size: 18px; font-weight: 700; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; margin-top: 40px; box-shadow: 0 4px 15px rgba(30,41,59,0.2);
+        }
+        .submit-btn:hover { background: #0f172a; transform: translateY(-2px); }
+
+        .error {
+            background: #fee2e2; color: #dc2626; padding: 15px; border-radius: 8px;
+            text-align: center; margin-top: 20px; display: none; font-weight: 600; border: 1px solid #f87171;
+        }
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s ease-in; }
+        
+        .result-container {
+            background: var(--card-bg); padding: 40px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border);
+        }
+
+        .result-title { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 30px; color: var(--primary); }
+
+        /* Dual Bar Chart */
+        .dual-bar-container { margin-bottom: 40px; }
+        .bar-labels { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700; font-size: 16px; }
+        .lbl-left { color: var(--left-brain); }
+        .lbl-right { color: var(--right-brain); }
+        
+        .bar-track {
+            width: 100%; height: 30px; background: #e2e8f0; border-radius: 15px;
+            display: flex; overflow: hidden; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .bar-left { height: 100%; background: var(--left-brain); width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; padding-left: 15px; color: white; font-weight: bold; font-size: 14px;}
+        .bar-right { height: 100%; background: var(--right-brain); width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: flex-end; padding-right: 15px; color: white; font-weight: bold; font-size: 14px;}
+
+        .analysis-card { background: #f8fafc; padding: 25px; border-radius: 12px; border-left: 5px solid var(--primary); margin-top: 20px; }
+        .analysis-card h3 { font-size: 20px; margin-bottom: 10px; color: var(--primary); }
+        .analysis-card p { font-size: 15px; line-height: 1.8; margin-bottom: 15px;}
+        
+        .recommendation {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;
+        }
+        .rec-box { padding: 20px; border-radius: 12px; color: white; }
+        .rec-left { background: var(--left-brain); }
+        .rec-right { background: var(--right-brain); }
+        .rec-box h4 { margin-bottom: 10px; font-size: 16px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px;}
+        .rec-box ul { padding-left: 20px; font-size: 14px; }
+        .rec-box ul li { margin-bottom: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 768px) {
+            .recommendation { grid-template-columns: 1fr; }
+            .bar-left, .bar-right { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Khảo Sát Thiên Hướng Bán Cầu Não</h1>
+        <p>Phân tích khuynh hướng tư duy (Trái/Phải) trong công việc, định hình phong cách chốt sales và khả năng quản lý dành riêng cho nhân sự ngành Bất động sản.</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn thực hiện:</strong> Dưới đây là 20 tình huống công việc và thói quen hàng ngày. Hãy chọn <strong>MỘT</strong> phương án phản ánh đúng nhất phản xạ tự nhiên của bạn. Đừng suy nghĩ quá lâu, hãy chọn theo trực giác đầu tiên.
+    </div>
+
+    <div id="quiz-container">
+        <!-- 20 câu hỏi Hardcoded -->
+        
+        <!-- Câu 1 -->
+        <div class="question-card">
+            <div class="q-title">Câu 1: Khi được giao bán một dự án Bất động sản hoàn toàn mới, điều đầu tiên bạn quan tâm tìm hiểu là gì?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q1" value="L"> A. Bảng giá, diện tích, quy mô, chính sách chiết khấu và hồ sơ pháp lý.</label>
+                <label class="option-label"><input type="radio" name="q1" value="R"> B. Concept thiết kế, câu chuyện cảm hứng của dự án, phối cảnh 3D và tiện ích sống.</label>
+            </div>
+        </div>
+
+        <!-- Câu 2 -->
+        <div class="question-card">
+            <div class="q-title">Câu 2: Bàn làm việc tại sàn giao dịch của bạn thường trông như thế nào?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q2" value="L"> A. Rất gọn gàng, giấy tờ phân loại rõ ràng, bút sổ để đúng vị trí.</label>
+                <label class="option-label"><input type="radio" name="q2" value="R"> B. Khá lộn xộn với nhiều đồ đạc, nhưng tôi luôn biết chính xác tài liệu mình cần nằm ở đâu.</label>
+            </div>
+        </div>
+
+        <!-- Câu 3 -->
+        <div class="question-card">
+            <div class="q-title">Câu 3: Khi giải quyết một tranh chấp gay gắt với khách hàng (ví dụ: đòi lại tiền cọc), bạn có xu hướng giải quyết dựa trên:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q3" value="L"> A. Các điều khoản hợp đồng đã ký, tính logic và dữ liệu thực tế.</label>
+                <label class="option-label"><input type="radio" name="q3" value="R"> B. Thấu hiểu cảm xúc của khách, dùng sự khéo léo và nghệ thuật đàm phán để xoa dịu họ.</label>
+            </div>
+        </div>
+
+        <!-- Câu 4 -->
+        <div class="question-card">
+            <div class="q-title">Câu 4: Cách bạn ghi chú (take note) trong các cuộc họp giao ban hàng tuần?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q4" value="L"> A. Gạch đầu dòng rõ ràng, đánh số thứ tự (1, 2, 3), phân chia hạng mục logic.</label>
+                <label class="option-label"><input type="radio" name="q4" value="R"> B. Viết các từ khóa lộn xộn, hay vẽ sơ đồ tư duy (mindmap) hoặc vẽ vời linh tinh quanh mép giấy.</label>
+            </div>
+        </div>
+
+        <!-- Câu 5 -->
+        <div class="question-card">
+            <div class="q-title">Câu 5: Bạn ghi nhớ thông tin về những khách hàng cũ như thế nào?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q5" value="L"> A. Tôi nhớ rất rõ tên, số điện thoại, ngân sách và yêu cầu cụ thể của họ.</label>
+                <label class="option-label"><input type="radio" name="q5" value="R"> B. Tôi nhớ khuôn mặt, hoàn cảnh gia đình, hoặc cảm giác về buổi gặp gỡ đó, nhưng hay quên tên.</label>
+            </div>
+        </div>
+
+        <!-- Câu 6 -->
+        <div class="question-card">
+            <div class="q-title">Câu 6: Khi lập kế hoạch làm việc (To-do list) mỗi ngày, bạn:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q6" value="L"> A. Bám sát kế hoạch một cách kỷ luật, cảm thấy khó chịu nếu bị gián đoạn.</label>
+                <label class="option-label"><input type="radio" name="q6" value="R"> B. Lập kế hoạch nhưng thường xuyên linh hoạt thay đổi theo cảm hứng hoặc tình huống phát sinh.</label>
+            </div>
+        </div>
+
+        <!-- Câu 7 -->
+        <div class="question-card">
+            <div class="q-title">Câu 7: Điểm mạnh lớn nhất của bạn khi tư vấn chốt sales là gì?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q7" value="L"> A. Khả năng phân tích bài toán tài chính, tỷ suất sinh lời (ROI) rõ ràng, sắc bén.</label>
+                <label class="option-label"><input type="radio" name="q7" value="R"> B. Khả năng truyền cảm hứng, vẽ ra viễn cảnh tương lai và đánh trúng cảm xúc của khách.</label>
+            </div>
+        </div>
+
+        <!-- Câu 8 -->
+        <div class="question-card">
+            <div class="q-title">Câu 8: Đứng trước một quyết định lớn (ví dụ: chuyển sang một công ty BĐS khác), bạn sẽ:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q8" value="L"> A. Lập bảng phân tích ưu/nhược điểm (Pros & Cons), so sánh mức lương, chế độ.</label>
+                <label class="option-label"><input type="radio" name="q8" value="R"> B. Dựa vào "linh cảm" (gut feeling) xem môi trường đó có hợp với mình không, sếp có tầm nhìn không.</label>
+            </div>
+        </div>
+
+        <!-- Câu 9 -->
+        <div class="question-card">
+            <div class="q-title">Câu 9: Khi công ty triển khai một phần mềm quản lý CRM mới, cách học của bạn là:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q9" value="L"> A. Đọc kỹ tài liệu hướng dẫn và làm theo từng bước tuần tự từ 1 đến 10.</label>
+                <label class="option-label"><input type="radio" name="q9" value="R"> B. Bỏ qua hướng dẫn, tự bấm lung tung để khám phá và hiểu cách hoạt động tổng thể.</label>
+            </div>
+        </div>
+
+        <!-- Câu 10 -->
+        <div class="question-card">
+            <div class="q-title">Câu 10: Khi diễn đạt một ý tưởng phức tạp cho đồng nghiệp, bạn thường:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q10" value="L"> A. Sử dụng từ ngữ chính xác, ngắn gọn, đi thẳng vào vấn đề.</label>
+                <label class="option-label"><input type="radio" name="q10" value="R"> B. Dùng nhiều ngôn ngữ cơ thể, hình ảnh ẩn dụ, ví von để họ dễ hình dung.</label>
+            </div>
+        </div>
+
+        <!-- Câu 11 -->
+        <div class="question-card">
+            <div class="q-title">Câu 11: Nếu một dự án đang bán đột ngột bị tạm ngưng vì lý do pháp lý, phản ứng của bạn là:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q11" value="L"> A. Cảm thấy hụt hẫng, mất phương hướng vì kế hoạch đã định sẵn bị phá vỡ hoàn toàn.</label>
+                <label class="option-label"><input type="radio" name="q11" value="R"> B. Thích ứng rất nhanh, lập tức nghĩ ra phương án bẻ lái khách hàng sang dự án khác.</label>
+            </div>
+        </div>
+
+        <!-- Câu 12 -->
+        <div class="question-card">
+            <div class="q-title">Câu 12: Khi kiểm tra một hợp đồng đặt cọc trước khi đưa khách ký, bạn:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q12" value="L"> A. Soi kỹ từng câu chữ, con số, dấu chấm phẩy để đảm bảo tính pháp lý không sai sót.</label>
+                <label class="option-label"><input type="radio" name="q12" value="R"> B. Chỉ lướt qua xem các ý chính, tổng tiền, ngày tháng đã đúng chưa rồi tin tưởng bộ phận pháp lý.</label>
+            </div>
+        </div>
+
+        <!-- Câu 13 -->
+        <div class="question-card">
+            <div class="q-title">Câu 13: Khi được yêu cầu đóng góp ý tưởng Marketing cho dự án, bạn có xu hướng:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q13" value="L"> A. Cải tiến và tối ưu hóa các phương pháp cũ (telesale, chạy ads) để tăng hiệu quả.</label>
+                <label class="option-label"><input type="radio" name="q13" value="R"> B. Khởi xướng những ý tưởng hoàn toàn mới lạ, khác biệt chưa ai từng làm.</label>
+            </div>
+        </div>
+
+        <!-- Câu 14 -->
+        <div class="question-card">
+            <div class="q-title">Câu 14: Về quản lý thời gian và các cuộc hẹn với khách hàng:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q14" value="L"> A. Tôi luôn xem đồng hồ, đến đúng giờ hoặc sớm hơn kế hoạch.</label>
+                <label class="option-label"><input type="radio" name="q14" value="R"> B. Tôi thường xuyên ước lượng sai thời gian di chuyển, thi thoảng đến muộn một chút.</label>
+            </div>
+        </div>
+
+        <!-- Câu 15 -->
+        <div class="question-card">
+            <div class="q-title">Câu 15: Mục tiêu nghề nghiệp của bạn thường được định hình dưới dạng:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q15" value="L"> A. Mục tiêu SMART (Ví dụ: Đạt 500 triệu doanh thu trong Quý 3 năm nay).</label>
+                <label class="option-label"><input type="radio" name="q15" value="R"> B. Một bức tranh tầm nhìn (Ví dụ: Trở thành chuyên gia BĐS cao cấp nhất khu Đông, tự do tài chính).</label>
+            </div>
+        </div>
+
+        <!-- Câu 16 -->
+        <div class="question-card">
+            <div class="q-title">Câu 16: Khi ngồi trò chuyện với khách hàng, não bộ bạn chú ý nhiều nhất vào điều gì?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q16" value="L"> A. Nội dung chính xác của những gì khách hàng đang nói.</label>
+                <label class="option-label"><input type="radio" name="q16" value="R"> B. Giọng điệu, nét mặt và ngôn ngữ cơ thể (body language) của họ.</label>
+            </div>
+        </div>
+
+        <!-- Câu 17 -->
+        <div class="question-card">
+            <div class="q-title">Câu 17: Khi đối mặt với một vấn đề hóc búa trong công việc, cách giải quyết của bạn:</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q17" value="L"> A. Chia nhỏ vấn đề thành từng mảnh nhỏ, giải quyết tuần tự từng phần một.</label>
+                <label class="option-label"><input type="radio" name="q17" value="R"> B. Nhìn nhận vấn đề một cách tổng thể, bao quát để tìm ra bức tranh toàn cảnh trước.</label>
+            </div>
+        </div>
+
+        <!-- Câu 18 -->
+        <div class="question-card">
+            <div class="q-title">Câu 18: Sở thích cá nhân của bạn ngoài giờ làm việc thiên về nhóm nào hơn?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q18" value="L"> A. Chơi cờ, giải đố logic, đọc sách kinh tế, công nghệ, hoặc các game chiến thuật.</label>
+                <label class="option-label"><input type="radio" name="q18" value="R"> B. Nghe nhạc, xem phim, vẽ tranh, trang trí nhà cửa, hoặc các hoạt động nghệ thuật.</label>
+            </div>
+        </div>
+
+        <!-- Câu 19 -->
+        <div class="question-card">
+            <div class="q-title">Câu 19: Bạn thích đọc các tài liệu phân tích thị trường Bất động sản dưới định dạng nào?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q19" value="L"> A. Các bảng biểu (Excel), biểu đồ kỹ thuật và số liệu thống kê chi tiết.</label>
+                <label class="option-label"><input type="radio" name="q19" value="R"> B. Infographic, hình ảnh minh họa, biểu đồ màu sắc hoặc video tổng hợp.</label>
+            </div>
+        </div>
+
+        <!-- Câu 20 -->
+        <div class="question-card">
+            <div class="q-title">Câu 20: Tự đánh giá bản thân, bạn thấy mình giống với hình mẫu nào hơn?</div>
+            <div class="options-group">
+                <label class="option-label"><input type="radio" name="q20" value="L"> A. Một "Nhà phân tích": Thực tế, lý trí, làm việc dựa trên nguyên tắc và dữ liệu.</label>
+                <label class="option-label"><input type="radio" name="q20" value="R"> B. Một "Nghệ sĩ": Sáng tạo, cảm xúc, làm việc dựa trên trực giác và sự linh hoạt.</label>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="error-msg" class="error">⚠️ Vui lòng hoàn thành toàn bộ 20 câu hỏi trước khi phân tích!</div>
+    
+    <button type="button" id="calc-btn" class="submit-btn">PHÂN TÍCH BÁN CẦU NÃO CỦA TÔI</button>
+
+    <div id="result-section">
+        <div class="result-container">
+            <h2 class="result-title">Kết Quả Phân Tích Thiên Hướng Tư Duy</h2>
+            
+            <div class="dual-bar-container">
+                <div class="bar-labels">
+                    <span class="lbl-left">NÃO TRÁI (Logic & Phân tích)</span>
+                    <span class="lbl-right">NÃO PHẢI (Sáng tạo & Trực giác)</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-left" id="bar-left-fill">0%</div>
+                    <div class="bar-right" id="bar-right-fill">0%</div>
+                </div>
+            </div>
+
+            <div class="analysis-card">
+                <h3 id="dom-title">Đang phân tích...</h3>
+                <p id="dom-desc"></p>
+            </div>
+
+            <div class="recommendation">
+                <div class="rec-box rec-left">
+                    <h4>Ứng dụng Não Trái trong BĐS</h4>
+                    <ul>
+                        <li>Kiểm soát tính an toàn của pháp lý dự án.</li>
+                        <li>Phân tích dòng tiền, bảng tính lãi suất cho khách hàng vay vốn.</li>
+                        <li>Thẩm định giá và nghiên cứu thị trường dựa trên Data thực tế.</li>
+                        <li>Tối ưu hóa quy trình làm việc cá nhân (CRM, phễu bán hàng).</li>
+                    </ul>
+                </div>
+                <div class="rec-box rec-right">
+                    <h4>Ứng dụng Não Phải trong BĐS</h4>
+                    <ul>
+                        <li>Đọc vị ngôn ngữ cơ thể, cảm xúc của khách hàng khi đi xem nhà.</li>
+                        <li>Thiết kế content Marketing, quay Video Review dự án cảm xúc.</li>
+                        <li>Kỹ năng Storytelling (kể chuyện) để nâng tầm giá trị Bất động sản.</li>
+                        <li>Trang trí, setup không gian (Home Staging) để thu hút thị giác.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Xử lý hiệu ứng chọn đáp án
+    const allRadios = document.querySelectorAll('input[type="radio"]');
+    allRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const group = this.closest('.options-group');
+            group.querySelectorAll('.option-label').forEach(lbl => lbl.classList.remove('selected'));
+            this.closest('.option-label').classList.add('selected');
+        });
+    });
+
+    // Tính toán kết quả
+    document.getElementById('calc-btn').addEventListener('click', function() {
+        let leftScore = 0;
+        let rightScore = 0;
+        let answered = 0;
+
+        for(let i = 1; i <= 20; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected) {
+                answered++;
+                if(selected.value === 'L') leftScore++;
+                if(selected.value === 'R') rightScore++;
+            }
+        }
+
+        const errorMsg = document.getElementById('error-msg');
+        if(answered < 20) {
+            errorMsg.style.display = 'block';
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tính % 
+        const leftPercent = Math.round((leftScore / 20) * 100);
+        const rightPercent = Math.round((rightScore / 20) * 100);
+
+        // Hiển thị UI
+        document.getElementById('result-section').style.display = 'block';
+        
+        const leftBar = document.getElementById('bar-left-fill');
+        const rightBar = document.getElementById('bar-right-fill');
+        
+        // Đặt timeout để animation chạy
+        setTimeout(() => {
+            leftBar.style.width = leftPercent + '%';
+            leftBar.innerText = leftPercent + '%';
+            rightBar.style.width = rightPercent + '%';
+            rightBar.innerText = rightPercent + '%';
+        }, 100);
+
+        // Đánh giá kết quả
+        let title = "";
+        let desc = "";
+
+        if(leftPercent >= 70) {
+            title = "🧠 NÃO TRÁI VƯỢT TRỘI (Nhà Phân Tích Thực Tế)";
+            desc = "Bạn là người cực kỳ lý trí, kỷ luật và định hướng chi tiết. Trong ngành Bất động sản, bạn là chỗ dựa vững chắc cho khách hàng đầu tư vì khả năng tính toán lợi suất, kiểm soát rủi ro pháp lý tuyệt vời. <b>Lời khuyên:</b> Hãy cởi mở hơn với những ý tưởng đột phá và học thêm cách đồng cảm cảm xúc, vì quyết định mua nhà của khách hàng thường được chốt bởi cảm xúc trước khi lý trí vào cuộc.";
+        } 
+        else if (rightPercent >= 70) {
+            title = "🎨 NÃO PHẢI VƯỢT TRỘI (Nghệ Sĩ Sales & Sáng Tạo)";
+            desc = "Bạn làm việc dựa trên trực giác, cảm xúc và trí tưởng tượng phong phú. Khả năng đồng cảm giúp bạn đọc vị khách hàng xuất sắc. Bạn có tố chất làm Marketing BĐS hoặc môi giới phân khúc hạng sang - nơi khách hàng mua phong cách sống (lifestyle). <b>Lời khuyên:</b> Hãy cẩn thận với các cạm bẫy pháp lý và con số. Nên hợp tác với một đồng nghiệp Não Trái để bù đắp khuyết điểm quản lý dữ liệu.";
+        }
+        else {
+            title = "⚖️ CÂN BẰNG TOÀN NÃO (Nhà Quản Trị Linh Hoạt)";
+            desc = "Tuyệt vời! Bạn sở hữu sự cân bằng hiếm có giữa Logic và Cảm xúc. Bạn vừa có thể tính toán ROI sắc bén (Não trái), vừa biết cách truyền cảm hứng chốt sales (Não phải). Tố chất này đặc biệt phù hợp để trở thành <b>Giám đốc Sàn (Floor Manager)</b> hoặc <b>Trưởng phòng Kinh doanh</b>, vì bạn có thể dung hòa và lãnh đạo cả nhân viên hệ 'Số liệu' lẫn nhân viên hệ 'Nghệ thuật'.";
+        }
+
+        document.getElementById('dom-title').innerHTML = title;
+        document.getElementById('dom-desc').innerHTML = desc;
+
+        // Auto scroll
+        setTimeout(() => {
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    });
+</script>
+
+</body>
+</html>
