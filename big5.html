@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đánh Giá Tính Cách Big Five (OCEAN) - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --border: #e2e8f0;
+            --radius: 12px;
+            
+            /* Trait Colors */
+            --color-o: #8b5cf6; /* Openness - Purple */
+            --color-c: #0ea5e9; /* Conscientiousness - Blue */
+            --color-e: #f59e0b; /* Extraversion - Amber */
+            --color-a: #10b981; /* Agreeableness - Green */
+            --color-n: #ef4444; /* Neuroticism - Red */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6; padding: 40px 15px;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; 
+            background: var(--primary); color: white; 
+            padding: 45px 20px; border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(30, 41, 59, 0.15);
+        }
+
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; color: #f8fafc; }
+        .header p { font-size: 15px; color: #94a3b8; max-width: 800px; margin: 0 auto; }
+
+        .instruction {
+            background: var(--card-bg); padding: 25px; border-radius: var(--radius);
+            border-left: 5px solid var(--secondary); margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .likert-scale-guide {
+            display: flex; justify-content: space-between; background: #f8fafc; 
+            padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: 600; font-size: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .question-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .q-card {
+            background: var(--card-bg); padding: 20px 25px; border-radius: var(--radius);
+            border: 1px solid var(--border); display: flex; justify-content: space-between;
+            align-items: center; transition: 0.2s;
+        }
+        
+        .q-card:hover { border-color: #cbd5e1; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .q-card.unanswered { border-left: 4px solid var(--color-n); background: #fef2f2; }
+
+        .q-text { flex: 1; font-weight: 500; font-size: 15px; padding-right: 20px; }
+        .q-number { font-weight: 700; color: var(--secondary); margin-right: 8px; }
+
+        .likert-group { display: flex; gap: 8px; }
+        .likert-btn {
+            width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border);
+            background: #f8fafc; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-weight: 600; transition: 0.2s; position: relative; color: var(--text-main);
+        }
+        
+        .likert-btn input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        
+        .likert-btn:hover { background: #e2e8f0; }
+        .likert-btn.selected { background: var(--secondary); color: white; border-color: var(--secondary); transform: scale(1.1); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+
+        .submit-btn {
+            width: 100%; background: var(--secondary); color: white; border: none; 
+            padding: 20px; font-size: 18px; font-weight: 700; border-radius: var(--radius); 
+            cursor: pointer; transition: 0.3s; margin-top: 40px;
+        }
+        .submit-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+
+        .error-msg { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; display: none; font-weight: 600; border: 1px solid #f87171;}
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s; }
+        
+        .chart-box { background: var(--card-bg); padding: 35px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);}
+        .chart-title { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 30px; color: var(--primary); }
+        
+        .bar-row { display: flex; align-items: center; margin-bottom: 22px; }
+        .bar-label { width: 220px; font-weight: 700; font-size: 14px; }
+        .bar-track { flex: 1; background: #f1f5f9; height: 24px; border-radius: 12px; margin: 0 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
+        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 12px; }
+        .bar-score { width: 50px; font-weight: 700; text-align: right; font-size: 16px;}
+
+        .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .trait-card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); border-left: 6px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .trait-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;}
+        .trait-title { font-size: 18px; font-weight: 700; }
+        .trait-level { font-weight: 700; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: white;}
+        .trait-desc { font-size: 15px; color: var(--text-main); line-height: 1.7; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .q-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .likert-group { width: 100%; justify-content: space-between; }
+            .bar-row { flex-direction: column; align-items: flex-start; margin-bottom: 15px;}
+            .bar-label { width: 100%; margin-bottom: 8px; }
+            .bar-track { width: 100%; margin: 0 0 8px 0; }
+            .bar-score { width: 100%; text-align: left; }
+            .likert-scale-guide { flex-direction: column; text-align: center; gap: 8px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Khảo Sát Tính Cách Big Five (OCEAN)</h1>
+        <p>Đánh giá 5 khía cạnh cốt lõi của tính cách cá nhân, định hình phong cách làm việc, đàm phán và khả năng chịu áp lực trong môi trường Bất động sản khốc liệt.</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn thực hiện:</strong> Dưới đây là 25 nhận định về cách bạn phản ứng trong công việc thực tế. Hãy chọn mức độ đồng ý phản ánh chân thực nhất về bạn (không phải người bạn muốn trở thành).
+        <div class="likert-scale-guide">
+            <span style="color: #ef4444;">1 = Hoàn toàn KHÔNG ĐÚNG</span>
+            <span style="color: #94a3b8;">3 = TRUNG LẬP (Đôi khi)</span>
+            <span style="color: #10b981;">5 = Hoàn toàn CHÍNH XÁC</span>
+        </div>
+    </div>
+
+    <div id="quiz-container" class="question-list">
+        <!-- JS Render -->
+    </div>
+
+    <div id="error-msg" class="error-msg">⚠️ Bạn đã bỏ sót câu hỏi. Các câu chưa trả lời đã được tô viền đỏ!</div>
+    
+    <button type="button" id="submit-btn" class="submit-btn">PHÂN TÍCH HỒ SƠ TÍNH CÁCH</button>
+
+    <div id="result-section">
+        <div class="chart-box">
+            <h2 class="chart-title">Bản Đồ Tính Cách Của Bạn (OCEAN)</h2>
+            <div id="chart-container">
+                <!-- Bars injected here -->
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--primary);">Phân Tích Ứng Dụng Thực Chiến Trong BĐS</h3>
+        <div class="analysis-grid" id="analysis-grid">
+            <!-- Cards injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu 25 câu hỏi (5 câu/yếu tố)
+    // Cấu trúc đánh giá tính cực (Tất cả đều đồng biến để dễ hiểu: Điểm cao = Biểu hiện tính cách đó cao)
+    const rawQuestions = [
+        /* O - Openness (Cởi mở/Thích ứng) */
+        { type: "O", q: "Tôi luôn tiên phong thử nghiệm các công cụ mới (AI, CRM, TikTok) để tìm kiếm khách hàng thay vì chỉ dùng cách cũ." },
+        { type: "O", q: "Khi thị trường thay đổi (ví dụ: siết tín dụng), tôi nhanh chóng tìm ra ngách sản phẩm mới thay vì than vãn." },
+        { type: "O", q: "Tôi thích bán các dự án có concept độc lạ, chưa từng có trên thị trường hơn là các sản phẩm truyền thống." },
+        { type: "O", q: "Tôi luôn chủ động học hỏi các kiến thức ngoài ngành (tài chính, phong thủy, kiến trúc) để làm phong phú câu chuyện tư vấn." },
+        { type: "O", q: "Tôi thích nghĩ ra những chiến lược marketing 'du kích' sáng tạo, khác biệt hoàn toàn với đối thủ." },
+
+        /* C - Conscientiousness (Tận tâm/Kỷ luật) */
+        { type: "C", q: "Tôi luôn kiểm tra tỉ mỉ từng dấu chấm phẩy, con số trong hợp đồng đặt cọc trước khi gửi cho khách hàng." },
+        { type: "C", q: "Tôi có thói quen ghi chép và bám sát lịch trình chăm sóc lại (follow-up) từng khách hàng trong phễu mà không bỏ sót." },
+        { type: "C", q: "Dù không có sếp giám sát, tôi vẫn tự kỷ luật bản thân hoàn thành đủ số lượng Telesales/Data mỗi ngày." },
+        { type: "C", q: "Tôi luôn chuẩn bị sẵn nhiều phương án dự phòng (pháp lý, ngân hàng) trước khi dẫn khách đi công chứng." },
+        { type: "C", q: "Tôi đánh giá sự thành công của bản thân bằng việc hoàn thành 100% KPI đã cam kết từ đầu tháng." },
+
+        /* E - Extraversion (Hướng ngoại) */
+        { type: "E", q: "Tôi cảm thấy tràn đầy năng lượng sau những buổi dẫn site tour đông người hoặc tổ chức sự kiện mở bán." },
+        { type: "E", q: "Tôi có thể dễ dàng bắt chuyện và tạo mạng lưới quan hệ (networking) với những người hoàn toàn xa lạ tại các sự kiện." },
+        { type: "E", q: "Tôi thích việc nhấc máy lên gọi lạnh (Cold Calling) hoặc đi thị trường gặp gỡ trực tiếp hơn là nhắn tin/email." },
+        { type: "E", q: "Tôi là người thường xuyên khuấy động phong trào và tạo không khí vui vẻ tại sàn giao dịch." },
+        { type: "E", q: "Trong các cuộc đàm phán hoặc làm việc nhóm, tôi luôn là người chủ động lên tiếng và dẫn dắt câu chuyện." },
+
+        /* A - Agreeableness (Dễ chịu/Hợp tác) */
+        { type: "A", q: "Khi hợp tác (co-broker) với môi giới khác, tôi sẵn sàng nhường một chút quyền lợi để giao dịch diễn ra êm đẹp." },
+        { type: "A", q: "Khách hàng thường nhận xét tôi là người rất chân thành, biết lắng nghe và đặt lợi ích của họ lên trên hết." },
+        { type: "A", q: "Khi phát sinh xung đột quyền lợi giữa người Mua và người Bán, tôi luôn tìm cách hòa giải để đạt 'Win-Win'." },
+        { type: "A", q: "Tôi hiếm khi tranh cãi gay gắt với đồng nghiệp, luôn ưu tiên duy trì sự hòa khí trong nội bộ sàn giao dịch." },
+        { type: "A", q: "Tôi dễ dàng cảm thông với những khó khăn tài chính của khách hàng và kiên nhẫn tìm giải pháp giúp họ." },
+
+        /* N - Neuroticism (Bất ổn/Lo âu) */
+        { type: "N", q: "Tôi thường bị mất ngủ hoặc căng thẳng tột độ khi một giao dịch lớn có nguy cơ bị hủy cọc." },
+        { type: "N", q: "Cảm xúc và hiệu suất làm việc của tôi lên xuống thất thường phụ thuộc vào việc tôi có chốt được deal hay không." },
+        { type: "N", q: "Tôi hay lo lắng thái quá về các rủi ro có thể xảy ra (khách bùng cọc, thị trường sập, chủ đầu tư chậm tiến độ)." },
+        { type: "N", q: "Những lời phàn nàn, cáu gắt từ khách hàng làm tôi suy nghĩ tiêu cực và buồn bã nhiều ngày liền." },
+        { type: "N", q: "Đứng trước áp lực doanh số từ cấp trên, tôi thường cảm thấy bị ngợp, bồn chồn và dễ mất bình tĩnh." }
+    ];
+
+    // Trộn mảng câu hỏi
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    const questions = shuffle([...rawQuestions]);
+
+    // Render Form
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((q, index) => {
+        let optionsHtml = '';
+        for(let i=1; i<=5; i++) {
+            optionsHtml += `
+                <div class="likert-btn" data-val="${i}">
+                    ${i}
+                    <input type="radio" name="q${index}" value="${i}">
+                </div>
+            `;
+        }
+        const html = `
+            <div class="q-card" id="card-q${index}">
+                <div class="q-text"><span class="q-number">${index + 1}.</span> ${q.q}</div>
+                <div class="likert-group">${optionsHtml}</div>
+            </div>
+        `;
+        quizContainer.insertAdjacentHTML('beforeend', html);
+    });
+
+    // UX Logic cho nút Likert
+    document.querySelectorAll('.likert-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const group = this.parentElement;
+            const card = this.closest('.q-card');
+            
+            group.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+            card.classList.remove('unanswered'); 
+            
+            this.classList.add('selected');
+            this.querySelector('input').checked = true;
+        });
+    });
+
+    // Cấu trúc Data Big Five
+    const traitsDict = {
+        'O': { 
+            name: "Openness (Cởi mở / Thích ứng)", color: "var(--color-o)",
+            high: "Bạn là người sáng tạo, linh hoạt và cực kỳ nhạy bén với xu hướng thị trường mới. Bạn giỏi trong việc tìm ra các ngách khách hàng mới, áp dụng công nghệ (CRM, AI, TikTok) vào việc chốt sales. Bạn ghét sự gò bó và những quy trình cũ kỹ.",
+            low: "Bạn có xu hướng thực tế, kiên định và thích những phương pháp bán hàng đã được kiểm chứng (traditional sales). Bạn rất đáng tin cậy trong việc duy trì doanh số ở những thị trường ổn định, nhưng có thể gặp khó khi thị trường đảo chiều đột ngột."
+        },
+        'C': { 
+            name: "Conscientiousness (Tận tâm / Kỷ luật)", color: "var(--color-c)",
+            high: "Bạn là nhân viên hình mẫu: làm việc có kế hoạch, bám sát KPI và kỷ luật cực cao. Khách hàng làm việc với bạn vô cùng an tâm vì bạn kiểm soát rủi ro pháp lý và follow-up khách hàng không sai một ly. Tố chất tuyệt vời cho vị trí Quản lý vận hành Sàn.",
+            low: "Bạn làm việc ngẫu hứng, linh hoạt và thích 'tùy cơ ứng biến'. Mặc dù sự linh hoạt giúp bạn dễ thở trong đàm phán, nhưng bạn rất dễ để rớt khách do lười cập nhật hệ thống CRM hoặc quên lịch hẹn chăm sóc lại (follow-up)."
+        },
+        'E': { 
+            name: "Extraversion (Hướng ngoại / Năng lượng)", color: "var(--color-e)",
+            high: "Bạn là 'ngôi sao' của sàn giao dịch. Việc gặp gỡ, gọi điện, dẫn khách đi site tour đông người giúp bạn sạc năng lượng. Mạng lưới quan hệ (Networking) của bạn rất rộng. Bạn sinh ra để làm các vị trí cần tạo sức ảnh hưởng lớn hoặc đại sứ thương hiệu.",
+            low: "Bạn thuộc tuýp Hướng nội (Introvert). Đám đông rút cạn năng lượng của bạn, nhưng bù lại, bạn là bậc thầy trong các cuộc tư vấn 1-1 chuyên sâu. Bạn phù hợp làm việc với tệp khách hàng VIP, tinh hoa - những người cần sự kín đáo, lắng nghe và phân tích sâu sắc."
+        },
+        'A': { 
+            name: "Agreeableness (Dễ chịu / Hợp tác)", color: "var(--color-a)",
+            high: "Bạn có chỉ số thấu cảm (Empathy) cao. Bạn đề cao sự hòa khí, sẵn sàng 'lùi một bước' để chốt giao dịch êm đẹp. Khách hàng rất yêu quý và trung thành với bạn. Trong tập thể, bạn là chất keo gắn kết và hòa giải xung đột Co-broker xuất sắc.",
+            low: "Bạn là một nhà đàm phán lạnh lùng, lý trí và cứng rắn. Bạn bảo vệ quyền lợi và hoa hồng của mình/công ty đến cùng. Bạn không dễ bị khách hàng ép giá hay bị đồng nghiệp lấn lướt, nhưng đôi khi sự cứng nhắc này có thể làm mất lòng đối tác."
+        },
+        'N': { 
+            name: "Neuroticism (Bất ổn / Căng thẳng)", color: "var(--color-n)",
+            high: "Bạn rất nhạy cảm với áp lực và những rủi ro. Dù sự lo âu này giúp bạn cẩn thận rà soát hợp đồng, nhưng nó khiến bạn dễ bị kiệt sức (burnout), chán nản sâu khi rớt deal hoặc thị trường đóng băng. Bạn cần rèn luyện quản trị cảm xúc (EQ) để tồn tại lâu dài với nghề.",
+            low: "Bạn sở hữu 'thần kinh thép'. Những lời từ chối của khách hàng, các thương vụ đổ bể phút chót hay thị trường đi xuống không làm bạn dao động. Sự điềm tĩnh và sức bật tinh thần (Resilience) tuyệt vời này chính là vũ khí giúp bạn trụ vững và trở thành Top Biller."
+        }
+    };
+
+    // Theo chuẩn OCEAN: 5 câu x 5 điểm = max 25 điểm mỗi yếu tố.
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        let scores = { 'O': 0, 'C': 0, 'E': 0, 'A': 0, 'N': 0 };
+        let allAnswered = true;
+
+        questions.forEach((qObj, index) => {
+            const card = document.getElementById(`card-q${index}`);
+            const selected = card.querySelector(`input[name="q${index}"]:checked`);
+            
+            if(selected) {
+                scores[qObj.type] += parseInt(selected.value);
+            } else {
+                allAnswered = false;
+                card.classList.add('unanswered');
+            }
+        });
+
+        const errorMsg = document.getElementById('error-msg');
+        if(!allAnswered) {
+            errorMsg.style.display = 'block';
+            errorMsg.scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tính % và Render
+        document.getElementById('result-section').style.display = 'block';
+        const chartBox = document.getElementById('chart-container');
+        const gridBox = document.getElementById('analysis-grid');
+        
+        chartBox.innerHTML = '';
+        gridBox.innerHTML = '';
+
+        // Render theo thứ tự O - C - E - A - N
+        const oceanKeys = ['O', 'C', 'E', 'A', 'N'];
+        
+        oceanKeys.forEach(key => {
+            let score = scores[key];
+            let percent = Math.round((score / 25) * 100);
+            let traitData = traitsDict[key];
+            
+            // Đánh giá Cao hay Thấp (Ngưỡng 60%)
+            let isHigh = percent >= 60;
+            let levelText = isHigh ? "CAO" : "THẤP/TRUNG BÌNH";
+            let levelColor = isHigh ? traitData.color : "#94a3b8";
+            let descText = isHigh ? traitData.high : traitData.low;
+
+            // Biểu đồ
+            const chartHtml = `
+                <div class="bar-row">
+                    <div class="bar-label" style="color: ${traitData.color}">${traitData.name}</div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: 0%; background: ${traitData.color}" data-target="${percent}"></div>
+                    </div>
+                    <div class="bar-score" style="color: ${traitData.color}">${percent}%</div>
+                </div>
+            `;
+            chartBox.insertAdjacentHTML('beforeend', chartHtml);
+
+            // Thẻ phân tích
+            const cardHtml = `
+                <div class="trait-card" style="border-left-color: ${traitData.color}">
+                    <div class="trait-header">
+                        <div class="trait-title" style="color: ${traitData.color}">${traitData.name}</div>
+                        <div class="trait-level" style="background: ${levelColor}">MỨC ĐỘ ${levelText} (${percent}%)</div>
+                    </div>
+                    <div class="trait-desc">${descText}</div>
+                </div>
+            `;
+            gridBox.insertAdjacentHTML('beforeend', cardHtml);
+        });
+
+        // Chạy animation biểu đồ
+        setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-target') + '%';
+            });
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+    });
+</script>
+
+</body>
+</html>
