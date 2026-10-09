@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đánh Giá Đa Trí Tuệ (7 Intelligences) - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f2027;
+            --secondary: #203a43;
+            --accent: #2c5364;
+            --gold: #d4af37;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2d3436;
+            --border: #dfe6e9;
+            --radius: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6; padding: 30px 15px;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; 
+            background: linear-gradient(to right, var(--primary), var(--secondary), var(--accent));
+            color: white; padding: 40px 20px; border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; color: var(--gold); }
+        .header p { font-size: 15px; opacity: 0.9; max-width: 800px; margin: 0 auto; }
+
+        .instruction {
+            background: var(--card-bg); padding: 20px 25px; border-radius: var(--radius);
+            border-left: 5px solid var(--gold); margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .likert-scale-guide {
+            display: flex; justify-content: space-between; background: #eef2f3; 
+            padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: 600; font-size: 14px;
+        }
+
+        /* Bảng câu hỏi tự động sinh */
+        .question-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .q-card {
+            background: var(--card-bg); padding: 20px; border-radius: var(--radius);
+            border: 1px solid var(--border); display: flex; justify-content: space-between;
+            align-items: center; transition: 0.2s;
+        }
+        
+        .q-card:hover { border-color: var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .q-card.unanswered { border-left: 4px solid #e74c3c; background: #fff5f5; }
+
+        .q-text { flex: 1; font-weight: 500; font-size: 15px; padding-right: 20px; }
+        .q-number { font-weight: 700; color: var(--accent); margin-right: 8px; }
+
+        .likert-group { display: flex; gap: 8px; }
+        .likert-btn {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+            background: #f8f9fa; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-weight: 600; transition: 0.2s; position: relative;
+        }
+        
+        .likert-btn input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        
+        .likert-btn:hover { background: #e2e8f0; }
+        .likert-btn.selected { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.1); box-shadow: 0 3px 8px rgba(44, 83, 100, 0.4); }
+
+        .submit-btn {
+            width: 100%; background: linear-gradient(to right, var(--gold), #b8860b);
+            color: white; border: none; padding: 20px; font-size: 18px; font-weight: 700;
+            border-radius: var(--radius); cursor: pointer; transition: 0.3s; margin-top: 40px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .submit-btn:hover { filter: brightness(1.1); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+
+        .error-msg { background: #fee2e2; color: #c0392b; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; display: none; font-weight: 600; }
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s; }
+        .result-header { text-align: center; margin-bottom: 30px; }
+        .result-header h2 { color: var(--accent); font-size: 28px; margin-bottom: 10px; }
+        
+        .chart-box { background: var(--card-bg); padding: 30px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 30px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 18px; }
+        .bar-label { width: 180px; font-weight: 600; font-size: 14px; color: var(--secondary); }
+        .bar-track { flex: 1; background: #e2e8f0; height: 20px; border-radius: 10px; margin: 0 20px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1.5s ease-out; border-radius: 10px; }
+        .bar-score { width: 50px; font-weight: 700; text-align: right; color: var(--accent); }
+
+        .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .intel-card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); border-left: 5px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .intel-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .intel-desc { font-size: 14px; color: #636e72; margin-bottom: 15px; }
+        .intel-app { background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 14px; }
+        .intel-app ul { padding-left: 20px; margin-top: 10px; }
+        .intel-app li { margin-bottom: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .q-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .likert-group { width: 100%; justify-content: space-between; }
+            .bar-row { flex-direction: column; align-items: flex-start; }
+            .bar-label { width: 100%; margin-bottom: 5px; }
+            .bar-track { width: 100%; margin: 0 0 5px 0; }
+            .bar-score { width: 100%; text-align: left; }
+            .likert-scale-guide { flex-direction: column; text-align: center; gap: 5px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Khảo Sát Đa Trí Tuệ (7 Intelligences)</h1>
+        <p>Phiên bản độc quyền với 50 câu hỏi phân tích cấu trúc não bộ, được tùy biến dành riêng cho Chuyên gia môi giới và Quản lý Sàn giao dịch Bất động sản.</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn:</strong> Đánh giá mức độ phản ánh đúng bản chất của bạn trong công việc và cuộc sống. Hãy chọn theo phản xạ đầu tiên.
+        <div class="likert-scale-guide">
+            <span>1 = Hoàn toàn không đúng</span>
+            <span>3 = Đôi khi đúng</span>
+            <span>5 = Hoàn toàn chính xác</span>
+        </div>
+    </div>
+
+    <div id="quiz-container" class="question-list">
+        <!-- 50 Câu hỏi sẽ được Render bằng JS -->
+    </div>
+
+    <div id="error-msg" class="error-msg">⚠️ Bạn đã bỏ sót một số câu hỏi. Những câu chưa trả lời đã được viền đỏ!</div>
+    
+    <button type="button" id="submit-btn" class="submit-btn">PHÂN TÍCH HỒ SƠ TRÍ TUỆ CỦA TÔI</button>
+
+    <div id="result-section">
+        <div class="result-header">
+            <h2>Hồ Sơ Đa Trí Tuệ Bất Động Sản</h2>
+            <p>Báo cáo phân bổ 7 loại hình thông minh trong não bộ của bạn (Thang điểm chuẩn hóa 100%)</p>
+        </div>
+
+        <div class="chart-box" id="chart-container">
+            <!-- Bars injected here -->
+        </div>
+
+        <h3 style="margin-bottom: 20px; color: var(--primary);">Phân Tích Chi Tiết Ứng Dụng Nghề Nghiệp</h3>
+        <div class="analysis-grid" id="analysis-grid">
+            <!-- Cards injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu 50 câu hỏi phân loại 7 nhóm
+    // Ling: Ngôn ngữ, Log: Logic, Spat: Không gian, Kin: Vận động, Mus: Âm nhạc, Inter: Tương tác, Intra: Nội tâm
+    const rawQuestions = [
+        /* Ngôn ngữ (Linguistic) - 7 câu */
+        { type: "LING", q: "Tôi viết các bài đăng quảng cáo (content) BĐS trên Facebook/Zalo rất mượt mà và thu hút." },
+        { type: "LING", q: "Trong lúc đàm phán, tôi luôn biết cách dùng từ ngữ chính xác để xoay chuyển tình thế." },
+        { type: "LING", q: "Tôi nhớ rất rõ các thông tin quy hoạch, luật đất đai thông qua việc đọc tài liệu văn bản." },
+        { type: "LING", q: "Tôi thích giải thích các điều khoản phức tạp trong hợp đồng cho khách hàng nghe." },
+        { type: "LING", q: "Tôi thường ghi điểm bằng cách kể những câu chuyện thú vị về lịch sử khu vực dự án." },
+        { type: "LING", q: "Giọng văn trong email và tin nhắn chăm sóc khách hàng của tôi rất chuyên nghiệp." },
+        { type: "LING", q: "Tôi có thể nhanh chóng nghĩ ra những kịch bản gọi điện (Telesales script) hiệu quả." },
+
+        /* Logic - Toán học (Logical) - 7 câu */
+        { type: "LOG", q: "Tôi tính nhẩm tỷ suất sinh lời (ROI), chiết khấu, dòng tiền vay ngân hàng cực kỳ nhanh." },
+        { type: "LOG", q: "Tôi không tin vào cảm tính, mọi quyết định đầu tư BĐS đều phải chứng minh bằng số liệu." },
+        { type: "LOG", q: "Tôi sử dụng thành thạo Excel và CRM để quản lý phễu khách hàng." },
+        { type: "LOG", q: "Tôi rất thích tìm kiếm quy luật tăng giá của thị trường qua các chu kỳ kinh tế." },
+        { type: "LOG", q: "Cách tôi làm việc luôn có quy trình (Bước 1, Bước 2, Bước 3) rất bài bản." },
+        { type: "LOG", q: "Tôi dễ dàng phát hiện ra lỗ hổng rủi ro trong một phương án tài chính của khách hàng." },
+        { type: "LOG", q: "Việc lập mục tiêu doanh số (KPIs) và bẻ nhỏ chúng theo tuần/tháng làm tôi hào hứng." },
+
+        /* Không gian - Thị giác (Spatial) - 7 câu */
+        { type: "SPAT", q: "Chỉ cần nhìn bản vẽ mặt bằng (Layout), tôi có thể tưởng tượng ngay ra không gian 3D." },
+        { type: "SPAT", q: "Tôi có cảm quan rất tốt về phong thủy, hướng gió, ánh sáng khi dẫn khách xem nhà." },
+        { type: "SPAT", q: "Tôi rất nhạy bén trong việc bắt lỗi hình ảnh/video quảng cáo bị xấu hoặc sai tỷ lệ." },
+        { type: "SPAT", q: "Tôi có trí nhớ không gian tốt, đi khảo sát đất một lần là nhớ đường đi không cần bản đồ." },
+        { type: "SPAT", q: "Tôi thích tự tay sắp xếp lại nội thất, dọn dẹp nhà mẫu (Staging) để căn nhà trông rộng hơn." },
+        { type: "SPAT", q: "Khi tư vấn, tôi thích dùng sơ đồ tư duy (Mindmap) hoặc vẽ ra giấy để khách hình dung." },
+        { type: "SPAT", q: "Tôi đánh giá giá trị một BĐS rất nhanh thông qua hình dáng thửa đất và mặt tiền." },
+
+        /* Thể chất - Vận động (Kinesthetic) - 7 câu */
+        { type: "KIN", q: "Tôi thích làm việc ngoài thị trường (đi xem đất, dẫn site tour) hơn là ngồi ở văn phòng gọi điện." },
+        { type: "KIN", q: "Tôi sử dụng ngôn ngữ cơ thể (body language) rất nhiều để tạo sức hút khi thuyết trình dự án." },
+        { type: "KIN", q: "Tôi thích tự tay kiểm tra BĐS: gõ vào tường, sờ chất liệu gỗ, mở cửa sổ để cảm nhận." },
+        { type: "KIN", q: "Tôi có thể lực rất tốt, có thể phơi nắng dẫn khách đi xem nhiều dự án trong một ngày." },
+        { type: "KIN", q: "Tôi xử lý tình huống phát sinh tại sự kiện mở bán (Event) cực kỳ nhanh nhẹn và dứt khoát." },
+        { type: "KIN", q: "Tôi khó tập trung nếu phải ngồi yên một chỗ quá 2 tiếng." },
+        { type: "KIN", q: "Khi suy nghĩ chiến lược, tôi thường phải đi bộ qua lại hoặc vận động nhẹ." },
+
+        /* Âm nhạc - Nhịp điệu (Musical) - 7 câu */
+        { type: "MUS", q: "Tôi rất nhạy cảm với tông giọng của khách qua điện thoại để biết họ đang vui hay khó chịu." },
+        { type: "MUS", q: "Giọng nói của tôi có tính nhịp điệu, truyền cảm và dễ nghe khi tư vấn." },
+        { type: "MUS", q: "Tôi biết cách chọn nhạc nền (BGM) hoàn hảo để chèn vào video review dự án." },
+        { type: "MUS", q: "Khi tổ chức Event bán hàng, tôi rất chú trọng đến âm thanh và sự sôi động của hội trường." },
+        { type: "MUS", q: "Tôi thường ghi nhớ thông tin bằng cách gắn chúng với những âm vần dễ nhớ." },
+        { type: "MUS", q: "Tôi cảm thấy cực kỳ khó chịu nếu loa sự kiện bị rè hoặc người thuyết trình nói sai nhịp." },
+        { type: "MUS", q: "Tôi lấy lại năng lượng sau một ngày rớt sale bằng cách nghe những bản nhạc yêu thích." },
+
+        /* Tương tác - Xã hội (Interpersonal) - 8 câu (Đặc thù ngành Sales) */
+        { type: "INTER", q: "Tôi có thể dễ dàng bắt chuyện và làm thân với một người lạ hoàn toàn tại quán cafe." },
+        { type: "INTER", q: "Tôi thấu hiểu nhu cầu của khách hàng ngay cả khi họ không nói ra trực tiếp." },
+        { type: "INTER", q: "Tôi rất giỏi trong việc làm trung gian hòa giải khi Bên Mua và Bên Bán xảy ra xung đột." },
+        { type: "INTER", q: "Mạng lưới quan hệ (Networking) của tôi rất rộng, bao gồm cả ngân hàng, công chứng, địa chính." },
+        { type: "INTER", q: "Tôi thích làm việc nhóm (Co-broker) để cùng chốt sale thay vì làm việc đơn độc." },
+        { type: "INTER", q: "Tôi là người thường đứng ra kết nối các thành viên trong sàn giao dịch." },
+        { type: "INTER", q: "Tôi nhận ra sự thay đổi thái độ nhỏ nhất của đối tác trong bàn đàm phán." },
+        { type: "INTER", q: "Kỹ năng thương lượng và thuyết phục người khác làm theo ý mình là thế mạnh lớn nhất của tôi." },
+
+        /* Nội tâm (Intrapersonal) - 7 câu */
+        { type: "INTRA", q: "Tôi hiểu rất rõ điểm mạnh và điểm yếu của bản thân trong nghề môi giới." },
+        { type: "INTRA", q: "Tôi có khả năng tự phục hồi động lực rất nhanh sau khi bị khách hàng hủy hợp đồng." },
+        { type: "INTRA", q: "Tôi làm việc hiệu quả nhất khi được giao quyền độc lập, tự chủ hoàn toàn." },
+        { type: "INTRA", q: "Tôi quản trị cảm xúc rất tốt, không bao giờ để cơn nóng giận bùng phát trước mặt khách." },
+        { type: "INTRA", q: "Tôi có hệ thống mục tiêu cá nhân rõ ràng và kỷ luật tuân theo dù không có ai giám sát." },
+        { type: "INTRA", q: "Tôi nhận thức rõ giới hạn của mình và biết từ chối những giao dịch vi phạm đạo đức cá nhân." },
+        { type: "INTRA", q: "Tôi không bao giờ đổ lỗi cho hoàn cảnh (thị trường xuống) mà luôn tự tìm nguyên nhân từ mình." }
+    ];
+
+    // Trộn mảng câu hỏi để khách quan (Shuffle Array)
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    const questions = shuffle([...rawQuestions]);
+
+    // Render Form
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((q, index) => {
+        let optionsHtml = '';
+        for(let i=1; i<=5; i++) {
+            optionsHtml += `
+                <div class="likert-btn" data-val="${i}">
+                    ${i}
+                    <input type="radio" name="q${index}" value="${i}">
+                </div>
+            `;
+        }
+        const html = `
+            <div class="q-card" id="card-q${index}">
+                <div class="q-text"><span class="q-number">${index + 1}.</span> ${q.q}</div>
+                <div class="likert-group">${optionsHtml}</div>
+            </div>
+        `;
+        quizContainer.insertAdjacentHTML('beforeend', html);
+    });
+
+    // UX Logic cho Likert Scale
+    document.querySelectorAll('.likert-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const group = this.parentElement;
+            const card = this.closest('.q-card');
+            
+            // Xóa style đã chọn
+            group.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+            card.classList.remove('unanswered'); // Xóa viền đỏ cảnh báo
+            
+            // Set style mới
+            this.classList.add('selected');
+            this.querySelector('input').checked = true;
+        });
+    });
+
+    // Từ điển Đánh giá
+    const intelDict = {
+        'LING': { 
+            name: "Trí thông minh Ngôn ngữ (Linguistic)", color: "#e74c3c", max: 35,
+            desc: "Khả năng thao túng ngôn từ, nhạy bén với câu chữ và kỹ năng thuyết trình xuất sắc.",
+            app: ["Phụ trách soạn thảo hợp đồng, pháp lý phức tạp.", "Thiết kế kịch bản Telesales (Sale scripts) có tính thuyết phục cao.", "Viết content PR dự án, chạy quảng cáo Facebook/Zalo sắc bén."]
+        },
+        'LOG': { 
+            name: "Trí thông minh Logic - Toán học (Logical)", color: "#3498db", max: 35,
+            desc: "Lý trí, sắc bén với các con số, chu kỳ kinh tế và khả năng phân tích rủi ro.",
+            app: ["Chuyên gia tư vấn đầu tư dòng tiền, tính toán lợi suất (ROI) cho các 'cá mập'.", "Quản lý sàn dựa trên số liệu (Data-driven), tối ưu tỷ lệ chuyển đổi CRM.", "Thẩm định giá và đo lường rủi ro thanh khoản của dự án."]
+        },
+        'SPAT': { 
+            name: "Trí thông minh Không gian (Spatial)", color: "#9b59b6", max: 35,
+            desc: "Tư duy hình ảnh 3D tốt, nhạy bén với thiết kế, mặt bằng và phong thủy.",
+            app: ["Tư vấn bán Biệt thự, Căn hộ cao cấp bằng cách giúp khách hình dung không gian sống.", "Decor, sắp xếp lại BĐS cũ (Home Staging) để bán được giá cao.", "Đọc bản vẽ quy hoạch 1/500 và đánh giá tiềm năng hạ tầng hạ tầng."]
+        },
+        'KIN': { 
+            name: "Trí thông minh Vận động (Kinesthetic)", color: "#e67e22", max: 35,
+            desc: "Năng lượng dồi dào, học hỏi qua trải nghiệm thực tế và sử dụng tốt ngôn ngữ cơ thể.",
+            app: ["Chuyên viên Site Tour, trực tiếp dẫn khách xuống công trường truyền lửa dự án.", "Điều phối các sự kiện mở bán (Event) quy mô lớn cần cường độ làm việc cao.", "Chuyên bán đất nền tỉnh, BĐS nghỉ dưỡng yêu cầu di chuyển liên tục."]
+        },
+        'MUS': { 
+            name: "Trí thông minh Âm điệu (Musical / Rhythmic)", color: "#1abc9c", max: 35,
+            desc: "Sở hữu chất giọng truyền cảm, nhạy cảm với tông giọng và nhịp độ giao tiếp.",
+            app: ["Làm MC sự kiện BĐS, điều khiển nhịp điệu sân khấu để chốt deal tập thể.", "Làm Video Review BĐS, biết cách lồng nhạc và tạo cao trào cảm xúc.", "Nắm bắt tâm lý khách hàng qua điện thoại cực nhạy dựa vào hơi thở, giọng điệu."]
+        },
+        'INTER': { 
+            name: "Trí thông minh Tương tác (Interpersonal)", color: "#f1c40f", max: 40, /* 8 câu */
+            desc: "Bậc thầy đắc nhân tâm, thấu cảm người khác và kỹ năng Networking vô đối.",
+            app: ["Vị trí Giám đốc Sàn (Floor Manager), gắn kết đội ngũ, giải quyết xung đột nội bộ.", "Xây dựng tệp khách hàng thân thiết, khách hàng giới thiệu khách hàng (Referral).", "Trực tiếp đàm phán các thương vụ khó, bẻ gãy sự phòng thủ của khách hàng."]
+        },
+        'INTRA': { 
+            name: "Trí thông minh Nội tâm (Intrapersonal)", color: "#34495e", max: 35,
+            desc: "Sự kỷ luật thép, tự nhận thức sâu sắc và khả năng quản trị cảm xúc đỉnh cao.",
+            app: ["Môi giới độc lập (Solo Agent) hoạt động trong phân khúc ngách, giá trị siêu cao.", "Khả năng phục hồi cực nhanh sau các thương vụ rớt cọc, duy trì phong độ ổn định.", "Trở thành cố vấn chiến lược, xây dựng mục tiêu dài hạn cho cá nhân và tổ chức."]
+        }
+    };
+
+    // Chấm điểm
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        let scores = { 'LING': 0, 'LOG': 0, 'SPAT': 0, 'KIN': 0, 'MUS': 0, 'INTER': 0, 'INTRA': 0 };
+        let allAnswered = true;
+
+        questions.forEach((qObj, index) => {
+            const card = document.getElementById(`card-q${index}`);
+            const selected = card.querySelector(`input[name="q${index}"]:checked`);
+            
+            if(selected) {
+                scores[qObj.type] += parseInt(selected.value);
+            } else {
+                allAnswered = false;
+                card.classList.add('unanswered');
+            }
+        });
+
+        const errorMsg = document.getElementById('error-msg');
+        if(!allAnswered) {
+            errorMsg.style.display = 'block';
+            errorMsg.scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tính % và đổ dữ liệu UI
+        document.getElementById('result-section').style.display = 'block';
+        const chartBox = document.getElementById('chart-container');
+        const gridBox = document.getElementById('analysis-grid');
+        
+        chartBox.innerHTML = '';
+        gridBox.innerHTML = '';
+
+        // Sắp xếp loại trí thông minh từ cao xuống thấp dựa trên % (để chuẩn hóa giữa 35 và 40 max)
+        let sortedIntels = Object.keys(scores).map(key => {
+            return {
+                key: key,
+                score: scores[key],
+                percent: Math.round((scores[key] / intelDict[key].max) * 100),
+                data: intelDict[key]
+            };
+        }).sort((a, b) => b.percent - a.percent);
+
+        // Render Biểu đồ thanh ngang
+        sortedIntels.forEach((item, index) => {
+            const isTop = index < 2; // Đánh dấu 2 trí thông minh cao nhất
+            const borderColor = isTop ? item.data.color : 'var(--border)';
+            const opacity = isTop ? '1' : '0.7';
+
+            // Biểu đồ
+            const chartHtml = `
+                <div class="bar-row" style="opacity: ${opacity}">
+                    <div class="bar-label">${item.data.name.split(' (')[0]}</div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: 0%; background: ${item.data.color}" data-target="${item.percent}"></div>
+                    </div>
+                    <div class="bar-score">${item.percent}%</div>
+                </div>
+            `;
+            chartBox.insertAdjacentHTML('beforeend', chartHtml);
+
+            // Thẻ phân tích
+            let appsHtml = item.data.app.map(a => `<li>${a}</li>`).join('');
+            const cardHtml = `
+                <div class="intel-card" style="border-left-color: ${item.data.color}">
+                    <div class="intel-title">
+                        <span style="color: ${item.data.color}">${index + 1}. ${item.data.name}</span>
+                        <span style="color: #636e72;">Độ tương thích: ${item.percent}%</span>
+                    </div>
+                    <div class="intel-desc">${item.data.desc}</div>
+                    <div class="intel-app">
+                        <strong>🎯 Khuyến nghị vị trí / Ứng dụng trong BĐS:</strong>
+                        <ul>${appsHtml}</ul>
+                    </div>
+                </div>
+            `;
+            gridBox.insertAdjacentHTML('beforeend', cardHtml);
+        });
+
+        // Chạy animation biểu đồ
+        setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-target') + '%';
+            });
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+    });
+</script>
+
+</body>
+</html>
