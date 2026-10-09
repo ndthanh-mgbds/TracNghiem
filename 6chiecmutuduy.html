@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh Giá Tư Duy 6 Chiếc Mũ - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #f4f7fa;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border: #e0e6ed;
+            --primary: #34495e;
+            --accent: #007bff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 15px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; background: #1a252f; color: white;
+            padding: 40px 20px; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 15px; }
+        .header p { color: #bdc3c7; font-size: 15px; max-width: 750px; margin: 0 auto; }
+
+        .instruction {
+            background: var(--card-bg); border-left: 5px solid var(--accent); padding: 20px 25px;
+            border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 30px; font-size: 15px;
+        }
+
+        .question-card {
+            background: var(--card-bg); padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .q-title { font-weight: 700; font-size: 17px; margin-bottom: 20px; color: #2c3e50; line-height: 1.5; }
+
+        .option-label {
+            display: flex; align-items: flex-start; padding: 15px; margin-bottom: 12px;
+            background: #f8fafc; border: 2px solid transparent; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s; font-size: 15px; font-weight: 500;
+        }
+        .option-label:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .option-label input { margin-top: 5px; margin-right: 15px; transform: scale(1.3); cursor: pointer; }
+        
+        /* Hiệu ứng khi được chọn */
+        .option-label.selected { background: #eef5ff; border-color: var(--accent); }
+
+        .submit-btn {
+            display: block; width: 100%; background: var(--accent); color: white; border: none;
+            padding: 18px; font-size: 18px; font-weight: 700; border-radius: 8px;
+            cursor: pointer; transition: 0.3s; margin-top: 40px; box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+        }
+        .submit-btn:hover { background: #0056b3; transform: translateY(-2px); }
+
+        .error {
+            background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;
+            text-align: center; margin-top: 20px; display: none; font-weight: 600;
+        }
+
+        /* Result Area */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s ease-in; }
+        
+        .dom-hat-card {
+            padding: 40px; border-radius: 12px; color: white; text-align: center;
+            margin-bottom: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .dom-hat-card h2 { font-size: 32px; margin-bottom: 10px; }
+        .dom-hat-card .role { font-size: 18px; font-weight: 600; opacity: 0.9; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .dom-hat-card p { font-size: 16px; line-height: 1.8; text-align: left; background: rgba(255,255,255,0.15); padding: 20px; border-radius: 8px; }
+
+        .chart-container {
+            background: var(--card-bg); padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border);
+        }
+        .chart-title { font-weight: 700; font-size: 20px; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        
+        .bar-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .bar-label { width: 140px; font-weight: 700; font-size: 14px; }
+        .bar-wrap { flex-grow: 1; background: #e9ecef; height: 24px; border-radius: 12px; margin: 0 20px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0; transition: width 1s ease-out; }
+        .bar-score { width: 40px; font-weight: 700; text-align: right; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .bar-row { flex-wrap: wrap; } .bar-label { width: 100%; margin-bottom: 5px; } .bar-wrap { margin: 0 15px 0 0; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Khảo Sát Khuynh Hướng Tư Duy (6 Chiếc Mũ)</h1>
+        <p>Phiên bản thiết kế chuyên biệt cho Chuyên gia môi giới và Quản lý sàn giao dịch Bất động sản. Giúp phân tích chính xác lăng kính tư duy cốt lõi của bạn.</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn:</strong> Hãy đọc kỹ 10 tình huống thực tế dưới đây. Chọn <strong>MỘT</strong> phương án phản xạ tự nhiên nhất của bạn (không phải phương án bạn cho là "đúng nhất" theo lý thuyết).
+    </div>
+
+    <!-- Loại bỏ thẻ <form> để tránh lỗi reload trang, thay bằng thẻ <div> -->
+    <div id="quiz-container">
+        
+        <!-- Tình huống 1 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 1: Chủ đầu tư vừa công bố một dự án căn hộ cao cấp mới với mức giá khá cao so với khu vực. Phản ứng đầu tiên của bạn là gì?</div>
+            <label class="option-label"><input type="radio" name="q1" value="A"> A. Yêu cầu cung cấp ngay bộ hồ sơ pháp lý, bảng giá chi tiết và dữ liệu so sánh giá các dự án lân cận.</label>
+            <label class="option-label"><input type="radio" name="q1" value="B"> B. Cảm thấy phấn khích hoặc e ngại dựa trên linh cảm về việc dự án này có hợp với tệp khách của mình không.</label>
+            <label class="option-label"><input type="radio" name="q1" value="C"> C. Lập tức nhìn ra bất lợi: giá quá cao, tiến độ thanh toán gấp và lo ngại khách hàng sẽ từ chối.</label>
+            <label class="option-label"><input type="radio" name="q1" value="D"> D. Nghĩ ngay đến hoa hồng hấp dẫn và tin tưởng rằng luôn có khách VIP sẵn sàng xuống tiền vì tiện ích đẹp.</label>
+            <label class="option-label"><input type="radio" name="q1" value="E"> E. Bắt đầu nảy ý tưởng làm chiến dịch marketing khác biệt (như quay video review độc lạ) để hút khách ngách.</label>
+            <label class="option-label"><input type="radio" name="q1" value="F"> F. Xác định ngay mục tiêu doanh số, lên lịch họp nhóm để phân công data và định hướng cách tiếp cận.</label>
+        </div>
+
+        <!-- Tình huống 2 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 2: Bạn đang tư vấn cho một nhà đầu tư lớn, nhưng họ do dự không chịu đặt cọc vì sợ thị trường đang đi xuống. Bạn sẽ xử lý thế nào?</div>
+            <label class="option-label"><input type="radio" name="q2" value="A"> A. Trình bày các biểu đồ chu kỳ BĐS, báo cáo vĩ mô và lịch sử biến động giá khu vực bằng con số cụ thể.</label>
+            <label class="option-label"><input type="radio" name="q2" value="B"> B. Bày tỏ sự đồng cảm sâu sắc với nỗi lo của họ, chia sẻ cảm nhận chân thành để tạo sự gắn kết cảm xúc.</label>
+            <label class="option-label"><input type="radio" name="q2" value="C"> C. Thừa nhận rủi ro hiện tại, sau đó cùng họ phân tích kỹ lưỡng các kịch bản xấu nhất (worst-case scenarios).</label>
+            <label class="option-label"><input type="radio" name="q2" value="D"> D. Nhấn mạnh vào lợi thế "bắt đáy", chiết khấu khủng và viễn cảnh lợi nhuận rực rỡ khi thị trường phục hồi.</label>
+            <label class="option-label"><input type="radio" name="q2" value="E"> E. Đề xuất phương án mới: thay vì mua đứt, đề nghị rủ thêm cổ đông mua chung hoặc chuyển sang loại hình ngách.</label>
+            <label class="option-label"><input type="radio" name="q2" value="F"> F. Tóm tắt lại những lo ngại, cấu trúc lại vấn đề và đưa ra lộ trình giải quyết gồm 3 bước rõ ràng để chốt deal.</label>
+        </div>
+
+        <!-- Tình huống 3 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 3: Trong cuộc họp giao ban đầu tháng, quản lý thông báo doanh số của toàn sàn tháng vừa rồi giảm mạnh. Thái độ của bạn là:</div>
+            <label class="option-label"><input type="radio" name="q3" value="A"> A. Chăm chú xem tỷ lệ chuyển đổi (conversion rate), số lượng khách tiềm năng để tìm ra khâu nào đang tắc nghẽn.</label>
+            <label class="option-label"><input type="radio" name="q3" value="B"> B. Thể hiện sự thất vọng, bực bội hoặc ngược lại, dùng lời lẽ truyền cảm xúc để xốc lại tinh thần anh em.</label>
+            <label class="option-label"><input type="radio" name="q3" value="C"> C. Cảnh báo về hậu quả (cắt giảm nhân sự, giảm phí) và chỉ ra những sai lầm tập thể đang mắc phải.</label>
+            <label class="option-label"><input type="radio" name="q3" value="D"> D. Chỉ ra vài giao dịch thành công hiếm hoi, động viên mọi người rằng thị trường sắp tới sẽ tốt lên.</label>
+            <label class="option-label"><input type="radio" name="q3" value="E"> E. Hăng hái đề xuất sàn thử nghiệm kênh tìm khách hoàn toàn mới (livestream chốt nhà, lập kênh TikTok).</label>
+            <label class="option-label"><input type="radio" name="q3" value="F"> F. Lắng nghe ý kiến, đúc kết nguyên nhân cốt lõi và yêu cầu thiết lập lại Action Plan cho tuần tới.</label>
+        </div>
+
+        <!-- Tình huống 4 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 4: Sàn giao dịch đối thủ vừa mở ngay đối diện, quy tụ nhiều "siêu cò" và tung chính sách cắt hoa hồng để giành khách. Bạn nghĩ gì?</div>
+            <label class="option-label"><input type="radio" name="q4" value="A"> A. Tìm cách thu thập số liệu chính xác về quỹ hàng, mức phí môi giới và số lượng nhân sự của họ.</label>
+            <label class="option-label"><input type="radio" name="q4" value="B"> B. Cảm thấy nóng mặt, tự ái hoặc bị kích thích cạnh tranh mạnh mẽ để chứng minh bản thân giỏi hơn.</label>
+            <label class="option-label"><input type="radio" name="q4" value="C"> C. Đánh giá đây là mối đe dọa cực kỳ nguy hiểm, liệt kê khách VIP có thể bị cướp để có phương án phòng thủ.</label>
+            <label class="option-label"><input type="radio" name="q4" value="D"> D. Vui vẻ coi đây là minh chứng khu vực này đang sốt, sàn mình hoàn toàn có thể cạnh tranh bằng dịch vụ.</label>
+            <label class="option-label"><input type="radio" name="q4" value="E"> E. Suy nghĩ về việc tung ra dịch vụ "hậu mãi" độc quyền hoặc thông điệp truyền thông đi ngược lại đối thủ.</label>
+            <label class="option-label"><input type="radio" name="q4" value="F"> F. Triệu tập nhóm, thiết lập nguyên tắc ứng xử với đối thủ và củng cố quy trình kiểm soát thông tin nội bộ.</label>
+        </div>
+
+        <!-- Tình huống 5 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 5: Bạn vừa bị rớt một hợp đồng "khủng" ngay phút chót (khách bẻ cọc). Cách bạn đối mặt:</div>
+            <label class="option-label"><input type="radio" name="q5" value="A"> A. Đọc lại toàn bộ hợp đồng, tin nhắn để xác định chính xác lỗi pháp lý/quy trình nằm ở đoạn dữ liệu nào.</label>
+            <label class="option-label"><input type="radio" name="q5" value="B"> B. Cho phép bản thân bộc lộ sự buồn bã, đi uống bia giải tỏa cảm xúc trước khi làm việc lại.</label>
+            <label class="option-label"><input type="radio" name="q5" value="C"> C. Dằn vặt về những điểm thiếu sót, phân tích kỹ rủi ro đã bỏ qua để đảm bảo không lặp lại sai lầm.</label>
+            <label class="option-label"><input type="radio" name="q5" value="D"> D. Gạt đi nhanh chóng, tự nhủ "trong cái rủi có cái may", căn nhà này có thể bán cho người khác giá cao hơn.</label>
+            <label class="option-label"><input type="radio" name="q5" value="E"> E. Lập tức lấy chính căn nhà rớt cọc đó để chào cho một tệp khách hàng có khẩu vị rủi ro hoàn toàn khác.</label>
+            <label class="option-label"><input type="radio" name="q5" value="F"> F. Đánh giá lại toàn bộ rổ hàng (pipeline), sắp xếp lại ưu tiên của khách khác và tiếp tục làm việc chuẩn.</label>
+        </div>
+
+        <!-- Tình huống 6 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 6: Bạn đang nắm một căn nhà giá rất tốt, nhưng phát hiện có vấn đề về pháp lý (sổ đang cắm ngân hàng, ranh giới chưa rõ). Bạn sẽ:</div>
+            <label class="option-label"><input type="radio" name="q6" value="A"> A. Yêu cầu chủ nhà cung cấp bản vẽ trích lục hiện trạng, hợp đồng tín dụng để đo lường chính xác con số.</label>
+            <label class="option-label"><input type="radio" name="q6" value="B"> B. Dựa vào trực giác và thái độ của chủ nhà lúc tiếp xúc để quyết định xem người này có đáng tin hay không.</label>
+            <label class="option-label"><input type="radio" name="q6" value="C"> C. Cảnh báo khách hàng về nguy cơ mất trắng tiền cọc, khuyên khách nên rút lui để đảm bảo an toàn.</label>
+            <label class="option-label"><input type="radio" name="q6" value="D"> D. Xem đây là "cơ hội vàng" để mua rẻ, tin tưởng rằng chỉ cần chịu khó đi lại thì pháp lý nào cũng gỡ được.</label>
+            <label class="option-label"><input type="radio" name="q6" value="E"> E. Nghĩ ra kịch bản hợp đồng "cọc ba bên" hoặc đưa tiền vào tài khoản phong tỏa để lách qua khe cửa hẹp.</label>
+            <label class="option-label"><input type="radio" name="q6" value="F"> F. Đình chỉ việc chào bán, lập quy trình từng bước kiểm tra pháp lý và phân công người đi check quy hoạch.</label>
+        </div>
+
+        <!-- Tình huống 7 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 7: Khách VIP của bạn rất khó tính, liên tục thay đổi nhu cầu (lúc thích nhà phố, lúc đòi biệt thự vùng ven). Bạn sẽ:</div>
+            <label class="option-label"><input type="radio" name="q7" value="A"> A. Xin lại đúng budget tài chính, lọc chính xác bằng hệ thống data để đưa ra bảng so sánh lợi suất đầu tư.</label>
+            <label class="option-label"><input type="radio" name="q7" value="B"> B. Cảm thấy mệt mỏi nhưng cố gắng cảm nhận xem đằng sau sự thay đổi đó là "nỗi sợ" hay nhu cầu "thể hiện".</label>
+            <label class="option-label"><input type="radio" name="q7" value="C"> C. Đánh giá đây là khách hàng "ảo", tốn thời gian, nguy cơ không chốt được cao nên quyết định giãn dần ra.</label>
+            <label class="option-label"><input type="radio" name="q7" value="D"> D. Vẫn phục vụ cực kỳ nhiệt tình, tin rằng khách càng chảnh thì hoa hồng chốt được sẽ càng xứng đáng.</label>
+            <label class="option-label"><input type="radio" name="q7" value="E"> E. Đột ngột dẫn họ đi xem một loại hình BĐS mà họ chưa từng nhắc tới (VD: Đất rẫy farmstay) để tạo bất ngờ.</label>
+            <label class="option-label"><input type="radio" name="q7" value="F"> F. Lên lịch hẹn cà phê nghiêm túc để chốt lại bộ tiêu chí cuối cùng, thiết lập nguyên tắc làm việc với khách.</label>
+        </div>
+
+        <!-- Tình huống 8 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 8: Công ty vừa áp dụng một phần mềm quản lý khách hàng (CRM) mới rất phức tạp bắt buộc mọi người dùng. Phản ứng của bạn:</div>
+            <label class="option-label"><input type="radio" name="q8" value="A"> A. Lập tức đọc tài liệu hướng dẫn, tìm hiểu xem hệ thống lưu trữ data và phân tích báo cáo như thế nào.</label>
+            <label class="option-label"><input type="radio" name="q8" value="B"> B. Cảm thấy bực bội vì phải thay đổi thói quen, hoặc thấy phấn khích vì giao diện đẹp và mượt mà.</label>
+            <label class="option-label"><input type="radio" name="q8" value="C"> C. Cằn nhằn về việc phần mềm có lỗi, tốn thời gian nhập liệu và lo ngại việc bị lộ danh sách khách hàng.</label>
+            <label class="option-label"><input type="radio" name="q8" value="D"> D. Khen ngợi sự đổi mới của công ty, tin rằng công nghệ này sẽ giúp mọi người x2 doanh số trong tương lai.</label>
+            <label class="option-label"><input type="radio" name="q8" value="E"> E. Tìm ra các thủ thuật (trick), phím tắt hoặc cách ứng dụng phần mềm này để làm email marketing tự động.</label>
+            <label class="option-label"><input type="radio" name="q8" value="F"> F. Nắm bắt quy trình, tổ chức hướng dẫn lại cho team và thiết lập KPI nhập liệu hàng ngày cho nhân sự.</label>
+        </div>
+
+        <!-- Tình huống 9 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 9: Bạn được giao tổ chức sự kiện đưa khách hàng đi xem thực tế dự án (Site Tour) vào cuối tuần. Bạn chú trọng nhất điều gì?</div>
+            <label class="option-label"><input type="radio" name="q9" value="A"> A. Độ chuẩn xác của lịch trình, số lượng xe, ngân sách tổ chức và danh sách khách mời đã xác nhận.</label>
+            <label class="option-label"><input type="radio" name="q9" value="B"> B. Trải nghiệm cảm xúc: nhạc trên xe hay không, đồ ăn ngon không, khách có thấy được phục vụ như VVIP không.</label>
+            <label class="option-label"><input type="radio" name="q9" value="C"> C. Chuẩn bị sẵn các phương án dự phòng: lỡ kẹt xe, trời mưa giông, hoặc khách hủy kèo sát giờ xuất phát.</label>
+            <label class="option-label"><input type="radio" name="q9" value="D"> D. Tạo không khí cuồng nhiệt trên xe, truyền năng lượng đỉnh cao, nhắm tới tỷ lệ chốt cọc 100% ngay tại dự án.</label>
+            <label class="option-label"><input type="radio" name="q9" value="E"> E. Thay vì đi xe tour thông thường, nghĩ ra concept độc lạ (như tiệc rượu vang, xem dự án bằng kính VR thực tế ảo).</label>
+            <label class="option-label"><input type="radio" name="q9" value="F"> F. Đóng vai trò tổng chỉ huy, điều phối mượt mà giữa bộ phận Sales, Marketing và Hậu cần để sự kiện trơn tru.</label>
+        </div>
+
+        <!-- Tình huống 10 -->
+        <div class="question-card">
+            <div class="q-title">Tình huống 10: Thị trường khu vực bạn bán đột nhiên "sốt đất", giá nhảy múa từng ngày, khách tranh nhau mua. Bạn làm gì?</div>
+            <label class="option-label"><input type="radio" name="q10" value="A"> A. Phân tích ngay lịch sử giao dịch và khung giá đất để xác định đây là sóng thực hay bong bóng nhân tạo.</label>
+            <label class="option-label"><input type="radio" name="q10" value="B"> B. Bị cuốn vào hội chứng FOMO (sợ lỡ cơ hội), gọi điện hối thúc khách hàng với nhịp độ hồi hộp, dồn dập.</label>
+            <label class="option-label"><input type="radio" name="q10" value="C"> C. Cảnh báo khách hàng thân thiết về rủi ro đu đỉnh, kẹt thanh khoản và những cái bẫy pháp lý khi mua lướt sóng.</label>
+            <label class="option-label"><input type="radio" name="q10" value="D"> D. Khuyến khích khách hàng dốc tiền gom hàng ngay, vẽ ra viễn cảnh tài sản nhân đôi chỉ sau vài tháng.</label>
+            <label class="option-label"><input type="radio" name="q10" value="E"> E. Thay vì lao vào vùng đang sốt, tìm kiếm các xã/huyện giáp ranh chưa ai để ý để tạo ra một thị trường ngách mới.</label>
+            <label class="option-label"><input type="radio" name="q10" value="F"> F. Giữ kỷ luật cho sàn, ưu tiên chốt các giao dịch có độ an toàn cao và tránh để nhân viên cuốn theo cò lướt sóng ngoài.</label>
+        </div>
+
+        <div id="error-msg" class="error">⚠️ Vui lòng trả lời đầy đủ 10 câu hỏi trước khi xem kết quả!</div>
+        
+        <!-- Thay type="submit" thành type="button" -->
+        <button type="button" id="calc-btn" class="submit-btn">XEM BÁO CÁO TƯ DUY 6 CHIẾC MŨ</button>
+    </div>
+
+    <div id="result-section">
+        <div class="dom-hat-card" id="dom-hat-card">
+            <h2 id="hat-name">...</h2>
+            <div class="role" id="hat-role">...</div>
+            <p id="hat-desc">...</p>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Phân Bổ Cấu Trúc Tư Duy Của Bạn</div>
+            <div id="chart-bars"></div>
+            <p style="margin-top: 20px; font-size: 14px; color: #7f8c8d; font-style: italic;">*Một chuyên gia BĐS xuất sắc không chỉ dùng 1 chiếc mũ, mà biết linh hoạt đội chiếc mũ phù hợp tùy vào từng giai đoạn của thương vụ.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Xử lý hiệu ứng chọn đáp án An toàn 100% bằng sự kiện 'change' trên chính nút Radio
+    const allRadios = document.querySelectorAll('input[type="radio"]');
+    allRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Lấy khối thẻ cha của câu hỏi hiện tại
+            const card = this.closest('.question-card');
+            
+            // Bỏ chọn tất cả các đáp án trong câu đó
+            const labels = card.querySelectorAll('.option-label');
+            labels.forEach(lbl => lbl.classList.remove('selected'));
+            
+            // Đánh dấu đáp án đang được chọn
+            this.closest('.option-label').classList.add('selected');
+        });
+    });
+
+    const hatData = {
+        'A': { name: 'MŨ TRẮNG (White Hat)', shortName: 'MŨ TRẮNG', color: '#95a5a6', text: '#2c3e50', role: 'Nhà Phân Tích Dữ Liệu',
+               desc: 'Bạn làm việc dựa trên con số, pháp lý, quy hoạch và dữ liệu lịch sử. Khách hàng làm việc với bạn cảm thấy an tâm vì tính chính xác và minh bạch. Trong đội nhóm, bạn là chiếc mỏ neo kéo mọi người về thực tế.<br><br><strong>Vị trí phù hợp:</strong> Chuyên viên tư vấn đầu tư cấp cao, Thẩm định giá, Khai thác nguồn hàng.' },
+        
+        'B': { name: 'MŨ ĐỎ (Red Hat)', shortName: 'MŨ ĐỎ', color: '#e74c3c', text: '#fff', role: 'Nhà Bán Hàng Trực Giác',
+               desc: 'Bạn sử dụng chỉ số thông minh cảm xúc (EQ) cực tốt. Bạn chốt sales bằng khả năng đồng cảm, thao túng tâm lý và năng lượng truyền tải. Bạn đưa ra quyết định nhanh dựa trên linh cảm kinh doanh.<br><br><strong>Vị trí phù hợp:</strong> Chuyên viên chốt deal trực tiếp (Closer), Chăm sóc khách hàng VIP.' },
+        
+        'C': { name: 'MŨ ĐEN (Black Hat)', shortName: 'MŨ ĐEN', color: '#2c3e50', text: '#fff', role: 'Nhà Quản Trị Rủi Ro',
+               desc: 'Bạn luôn nhìn thấy "bẫy" trong mọi giao dịch. Sự thận trọng của bạn giúp bảo vệ sàn và khách hàng khỏi những dự án ma, pháp lý lỏng lẻo hay rủi ro dòng tiền. Đội nhóm rất cần bạn để tránh rủi ro pháp lý.<br><br><strong>Vị trí phù hợp:</strong> Trưởng phòng Pháp lý, Thẩm định dự án, Kiểm soát tuân thủ.' },
+        
+        'D': { name: 'MŨ VÀNG (Yellow Hat)', shortName: 'MŨ VÀNG', color: '#f1c40f', text: '#2c3e50', role: 'Người Truyền Cảm Hứng',
+               desc: 'Bạn là trung tâm của sự tích cực. Dù thị trường có sụp đổ, bạn vẫn tìm ra cơ hội để chốt lời. Tinh thần lạc quan của bạn giúp duy trì nhuệ khí cho tập thể và khách hàng.<br><br><strong>Vị trí phù hợp:</strong> Giám đốc phát triển mạng lưới, Chuyên viên bán hàng dự án mới, Đại sứ thương hiệu.' },
+        
+        'E': { name: 'MŨ XANH LÁ (Green Hat)', shortName: 'MŨ XANH LÁ', color: '#2ecc71', text: '#fff', role: 'Nhà Sáng Tạo Đột Phá',
+               desc: 'Bạn ghét lối mòn. Khi cách làm cũ không hiệu quả, bạn sẽ tạo ra xu hướng mới. Khả năng tư duy vượt giới hạn (out-of-the-box) giúp bạn chốt những giao dịch hoặc tiếp thị dự án một cách dị biệt.<br><br><strong>Vị trí phù hợp:</strong> Giám đốc Marketing BĐS (CMO), Chuyên viên phát triển dự án, Giám đốc chiến lược.' },
+        
+        'F': { name: 'MŨ XANH DƯƠNG (Blue Hat)', shortName: 'MŨ XANH DƯƠNG', color: '#2980b9', text: '#fff', role: 'Nhà Lãnh Đạo Chiến Lược',
+               desc: 'Bạn có tư duy hệ thống và khả năng kiểm soát bức tranh tổng thể. Bạn giỏi tổ chức, phân công, đánh giá năng lực nhân sự và điều phối các "chiếc mũ" khác làm việc cùng nhau một cách nhịp nhàng.<br><br><strong>Vị trí phù hợp:</strong> Giám đốc Sàn (Floor Manager), Giám đốc Điều hành (CEO), Trưởng phòng Kinh doanh.' }
+    };
+
+    // Xử lý khi bấm nút tính điểm (Bắt sự kiện click vào nút button thuần)
+    document.getElementById('calc-btn').addEventListener('click', function() {
+        
+        let scores = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0 };
+        let answeredCount = 0;
+
+        // Quét kiểm tra 10 câu hỏi
+        for(let i = 1; i <= 10; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected) {
+                scores[selected.value]++;
+                answeredCount++;
+            }
+        }
+
+        const errorMsg = document.getElementById('error-msg');
+        if(answeredCount < 10) {
+            errorMsg.style.display = 'block';
+            return; // Dừng lại nếu chưa làm đủ
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        // Tìm Mũ thống trị (Điểm cao nhất)
+        let maxScore = -1;
+        let domHat = 'A';
+        for (let key in scores) {
+            if (scores[key] > maxScore) {
+                maxScore = scores[key];
+                domHat = key;
+            }
+        }
+
+        // Đổ dữ liệu vào phần Kết quả
+        const resultSec = document.getElementById('result-section');
+        const domCard = document.getElementById('dom-hat-card');
+        const hatInfo = hatData[domHat];
+
+        resultSec.style.display = 'block';
+        domCard.style.backgroundColor = hatInfo.color;
+        domCard.style.color = hatInfo.text;
+        
+        document.getElementById('hat-name').innerText = hatInfo.name;
+        document.getElementById('hat-role').innerText = hatInfo.role;
+        document.getElementById('hat-desc').innerHTML = hatInfo.desc;
+
+        // Vẽ biểu đồ phân bổ
+        const chartBox = document.getElementById('chart-bars');
+        chartBox.innerHTML = '';
+
+        // Sắp xếp mảng để vẽ thanh biểu đồ từ cao xuống thấp
+        let sortedKeys = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+
+        sortedKeys.forEach(key => {
+            let score = scores[key];
+            let info = hatData[key];
+            const percent = (score / 10) * 100;
+            
+            // Xử lý màu chữ cho nhãn (Mũ Vàng và Trắng cần màu chữ tối để dễ đọc)
+            const labelColor = (info.color === '#f1c40f' || info.color === '#95a5a6') ? '#2c3e50' : info.color;
+
+            const html = `
+                <div class="bar-row">
+                    <div class="bar-label" style="color: ${labelColor}">${info.shortName}</div>
+                    <div class="bar-wrap">
+                        <div class="bar-fill" style="width: 0%; background: ${info.color};" data-target="${percent}"></div>
+                    </div>
+                    <div class="bar-score">${score}</div>
+                </div>
+            `;
+            chartBox.insertAdjacentHTML('beforeend', html);
+        });
+
+        // Chạy animation kéo thanh bar và tự động cuộn trang xuống xem kết quả
+        setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-target') + '%';
+            });
+            resultSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+    });
+</script>
+
+</body>
+</html>
