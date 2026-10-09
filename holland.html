@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Mật Mã Holland (RIASEC) - Bất Động Sản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #111827;
+            --secondary: #374151;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #d1d5db;
+            --radius: 12px;
+            
+            /* RIASEC Colors */
+            --color-r: #ef4444; /* Realistic - Red */
+            --color-i: #3b82f6; /* Investigative - Blue */
+            --color-a: #8b5cf6; /* Artistic - Purple */
+            --color-s: #10b981; /* Social - Green */
+            --color-e: #f59e0b; /* Enterprising - Amber */
+            --color-c: #64748b; /* Conventional - Slate */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6; padding: 40px 15px;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 40px; 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; padding: 45px 20px; border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(17, 24, 39, 0.15);
+        }
+
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px;}
+        .header p { font-size: 15px; color: #9ca3af; max-width: 800px; margin: 0 auto; }
+
+        .instruction {
+            background: var(--card-bg); padding: 25px; border-radius: var(--radius);
+            border-left: 5px solid var(--color-e); margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .likert-scale-guide {
+            display: flex; justify-content: space-between; background: #f9fafb; 
+            padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: 600; font-size: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .question-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .q-card {
+            background: var(--card-bg); padding: 20px 25px; border-radius: var(--radius);
+            border: 1px solid var(--border); display: flex; justify-content: space-between;
+            align-items: center; transition: 0.2s;
+        }
+        
+        .q-card:hover { border-color: #9ca3af; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .q-card.unanswered { border-left: 4px solid var(--color-r); background: #fef2f2; }
+
+        .q-text { flex: 1; font-weight: 500; font-size: 15px; padding-right: 20px; }
+        .q-number { font-weight: 700; color: var(--color-e); margin-right: 8px; }
+
+        .likert-group { display: flex; gap: 8px; }
+        .likert-btn {
+            width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border);
+            background: #f9fafb; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-weight: 600; transition: 0.2s; position: relative; color: var(--text-main);
+        }
+        
+        .likert-btn input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        
+        .likert-btn:hover { background: #e5e7eb; }
+        .likert-btn.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.1); box-shadow: 0 4px 10px rgba(17, 24, 39, 0.3); }
+
+        .submit-btn {
+            width: 100%; background: var(--primary); color: white; border: none; 
+            padding: 20px; font-size: 18px; font-weight: 700; border-radius: var(--radius); 
+            cursor: pointer; transition: 0.3s; margin-top: 40px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .submit-btn:hover { background: #000000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); }
+
+        .error-msg { background: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px; display: none; font-weight: 600; border: 1px solid #f87171;}
+
+        /* Result Section */
+        #result-section { display: none; margin-top: 50px; animation: fadeIn 0.8s; }
+        
+        .code-reveal {
+            background: linear-gradient(135deg, var(--color-e), #d97706);
+            color: white; padding: 40px; border-radius: var(--radius); text-align: center;
+            margin-bottom: 30px; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+        }
+        .code-reveal h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: 10px; }
+        .code-reveal .holland-code { font-size: 54px; font-weight: 800; letter-spacing: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+
+        .chart-box { background: var(--card-bg); padding: 35px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.03);}
+        .chart-title { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 30px; color: var(--primary); }
+        
+        .bar-row { display: flex; align-items: center; margin-bottom: 22px; }
+        .bar-label { width: 220px; font-weight: 700; font-size: 14px; }
+        .bar-track { flex: 1; background: #f1f5f9; height: 24px; border-radius: 12px; margin: 0 20px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
+        .bar-fill { height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 12px; }
+        .bar-score { width: 50px; font-weight: 700; text-align: right; font-size: 16px;}
+
+        .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .trait-card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); border-left: 6px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .trait-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border);}
+        .trait-desc { font-size: 15px; color: var(--text-main); line-height: 1.7; margin-bottom: 15px;}
+        .trait-app { background: #f9fafb; padding: 15px; border-radius: 8px; font-size: 14px;}
+        .trait-app ul { padding-left: 20px; margin-top: 10px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .q-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .likert-group { width: 100%; justify-content: space-between; }
+            .bar-row { flex-direction: column; align-items: flex-start; margin-bottom: 15px;}
+            .bar-label { width: 100%; margin-bottom: 8px; }
+            .bar-track { width: 100%; margin: 0 0 8px 0; }
+            .bar-score { width: 100%; text-align: left; }
+            .likert-scale-guide { flex-direction: column; text-align: center; gap: 8px;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Trắc Nghiệm Mật Mã Holland (RIASEC)</h1>
+        <p>Tìm ra 3 nhóm tính cách thống trị để định hướng đúng vai trò của bạn trên Sàn Giao dịch Bất động sản (Sales, Quản lý, Marketing hay Pháp lý).</p>
+    </div>
+
+    <div class="instruction">
+        <strong>📌 Hướng dẫn thực hiện:</strong> Dưới đây là 30 sở thích và xu hướng hành vi trong ngành BĐS. Hãy chọn mức độ bạn yêu thích hoặc đồng ý với các hoạt động này.
+        <div class="likert-scale-guide">
+            <span style="color: #ef4444;">1 = Rất Không Thích</span>
+            <span style="color: #6b7280;">3 = Bình Thường</span>
+            <span style="color: #10b981;">5 = Rất Yêu Thích</span>
+        </div>
+    </div>
+
+    <div id="quiz-container" class="question-list">
+        <!-- JS Render -->
+    </div>
+
+    <div id="error-msg" class="error-msg">⚠️ Vui lòng hoàn thành toàn bộ 30 câu hỏi! Các câu chưa chọn đã được viền đỏ.</div>
+    
+    <button type="button" id="submit-btn" class="submit-btn">GIẢI MÃ NGHỀ NGHIỆP CỦA TÔI</button>
+
+    <div id="result-section">
+        <div class="code-reveal">
+            <h2>Mật Mã Holland Của Bạn Là</h2>
+            <div class="holland-code" id="holland-code-text">R-I-A</div>
+            <p style="margin-top: 15px; font-size: 15px; opacity: 0.9;">Sự kết hợp của 3 nhóm tính cách cao nhất tạo nên lợi thế cạnh tranh tuyệt đối của bạn.</p>
+        </div>
+
+        <div class="chart-box">
+            <h2 class="chart-title">Phân Bổ 6 Nhóm Sở Thích (RIASEC)</h2>
+            <div id="chart-container">
+                <!-- Bars -->
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 20px; font-size: 20px; color: var(--primary);">Phân Tích Chi Tiết Định Hướng Bất Động Sản</h3>
+        <div class="analysis-grid" id="analysis-grid">
+            <!-- Cards -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu 30 câu hỏi (5 câu/nhóm)
+    const rawQuestions = [
+        /* R - Realistic (Thực tế) */
+        { type: "R", q: "Tôi thích tự mình lái xe đưa khách đi xem thực tế các lô đất vùng ven hơn là ngồi văn phòng telesales." },
+        { type: "R", q: "Khi nhận dự án mới, tôi muốn trực tiếp xuống công trường để xem tiến độ xây dựng và kiểm tra vật liệu." },
+        { type: "R", q: "Tôi thích việc tự tay sắp xếp, dọn dẹp lại căn nhà (home staging) trước khi chụp ảnh chào bán." },
+        { type: "R", q: "Tôi chuộng các công cụ làm việc thực tế, trực quan như sa bàn vật lý, thước đo laser, la bàn phong thủy." },
+        { type: "R", q: "Tôi thấy thoải mái khi làm việc ngoài trời, chạy ngược xuôi ngoài đường dù thời tiết có khắc nghiệt." },
+
+        /* I - Investigative (Nghiên cứu) */
+        { type: "I", q: "Tôi thường dành nhiều giờ để phân tích biểu đồ giá đất và các báo cáo kinh tế vĩ mô trước khi tư vấn." },
+        { type: "I", q: "Tôi thích việc truy tìm, tra cứu bản đồ quy hoạch, kiểm tra tính pháp lý phức tạp của một thửa đất." },
+        { type: "I", q: "Khi thị trường biến động, tôi luôn tìm cách lý giải nguyên nhân bằng các dữ liệu và phân tích logic." },
+        { type: "I", q: "Tôi thích đọc các bài báo chuyên sâu về tài chính, luật đất đai và chiến lược đầu tư dòng tiền." },
+        { type: "I", q: "Việc giải quyết những bài toán tài chính, tính lãi suất vay phức tạp cho khách hàng làm tôi thấy kích thích trí tuệ." },
+
+        /* A - Artistic (Nghệ thuật) */
+        { type: "A", q: "Tôi thường nảy ra những ý tưởng tiếp thị (marketing) độc lạ, không giống ai để thu hút khách hàng." },
+        { type: "A", q: "Tôi thích tự thiết kế hình ảnh, quay dựng video review BĐS với góc nhìn mang tính nghệ thuật, điện ảnh." },
+        { type: "A", q: "Tôi đề cao tính thẩm mỹ (concept kiến trúc, thiết kế nội thất) của một căn nhà khi lựa chọn rổ hàng để bán." },
+        { type: "A", q: "Tôi cảm thấy cực kỳ gò bó nếu phải làm việc theo một kịch bản chốt sales (script) rập khuôn, cứng nhắc." },
+        { type: "A", q: "Tôi thích tự tay nghĩ ra các concept sự kiện tri ân khách hàng mang đậm dấu ấn cá nhân." },
+
+        /* S - Social (Xã hội) */
+        { type: "S", q: "Niềm vui lớn nhất của tôi là giúp một gia đình tìm được tổ ấm ưng ý, an cư lạc nghiệp." },
+        { type: "S", q: "Tôi rất kiên nhẫn khi đào tạo, hướng dẫn và truyền kinh nghiệm cho các bạn môi giới mới vào nghề." },
+        { type: "S", q: "Tôi thích tổ chức các hoạt động gắn kết nội bộ, xây dựng văn hóa đội nhóm tình cảm tại sàn giao dịch." },
+        { type: "S", q: "Lắng nghe, thấu cảm và gỡ rối những khúc mắc tâm lý của khách hàng là thế mạnh lớn nhất của tôi." },
+        { type: "S", q: "Tôi đặt việc xây dựng mối quan hệ chân thành, lâu dài với khách hàng lên trên lợi ích hoa hồng trước mắt." },
+
+        /* E - Enterprising (Quản lý / Khởi nghiệp) */
+        { type: "E", q: "Tôi khao khát chốt được những 'deal' lớn, đạt doanh thu top đầu và nhận được sự ngưỡng mộ từ người khác." },
+        { type: "E", q: "Tôi rất tự tin trong việc thuyết phục, đàm phán và dẫn dắt khách hàng ra quyết định 'xuống tiền'." },
+        { type: "E", q: "Tôi thích đảm nhận vai trò Trưởng nhóm/Giám đốc sàn, quản lý và thúc đẩy đội ngũ đạt chỉ tiêu." },
+        { type: "E", q: "Sự cạnh tranh khốc liệt với các sàn đối thủ làm tôi cảm thấy hưng phấn và muốn chiến thắng." },
+        { type: "E", q: "Tôi luôn chủ động mở rộng mạng lưới quan hệ với những người có tầm ảnh hưởng, các 'cá mập' đầu tư." },
+
+        /* C - Conventional (Nghiệp vụ / Tuân thủ) */
+        { type: "C", q: "Tôi luôn rà soát rất kỹ từng câu chữ, con số trong hợp đồng đặt cọc để không xảy ra bất kỳ sai sót pháp lý nào." },
+        { type: "C", q: "Tôi thích việc lưu trữ, phân loại data khách hàng một cách có hệ thống và ngăn nắp trên phần mềm CRM." },
+        { type: "C", q: "Tôi tuân thủ nghiêm ngặt các quy trình, biểu mẫu, nội quy hành chính của công ty đưa ra." },
+        { type: "C", q: "Tôi cảm thấy an tâm khi làm việc ở một môi trường có chính sách hoa hồng minh bạch, rõ ràng bằng văn bản." },
+        { type: "C", q: "Việc theo dõi lịch thanh toán, nhắc nợ khách hàng và hoàn thiện hồ sơ giao dịch là công việc tôi làm rất xuất sắc." }
+    ];
+
+    // Trộn câu hỏi
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    const questions = shuffle([...rawQuestions]);
+
+    // Render Form
+    const quizContainer = document.getElementById('quiz-container');
+    questions.forEach((q, index) => {
+        let optionsHtml = '';
+        for(let i=1; i<=5; i++) {
+            optionsHtml += `
+                <div class="likert-btn" data-val="${i}">
+                    ${i}
+                    <input type="radio" name="q${index}" value="${i}">
+                </div>
+            `;
+        }
+        const html = `
+            <div class="q-card" id="card-q${index}">
+                <div class="q-text"><span class="q-number">${index + 1}.</span> ${q.q}</div>
+                <div class="likert-group">${optionsHtml}</div>
+            </div>
+        `;
+        quizContainer.insertAdjacentHTML('beforeend', html);
+    });
+
+    // UX Logic
+    document.querySelectorAll('.likert-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const group = this.parentElement;
+            const card = this.closest('.q-card');
+            group.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+            card.classList.remove('unanswered'); 
+            this.classList.add('selected');
+            this.querySelector('input').checked = true;
+        });
+    });
+
+    // Dữ liệu Holland
+    const hollandDict = {
+        'R': { 
+            name: "Thực Tế (Realistic)", code: "R", color: "var(--color-r)", max: 25,
+            desc: "Bạn thích hành động, làm việc với các công cụ vật lý, đồ vật thực tế và di chuyển ngoài trời. Bạn chuộng những giải pháp thực dụng và hiệu quả ngay lập tức.",
+            roles: ["Chuyên viên dẫn khách (Site Tour/Field Agent)", "Quản lý tòa nhà / Quản lý tài sản (Property Management)", "Khảo sát và định giá BĐS thực địa."]
+        },
+        'I': { 
+            name: "Nghiên Cứu (Investigative)", code: "I", color: "var(--color-i)", max: 25,
+            desc: "Bạn là người phân tích, tò mò, thích quan sát và giải quyết các vấn đề phức tạp. Bạn đưa ra quyết định dựa trên dữ liệu, logic và sự nghiên cứu kỹ lưỡng.",
+            roles: ["Chuyên viên Nghiên cứu Thị trường (Market Analyst)", "Tư vấn Đầu tư dòng tiền & Cấu trúc tài chính", "Chuyên viên Pháp lý & Đánh giá rủi ro dự án."]
+        },
+        'A': { 
+            name: "Nghệ Thuật (Artistic)", code: "A", color: "var(--color-a)", max: 25,
+            desc: "Bạn có óc sáng tạo, nhạy bén với cái đẹp, thích tự do và ghét sự rập khuôn. Bạn biết cách thổi hồn vào một dự án khô khan để tạo ra sức hút.",
+            roles: ["Chuyên viên Marketing BĐS (Content, Design, Video)", "Chuyên gia decor nhà mẫu (Home Staging)", "Tổ chức sự kiện mở bán sáng tạo (Event Conceptualization)."]
+        },
+        'S': { 
+            name: "Xã Hội (Social)", code: "S", color: "var(--color-s)", max: 25,
+            desc: "Bạn ấm áp, thấu cảm và thích giúp đỡ người khác. Bạn xây dựng lòng tin tuyệt đối từ khách hàng thông qua sự chân thành và khả năng lắng nghe thấu đáo.",
+            roles: ["Chuyên viên Chăm sóc khách hàng VIP", "Trưởng phòng Đào tạo & Nhân sự BĐS", "Trung gian hòa giải đàm phán, quản trị cộng đồng dân cư."]
+        },
+        'E': { 
+            name: "Quản Lý (Enterprising)", code: "E", color: "var(--color-e)", max: 25,
+            desc: "Bạn tràn đầy tham vọng, thích cạnh tranh, có khả năng thuyết phục và lãnh đạo xuất chúng. Bạn là 'cỗ máy in tiền' và là người dẫn dắt đội ngũ tiến lên.",
+            roles: ["Chuyên viên Chốt Sales cấp cao (Closer)", "Giám đốc Sàn Giao dịch / Trưởng phòng Kinh doanh", "Nhà đàm phán sáp nhập, mua bán dự án (M&A)."]
+        },
+        'C': { 
+            name: "Nghiệp Vụ (Conventional)", code: "C", color: "var(--color-c)", max: 25,
+            desc: "Bạn là người ngăn nắp, làm việc có hệ thống, chú ý đến từng chi tiết nhỏ và luôn tuân thủ luật lệ. Bạn bảo vệ sàn giao dịch khỏi những lỗ hổng chết người.",
+            roles: ["Chuyên viên Hành chính / Hợp đồng / Thủ tục (Admin Sales)", "Kiểm soát viên Tuân thủ / Thu hồi công nợ", "Quản trị cơ sở dữ liệu khách hàng (CRM Manager)."]
+        }
+    };
+
+    // Chấm điểm
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        let scores = { 'R': 0, 'I': 0, 'A': 0, 'S': 0, 'E': 0, 'C': 0 };
+        let allAnswered = true;
+
+        questions.forEach((qObj, index) => {
+            const card = document.getElementById(`card-q${index}`);
+            const selected = card.querySelector(`input[name="q${index}"]:checked`);
+            
+            if(selected) {
+                scores[qObj.type] += parseInt(selected.value);
+            } else {
+                allAnswered = false;
+                card.classList.add('unanswered');
+            }
+        });
+
+        const errorMsg = document.getElementById('error-msg');
+        if(!allAnswered) {
+            errorMsg.style.display = 'block';
+            errorMsg.scrollIntoView({behavior: 'smooth', block: 'center'});
+            return;
+        } else {
+            errorMsg.style.display = 'none';
+        }
+
+        document.getElementById('result-section').style.display = 'block';
+        const chartBox = document.getElementById('chart-container');
+        const gridBox = document.getElementById('analysis-grid');
+        
+        chartBox.innerHTML = '';
+        gridBox.innerHTML = '';
+
+        // Sắp xếp lấy Top 3
+        let sortedHolland = Object.keys(scores).map(key => {
+            return {
+                key: key,
+                score: scores[key],
+                percent: Math.round((scores[key] / 25) * 100),
+                data: hollandDict[key]
+            };
+        }).sort((a, b) => b.score - a.score);
+
+        // Render Mã Holland (Top 3)
+        const top3 = sortedHolland.slice(0, 3);
+        document.getElementById('holland-code-text').innerText = top3.map(t => t.key).join(' - ');
+
+        // Render Chart & Cards cho toàn bộ 6 nhóm
+        sortedHolland.forEach((item, index) => {
+            const isTop3 = index < 3;
+            const opacity = isTop3 ? '1' : '0.6';
+
+            // Biểu đồ
+            const chartHtml = `
+                <div class="bar-row" style="opacity: ${opacity}">
+                    <div class="bar-label" style="color: ${item.data.color}">${item.data.name}</div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: 0%; background: ${item.data.color}" data-target="${item.percent}"></div>
+                    </div>
+                    <div class="bar-score" style="color: ${item.data.color}">${item.score} đ</div>
+                </div>
+            `;
+            chartBox.insertAdjacentHTML('beforeend', chartHtml);
+
+            // Chỉ hiển thị giải thích chi tiết cho Top 3
+            if(isTop3) {
+                let rolesHtml = item.data.roles.map(r => `<li>${r}</li>`).join('');
+                const cardHtml = `
+                    <div class="trait-card" style="border-left-color: ${item.data.color}">
+                        <div class="trait-title" style="color: ${item.data.color}">
+                            Top ${index + 1}: ${item.data.name}
+                        </div>
+                        <div class="trait-desc">${item.data.desc}</div>
+                        <div class="trait-app">
+                            <strong>🎯 Vị trí đề xuất trong BĐS:</strong>
+                            <ul>${rolesHtml}</ul>
+                        </div>
+                    </div>
+                `;
+                gridBox.insertAdjacentHTML('beforeend', cardHtml);
+            }
+        });
+
+        // Animation
+        setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(bar => {
+                bar.style.width = bar.getAttribute('data-target') + '%';
+            });
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+    });
+</script>
+
+</body>
+</html>
